@@ -9,7 +9,7 @@ import Version3 from './sidebars/ecology/vue/version3';
 export default defineConfig({
   title: 'notes',
   description: 'A VitePress Site',
-  base: '/blog/',
+  base: '/blogs/',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     outline: 'deep',

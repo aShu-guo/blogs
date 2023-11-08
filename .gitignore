@@ -29,4 +29,6 @@ yarn-error.log*
 *.sw?
 ./packages
 ./history
+
 docs/.vitepress/dist
+docs/.vitepress/cache/*
