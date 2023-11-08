@@ -12,29 +12,27 @@
   <div class="search-box"></div>
 </template>
 <script lang="ts" setup>
-import {defineExpose} from 'vue'
+import { defineExpose } from 'vue';
 
 const submit = async () => {
-  return Promise.resolve('我被提交了')
-}
+  return Promise.resolve('我被提交了');
+};
 defineExpose({
-  submit
-})
+  submit,
+});
 </script>
 ```
 
 ```vue
-
 <template>
   <Search ref="searchRef"></Search>
 </template>
 <script lang="ts" setup>
-import {ref} from 'vue'
-import Search from './Search/index.vue'
+import { ref } from 'vue';
+import Search from './Search/index.vue';
 
 // 变量名需要与组件中的ref属性值保持一致
 const searchRef = ref<InstanceType<typeof Search> | null>(null);
-
 </script>
 ```
 
@@ -48,36 +46,32 @@ const searchRef = ref<InstanceType<typeof Search> | null>(null);
   <div class="search-box"></div>
 </template>
 <script lang="ts">
-
 export default {
   setup() {
     const submit = async () => {
-      return Promise.resolve('我被提交了')
-    }
+      return Promise.resolve('我被提交了');
+    };
     return {
-      submit
-    }
-  }
-}
+      submit,
+    };
+  },
+};
 </script>
 ```
 
 ```vue
-
 <template>
   <Search ref="searchRef"></Search>
 </template>
 <script lang="ts">
-import {ref} from 'vue'
-import Search from './Search/index.vue'
+import { ref } from 'vue';
+import Search from './Search/index.vue';
 
 export default {
   setup() {
-
-// 变量名需要与组件中的ref属性值保持一致
+    // 变量名需要与组件中的ref属性值保持一致
     const searchRef = ref<InstanceType<typeof Search> | null>(null);
-  }
-}
-
+  },
+};
 </script>
 ```

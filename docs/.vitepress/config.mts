@@ -4,6 +4,7 @@ import MvvmNavs from './navs/mvvm';
 // 导出sidebars
 import RfcTranslate from './sidebars/mvvm/rfc-translate';
 import Version2 from './sidebars/mvvm/version2';
+import Version3 from './sidebars/mvvm/version3';
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: 'notes',
@@ -15,6 +16,7 @@ export default defineConfig({
     sidebar: {
       ...RfcTranslate,
       ...Version2,
+      ...Version3,
     },
 
     socialLinks: [{ icon: 'github', link: 'https://github.com/vuejs/vitepress' }],
