@@ -3,8 +3,8 @@
 layout: home
 
 hero:
-  name: "notes"
-  text: "A VitePress Site"
+  name: "Ashu_Guo"
+#  text: "Technology Blog"
   tagline: My great project tagline
   actions:
     - theme: brand
