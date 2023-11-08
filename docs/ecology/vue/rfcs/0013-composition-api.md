@@ -7,33 +7,30 @@
 ## 基础用例
 
 ```vue
-
 <template>
-  <button @click="increment">
-    Count is: {{ state.count }}, double is: {{ state.double }}
-  </button>
+  <button @click="increment">Count is: {{ state.count }}, double is: {{ state.double }}</button>
 </template>
 
 <script>
-import {reactive, computed} from 'vue'
+import { reactive, computed } from 'vue';
 
 export default {
   setup() {
     const state = reactive({
       count: 0,
-      double: computed(() => state.count * 2)
-    })
+      double: computed(() => state.count * 2),
+    });
 
     function increment() {
-      state.count++
+      state.count++;
     }
 
     return {
       state,
-      increment
-    }
-  }
-}
+      increment,
+    };
+  },
+};
 </script>
 ```
 
@@ -79,12 +76,12 @@ API类型问题的更多[细节](#类API的类型问题)）
 让我们从一个简单的任务开始：声明一些响应式状态。
 
 ```js
-import {reactive} from 'vue'
+import { reactive } from 'vue';
 
 // reactive state
 const state = reactive({
-    count: 0
-})
+  count: 0,
+});
 ```
 
 `reactive`和2.x中的`Vue.observable()`功能相同，更名以避免在使用RxJs时造成困惑。这里，返回的`state`是一个响应式的对象，所有的Vue用户应该很熟悉。
@@ -94,15 +91,15 @@ const state = reactive({
 API：
 
 ```js
-import {reactive, watchEffect} from 'vue'
+import { reactive, watchEffect } from 'vue';
 
 const state = reactive({
-    count: 0
-})
+  count: 0,
+});
 
 watchEffect(() => {
-    document.body.innerHTML = `count is ${state.count}`
-})
+  document.body.innerHTML = `count is ${state.count}`;
+});
 ```
 
 `watchEffect`接收一个函数来执行想要的副作用（在这个用例中，设置`innerHTML`
@@ -119,38 +116,35 @@ innerHTML），它使用了这些响应式属性。
 
 ```js
 function increment() {
-    state.count++
+  state.count++;
 }
 
-document.body.addEventListener('click', increment)
+document.body.addEventListener('click', increment);
 ```
 
 但是在Vue模板系统中，我们并不需要纠结`innerHTML`或者手动关联事件监听器。使用一个假想的`renderTemplate`
 函数简化上述例子，以便我们关注响应副作用：
 
 ```js
-import {reactive, watchEffect} from 'vue'
+import { reactive, watchEffect } from 'vue';
 
 const state = reactive({
-    count: 0
-})
+  count: 0,
+});
 
 function increment() {
-    state.count++
+  state.count++;
 }
 
 const renderContext = {
-    state,
-    increment
-}
+  state,
+  increment,
+};
 
 watchEffect(() => {
-    // hypothetical internal code, NOT actual API
-    renderTemplate(
-        `<button @click="increment">{{ state.count }}</button>`,
-        renderContext
-    )
-})
+  // hypothetical internal code, NOT actual API
+  renderTemplate(`<button @click="increment">{{ state.count }}</button>`, renderContext);
+});
 ```
 
 #### 计算属性和Refs
@@ -158,13 +152,13 @@ watchEffect(() => {
 有时我们需要依赖其他属性的属性（在Vue中它被处理为*计算属性*）。我们可以使用`computed` API直接创建一个计算属性：
 
 ```js
-import {reactive, computed} from 'vue'
+import { reactive, computed } from 'vue';
 
 const state = reactive({
-    count: 0
-})
+  count: 0,
+});
 
-const double = computed(() => state.count * 2)
+const double = computed(() => state.count * 2);
 ```
 
 `computed`返回的是什么？如果让我们猜测下`computed`内部是怎么实现的，我们可能想到一些如下：
@@ -172,11 +166,11 @@ const double = computed(() => state.count * 2)
 ```js
 // simplified pseudo code
 function computed(getter) {
-    let value
-    watchEffect(() => {
-        value = getter()
-    })
-    return value
+  let value;
+  watchEffect(() => {
+    value = getter();
+  });
+  return value;
 }
 ```
 
@@ -190,13 +184,13 @@ function computed(getter) {
 ```js
 // simplified pseudo code
 function computed(getter) {
-    const ref = {
-        value: null
-    }
-    watchEffect(() => {
-        ref.value = getter()
-    })
-    return ref
+  const ref = {
+    value: null,
+  };
+  watchEffect(() => {
+    ref.value = getter();
+  });
+  return ref;
 }
 ```
 
@@ -205,13 +199,13 @@ function computed(getter) {
 来访问它：
 
 ```js
-const double = computed(() => state.count * 2)
+const double = computed(() => state.count * 2);
 
 watchEffect(() => {
-    console.log(double.value)
-}) // -> 0
+  console.log(double.value);
+}); // -> 0
 
-state.count++ // -> 2
+state.count++; // -> 2
 ```
 
 `double`是一个我们成为"ref"的对象，因为它可以作为持有内部值的响应式引用。
@@ -221,52 +215,49 @@ state.count++ // -> 2
 除了计算属性，我们也可以使用`ref` API直接创建普通可变引用：
 
 ```js
-const count = ref(0)
-console.log(count.value) // 0
+const count = ref(0);
+console.log(count.value); // 0
 
-count.value++
-console.log(count.value) // 1
+count.value++;
+console.log(count.value); // 1
 ```
 
 #### ref展开
 
-我们可以在渲染上下文中将ref作为属性暴露出去。在内部，Vue将会特殊处理它，以便当在渲染上下文中遇到ref时直接暴露它内部的值。这也意味着，在模板中我们可以直接使用`{{count}}`
-，而不是`{{count.value}}`。
+我们可以在渲染上下文中将ref作为属性暴露出去。在内部，Vue将会特殊处理它，以便当在渲染上下文中遇到ref时直接暴露它内部的值。这也意味着，在模板中我们可以直接使用<span v-pre>{{count}}</span>
+，而不是<span v-pre>{{count.value}}</span>。
 
 这是相同的计算器示例，使用`ref`而不是`reactive`：
 
 ```js
-import {ref, watch} from 'vue'
+import { ref, watch } from 'vue';
 
-const count = ref(0)
+const count = ref(0);
 
 function increment() {
-    count.value++
+  count.value++;
 }
 
 const renderContext = {
-    count,
-    increment
-}
+  count,
+  increment,
+};
 
 watchEffect(() => {
-    renderTemplate(
-        `<button @click="increment">{{ count }}</button>`,
-        renderContext
-    )
-})
+  renderTemplate(`<button @click="increment">{{ count }}</button>`, renderContext);
+});
 ```
 
 另外，当ref作为reactive对象的其中的一个属性时，使用时也会自动解构：
 
 ```js
 const state = reactive({
-    count: 0,
-    double: computed(() => state.count * 2)
-})
+  count: 0,
+  double: computed(() => state.count * 2),
+});
 
 // no need to use `state.double.value`
-console.log(state.double)
+console.log(state.double);
 ```
 
 #### 在组件中使用
@@ -274,34 +265,34 @@ console.log(state.double)
 我们的代码到目前为止提供了一个可用的UI，它可以基于用户输入更新DOM（但是这个代码只能运行一次，而且无法复用）。如果我们想要复用这段逻辑，合理的下一步似乎是将它放进函数中：
 
 ```js
-import {reactive, computed, watchEffect} from 'vue'
+import { reactive, computed, watchEffect } from 'vue';
 
 function setup() {
-    const state = reactive({
-        count: 0,
-        double: computed(() => state.count * 2)
-    })
+  const state = reactive({
+    count: 0,
+    double: computed(() => state.count * 2),
+  });
 
-    function increment() {
-        state.count++
-    }
+  function increment() {
+    state.count++;
+  }
 
-    return {
-        state,
-        increment
-    }
+  return {
+    state,
+    increment,
+  };
 }
 
-const renderContext = setup()
+const renderContext = setup();
 
 watchEffect(() => {
-    renderTemplate(
-        `<button @click="increment">
+  renderTemplate(
+    `<button @click="increment">
       Count is: {{ state.count }}, double is: {{ state.double }}
     </button>`,
-        renderContext
-    )
-})
+    renderContext,
+  );
+});
 ```
 
 > 注意上面的代码是如何不依赖组件实例的。确实，到目前为止介绍的API都可以在组件上下文外使用，允许我们在广阔的场景中使用Vue的响应式系统。
@@ -309,33 +300,30 @@ watchEffect(() => {
 现在如果我们放弃调用`setup()`，创建watcher和渲染模板到框架中，我们可以仅使用`setup()`函数和模板定义一个组件：
 
 ```vue
-
 <template>
-  <button @click="increment">
-    Count is: {{ state.count }}, double is: {{ state.double }}
-  </button>
+  <button @click="increment">Count is: {{ state.count }}, double is: {{ state.double }}</button>
 </template>
 
 <script>
-import {reactive, computed} from 'vue'
+import { reactive, computed } from 'vue';
 
 export default {
   setup() {
     const state = reactive({
       count: 0,
-      double: computed(() => state.count * 2)
-    })
+      double: computed(() => state.count * 2),
+    });
 
     function increment() {
-      state.count++
+      state.count++;
     }
 
     return {
       state,
-      increment
-    }
-  }
-}
+      increment,
+    };
+  },
+};
 </script>
 ```
 
@@ -353,15 +341,15 @@ export default {
 APIs来执行副作用。当在不同的生命周期钩子中执行副作用时，我们可以使用专用的`onXXX` APIs（是现存生命周期选项中的镜像）：
 
 ```js
-import {onMounted} from 'vue'
+import { onMounted } from 'vue';
 
 export default {
-    setup() {
-        onMounted(() => {
-            console.log('component is mounted!')
-        })
-    }
-}
+  setup() {
+    onMounted(() => {
+      console.log('component is mounted!');
+    });
+  },
+};
 ```
 
 这些生命周期函数只能在`setup`执行时使用。它会使用内部全局状态自动检测出被调用`setup`钩子的组件实例。特意以这种设计，来减少逻辑提取到外部函数的性能损耗。
@@ -412,33 +400,33 @@ API的代码分辨出这些逻辑是哪个关注点的一部分么？这确实�
 
 ```js
 function useCreateFolder(openFolder) {
-    // originally data properties
-    const showNewFolder = ref(false)
-    const newFolderName = ref('')
+  // originally data properties
+  const showNewFolder = ref(false);
+  const newFolderName = ref('');
 
-    // originally computed property
-    const newFolderValid = computed(() => isValidMultiName(newFolderName.value))
+  // originally computed property
+  const newFolderValid = computed(() => isValidMultiName(newFolderName.value));
 
-    // originally a method
-    async function createFolder() {
-        if (!newFolderValid.value) return
-        const result = await mutate({
-            mutation: FOLDER_CREATE,
-            variables: {
-                name: newFolderName.value
-            }
-        })
-        openFolder(result.data.folderCreate.path)
-        newFolderName.value = ''
-        showNewFolder.value = false
-    }
+  // originally a method
+  async function createFolder() {
+    if (!newFolderValid.value) return;
+    const result = await mutate({
+      mutation: FOLDER_CREATE,
+      variables: {
+        name: newFolderName.value,
+      },
+    });
+    openFolder(result.data.folderCreate.path);
+    newFolderName.value = '';
+    showNewFolder.value = false;
+  }
 
-    return {
-        showNewFolder,
-        newFolderName,
-        newFolderValid,
-        createFolder
-    }
+  return {
+    showNewFolder,
+    newFolderName,
+    newFolderValid,
+    createFolder,
+  };
 }
 ```
 
@@ -453,23 +441,29 @@ function useCreateFolder(openFolder) {
 
 ```js
 export default {
-    setup() { // ...
-    }
+  setup() {
+    // ...
+  },
+};
+
+function useCurrentFolderData(networkState) {
+  // ...
 }
 
-function useCurrentFolderData(networkState) { // ...
+function useFolderNavigation({ networkState, currentFolderData }) {
+  // ...
 }
 
-function useFolderNavigation({networkState, currentFolderData}) { // ...
+function useFavoriteFolder(currentFolderData) {
+  // ...
 }
 
-function useFavoriteFolder(currentFolderData) { // ...
+function useHiddenFolders() {
+  // ...
 }
 
-function useHiddenFolders() { // ...
-}
-
-function useCreateFolder(openFolder) { // ...
+function useCreateFolder(openFolder) {
+  // ...
 }
 ```
 
@@ -477,38 +471,38 @@ function useCreateFolder(openFolder) { // ...
 
 ```js
 export default {
-    setup() {
-        // Network
-        const {networkState} = useNetworkState()
+  setup() {
+    // Network
+    const { networkState } = useNetworkState();
 
-        // Folder
-        const {folders, currentFolderData} = useCurrentFolderData(networkState)
-        const folderNavigation = useFolderNavigation({networkState, currentFolderData})
-        const {favoriteFolders, toggleFavorite} = useFavoriteFolders(currentFolderData)
-        const {showHiddenFolders} = useHiddenFolders()
-        const createFolder = useCreateFolder(folderNavigation.openFolder)
+    // Folder
+    const { folders, currentFolderData } = useCurrentFolderData(networkState);
+    const folderNavigation = useFolderNavigation({ networkState, currentFolderData });
+    const { favoriteFolders, toggleFavorite } = useFavoriteFolders(currentFolderData);
+    const { showHiddenFolders } = useHiddenFolders();
+    const createFolder = useCreateFolder(folderNavigation.openFolder);
 
-        // Current working directory
-        resetCwdOnLeave()
-        const {updateOnCwdChanged} = useCwdUtils()
+    // Current working directory
+    resetCwdOnLeave();
+    const { updateOnCwdChanged } = useCwdUtils();
 
-        // Utils
-        const {slicePath} = usePathUtils()
+    // Utils
+    const { slicePath } = usePathUtils();
 
-        return {
-            networkState,
-            folders,
-            currentFolderData,
-            folderNavigation,
-            favoriteFolders,
-            toggleFavorite,
-            showHiddenFolders,
-            createFolder,
-            updateOnCwdChanged,
-            slicePath
-        }
-    }
-}
+    return {
+      networkState,
+      folders,
+      currentFolderData,
+      folderNavigation,
+      favoriteFolders,
+      toggleFavorite,
+      showHiddenFolders,
+      createFolder,
+      updateOnCwdChanged,
+      slicePath,
+    };
+  },
+};
 ```
 
 当然，我们在使用Options API时从来没有写过这样的代码。但是注意setup函数读起来大体描述了组件提供了哪些功能（这在基于option
@@ -525,41 +519,41 @@ API。你可以仅简单的将它作为函数导出，复用组件的任何一�
 让我们来看一个例子：跟踪鼠标位置。
 
 ```js
-import {ref, onMounted, onUnmounted} from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue';
 
 export function useMousePosition() {
-    const x = ref(0)
-    const y = ref(0)
+  const x = ref(0);
+  const y = ref(0);
 
-    function update(e) {
-        x.value = e.pageX
-        y.value = e.pageY
-    }
+  function update(e) {
+    x.value = e.pageX;
+    y.value = e.pageY;
+  }
 
-    onMounted(() => {
-        window.addEventListener('mousemove', update)
-    })
+  onMounted(() => {
+    window.addEventListener('mousemove', update);
+  });
 
-    onUnmounted(() => {
-        window.removeEventListener('mousemove', update)
-    })
+  onUnmounted(() => {
+    window.removeEventListener('mousemove', update);
+  });
 
-    return {x, y}
+  return { x, y };
 }
 ```
 
 这是在组件中使用这个函数的方式：
 
 ```js
-import {useMousePosition} from './mouse'
+import { useMousePosition } from './mouse';
 
 export default {
-    setup() {
-        const {x, y} = useMousePosition()
-        // other logic...
-        return {x, y}
-    }
-}
+  setup() {
+    const { x, y } = useMousePosition();
+    // other logic...
+    return { x, y };
+  },
+};
 ```
 
 在基于Composition API的文件浏览器例子中，我们在内部文件中提取了一些工具代码，因为我们发现它们对于其他组件来说也是很有用的。
@@ -591,18 +585,18 @@ Composition API可以与现有Options API一起使用。
 当使用Composition API时，没有`this`上下文。取而代之的是，插件将在内部提供provide和inject并暴露出组合函数。以下是插件的假设代码：
 
 ```js
-const StoreSymbol = Symbol()
+const StoreSymbol = Symbol();
 
 export function provideStore(store) {
-    provide(StoreSymbol, store)
+  provide(StoreSymbol, store);
 }
 
 export function useStore() {
-    const store = inject(StoreSymbol)
-    if (!store) {
-        // throw error, no store provided
-    }
-    return store
+  const store = inject(StoreSymbol);
+  if (!store) {
+    // throw error, no store provided
+  }
+  return store;
 }
 ```
 
@@ -612,17 +606,17 @@ export function useStore() {
 // provide store at component root
 //
 const App = {
-    setup() {
-        provideStore(store)
-    }
-}
+  setup() {
+    provideStore(store);
+  },
+};
 
 const Child = {
-    setup() {
-        const store = useStore()
-        // use the store
-    }
-}
+  setup() {
+    const store = useStore();
+    // use the store
+  },
+};
 ```
 
 注意store也可以通过在[全局API变更](./0009-global-api-change.md)的RFC中提议的app级别的provide
@@ -659,25 +653,25 @@ API。只使用其中一个很可能会导致深奥的解决方法或者重复�
 
 ```js
 // style 1: separate variables
-let x = 0
-let y = 0
+let x = 0;
+let y = 0;
 
 function updatePosition(e) {
-    x = e.pageX
-    y = e.pageY
+  x = e.pageX;
+  y = e.pageY;
 }
 
 // --- compared to ---
 
 // style 2: single object
 const pos = {
-    x: 0,
-    y: 0
-}
+  x: 0,
+  y: 0,
+};
 
 function updatePosition(e) {
-    pos.x = e.pageX
-    pos.y = e.pageY
+  pos.x = e.pageX;
+  pos.y = e.pageY;
 }
 ```
 
@@ -689,55 +683,55 @@ function updatePosition(e) {
 ```js
 // composition function
 function useMousePosition() {
-    const pos = reactive({
-        x: 0,
-        y: 0
-    })
+  const pos = reactive({
+    x: 0,
+    y: 0,
+  });
 
-    // ...
-    return pos
+  // ...
+  return pos;
 }
 
 // consuming component
 export default {
-    setup() {
-        // reactivity lost!
-        const {x, y} = useMousePosition()
-        return {
-            x,
-            y
-        }
+  setup() {
+    // reactivity lost!
+    const { x, y } = useMousePosition();
+    return {
+      x,
+      y,
+    };
 
-        // reactivity lost!
-        return {
-            ...useMousePosition()
-        }
+    // reactivity lost!
+    return {
+      ...useMousePosition(),
+    };
 
-        // this is the only way to retain reactivity.
-        // you must return `pos` as-is and reference x and y as `pos.x` and `pos.y`
-        // in the template.
-        return {
-            pos: useMousePosition()
-        }
-    }
-}
+    // this is the only way to retain reactivity.
+    // you must return `pos` as-is and reference x and y as `pos.x` and `pos.y`
+    // in the template.
+    return {
+      pos: useMousePosition(),
+    };
+  },
+};
 ```
 
 `toRefs` API可以解决上述问题（将响应式对象中的每个属性都转换为ref实例）：
 
 ```js
 function useMousePosition() {
-    const pos = reactive({
-        x: 0,
-        y: 0
-    })
+  const pos = reactive({
+    x: 0,
+    y: 0,
+  });
 
-    // ...
-    return toRefs(pos)
+  // ...
+  return toRefs(pos);
 }
 
 // x & y are now refs!
-const {x, y} = useMousePosition()
+const { x, y } = useMousePosition();
 ```
 
 来总结下，这里有两种可行的风格：
@@ -774,8 +768,8 @@ API提高了代码质量的上线，但是也降低了下限。
 Controller之间的最大区别在于它不依赖于共享上下文作用域。这使得将逻辑拆分为单独的函数变得非常容易，这是 JavaScript
 代码组织的核心机制。
 
-任何JavaScript程序都开始于一个入口文件（将其视为程序的`setup()`）。我们基于逻辑关注点拆分代码到多个函数和模块中来组织程序。*
-*Composition API提供给我们以这种方式来实现Vue组件**。换句话说，写出组织良好的JavaScript代码的技巧同样适用于使用Composition
+任何JavaScript程序都开始于一个入口文件（将其视为程序的`setup()`）。我们基于逻辑关注点拆分代码到多个函数和模块中来组织程序。\*
+\*Composition API提供给我们以这种方式来实现Vue组件\*\*。换句话说，写出组织良好的JavaScript代码的技巧同样适用于使用Composition
 API精心良好的Vue代码。
 
 ## 采取的策略
@@ -804,13 +798,13 @@ Composition API将定位为高级功能，因为它旨在解决的问题主要�
 
 ```typescript
 interface Props {
-    message: string
+  message: string;
 }
 
 class App extends Component<Props> {
-    static props = {
-        message: String
-    }
+  static props = {
+    message: String,
+  };
 }
 ```
 
@@ -850,47 +844,45 @@ API写出的代码：
 #### Vue
 
 ```vue
-
 <script>
-import {ref, watchEffect, onMounted} from 'vue'
+import { ref, watchEffect, onMounted } from 'vue';
 
 export default {
   setup() {
-    const count = ref(0)
+    const count = ref(0);
 
     function increment() {
-      count.value++
+      count.value++;
     }
 
-    watchEffect(() => console.log(count.value))
+    watchEffect(() => console.log(count.value));
 
-    onMounted(() => console.log('mounted!'))
+    onMounted(() => console.log('mounted!'));
 
     return {
       count,
-      increment
-    }
-  }
-}
+      increment,
+    };
+  },
+};
 </script>
 ```
 
 #### Svelte
 
 ```vue
-
 <script>
-import {onMount} from 'svelte'
+import { onMount } from 'svelte';
 
-let count = 0
+let count = 0;
 
 function increment() {
-  count++
+  count++;
 }
 
-$: console.log(count)
+$: console.log(count);
 
-onMount(() => console.log('mounted!'))
+onMount(() => console.log('mounted!'));
 </script>
 ```
 
