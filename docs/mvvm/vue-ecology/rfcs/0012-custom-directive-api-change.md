@@ -88,7 +88,7 @@ return withDirectives(h('div'), [
 这里的`vFoo`将会是用户写的指令对象，它包含像`mounted`和`updated`那样的hook。
 
 `widthDirectives`
-返回一个包裹用户hook和作为vnode生命周期注入的hook的VNode的拷贝（参考[render函数API变更](/vue-ecology/rfcs/0008-render-function-api-change.md)
+返回一个包裹用户hook和作为vnode生命周期注入的hook的VNode的拷贝（参考[render函数API变更](./0008-render-function-api-change.md)
 的RFC获取更多细节）。
 
 ```js

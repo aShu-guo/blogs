@@ -4,7 +4,7 @@
 
 调整在自定义组件上v-model API的使用方式。
 
-这次变动建立在RFC[#5](/vue-ecology/rfcs/0005-replace-v-bind-sync-with-v-model-argument.md)上（用`v-model`参数替换`v-bind`
+这次变动建立在RFC[#5](./0005-replace-v-bind-sync-with-v-model-argument.md)上（用`v-model`参数替换`v-bind`
 的`.sync`修饰符）。
 
 ## 基础用例
@@ -30,7 +30,7 @@ h(Comp, {
 。在实践中，我们看到一些组件需要同步许多属性的值，并且这些属性必须通过`v-bind.sync`
 来同步值。我们注意到，从根本上来讲`v-model`
 和`v-bind.sync`
-是在做同样的事情，并且可以通过允许v-model接收参数来合并到同一个结构中（像[#5](/vue-ecology/rfcs/0005-replace-v-bind-sync-with-v-model-argument.md)
+是在做同样的事情，并且可以通过允许v-model接收参数来合并到同一个结构中（像[#5](./0005-replace-v-bind-sync-with-v-model-argument.md)
 提议的那样）。
 
 ## 详细设计
@@ -46,11 +46,11 @@ h(Comp, {
 
 如果一个组件想要支持无参数形式的`v-model`，它应该声明一个名称为`modelValue`
 的props。为了同步值回父组件，子组件应该抛出一个名为`"update:modelValu"`
-的事件（参考[render函数API变更](/vue-ecology/rfcs/0008-render-function-api-change.md)中的新VNode数据结构中的更多细节）。
+的事件（参考[render函数API变更](./0008-render-function-api-change.md)中的新VNode数据结构中的更多细节）。
 
 props和事件的默认编译前缀`model`可以避免与其他props和事件冲突。
 
-[RFC 5#](/vue-ecology/rfcs/0005-replace-v-bind-sync-with-v-model-argument.md)
+[RFC 5#](./0005-replace-v-bind-sync-with-v-model-argument.md)
 建议支持v-model接收参数的能力。使用这个参数时，意味着`v-model`应该绑定一个props。`v-model:value="foo"`被编译成：
 
 ```js

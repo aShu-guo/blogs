@@ -625,7 +625,7 @@ const Child = {
 }
 ```
 
-注意store也可以通过在[全局API变更](/vue-ecology/rfcs/0009-global-api-change.md)的RFC中提议的app级别的provide
+注意store也可以通过在[全局API变更](./0009-global-api-change.md)的RFC中提议的app级别的provide
 API提供，但是在组件消费时，useStore风格API是相同的。
 
 ## 缺点

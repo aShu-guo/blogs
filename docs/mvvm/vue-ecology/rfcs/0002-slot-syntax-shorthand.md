@@ -2,7 +2,7 @@
 
 ## 概要
 
-新增`v-slot`的简写语法，请确保先阅读[rfc-0001](/vue-ecology/rfcs/0001-new-slot-syntax.md)。
+新增`v-slot`的简写语法，请确保先阅读[rfc-0001](./0001-new-slot-syntax.md)。
 
 ## 基本示例
 

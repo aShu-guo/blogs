@@ -6,7 +6,7 @@
 
 - 全局改变Vue行为的全局API现在被迁移到通过`createApp`方法创建的**app示例**上，并且它们的作用只会在app实例中体现。
 - 没有改变Vue行为的全局API（例如：nextTick和[高阶响应式API](https://github.com/vuejs/rfcs/pull/22)
-  ）现在通过[具名导出](/vue-ecology/rfcs/0004-global-api-treeshaking.html)
+  ）现在通过[具名导出](./0004-global-api-treeshaking.html)
 
 ## 基础用例
 
@@ -102,7 +102,7 @@ app实例暴露出一个当前全局API的子集。基础的规则是任何全�
         - `Vue.mixin` 变更为 `app.mixin`。
         - `Vue.use` 变更为 `app.use`。
 
-另外没有全局改变行为的全局API现在建议通过[具名导出](/vue-ecology/rfcs/0004-global-api-treeshaking.html)。
+另外没有全局改变行为的全局API现在建议通过[具名导出](./0004-global-api-treeshaking.html)。
 
 唯一的例外是`Vue.extend`。因为全局`Vue`不再是一个新能力的构造函数，`Vue.extend`作为构造函数的拓展也不再有意义。
 
