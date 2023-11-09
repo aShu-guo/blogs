@@ -7,7 +7,7 @@ export default [
         items: [
           { text: '计算机网络', link: '/base/network/' },
           { text: 'markdown', link: '/base/markdown/' },
-          { text: 'Git', link: '/base/git/' },
+          { text: '版本控制工具', link: '/base/version-control/' },
         ],
       },
       {
