@@ -65,14 +65,19 @@
 ### 标准化
 
 向量中的值除以向量的长度，最终得到标准化后的向量，任何向量标准化后的取值范围在0～1之间
+![img.png](/imgs/computes-course/vector-normalize-2.png)
 
 #### 几何意义解释
+
+标准化后的向量一定在长度为1的单位圆内（在三维坐标中是单位球）
 
 ![img.png](/imgs/computes-course/vector-normalize.png)
 
 ### 加减规则
 
 相同维度的向量支持相互加减，结果的维度与原向量维度相同。两个向量相加减，将向量中对应维度的值相加减即可。其中减法可以理解为加一个负向量
+
+![img.png](/imgs/computes-course/vector-plus-2.png)
 
 #### 几何意义解释
 
@@ -95,9 +100,12 @@
 
 两向量相减得到的向量表达式，再计算出长度即是两向量之间距离
 
+![img.png](/imgs/computes-course/vector-length-1.png)
+
 ### 点乘
 
 又称为内积，两个相同维度的向量依据位置挨个相乘，将每个值相加的结果为点乘
+![img.png](/imgs/computes-course/vector-point-1.png)
 
 #### 几何意义解释
 
@@ -141,6 +149,8 @@
 向量v x 向量n = -(向量n x 向量v)
 ```
 
+代数计算公式：
+
 ![img.png](/imgs/computes-course/vector-cross.png)
 ![img.png](/imgs/computes-course/vector-cross-2.png)
 
@@ -154,10 +164,9 @@
 ![img.png](/imgs/computes-course/vector-cross-5.png)
 
 1. 叉乘向量的长度等于向量a、向量b构成平行四边形的面积
-2. 计算公式，n向量为向量a、向量b构成平面的单位向量
+2. 几何计算公式，n向量为向量a、向量b构成平面的单位向量
 
 ![img.png](/imgs/computes-course/vector-cross-4.png)
-
 
 :::info
 计算顺序：叉乘、点乘、乘除、加减
