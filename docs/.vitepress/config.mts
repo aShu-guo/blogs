@@ -16,6 +16,7 @@ import Git from './sidebars/base/version-control';
 import ComputerOrganization from './sidebars/courses/computer-organization';
 import Containerization from './sidebars/server/containerization';
 import Database from './sidebars/server/database';
+import ComputerGraphics from './sidebars/courses/computer-graphics';
 import Nest from './sidebars/server/nest';
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -23,12 +24,13 @@ export default defineConfig({
   description: 'A VitePress Site',
   base: '/blogs/',
   lastUpdated: true,
+  sitemap: { hostname: 'https://ashu-guo.github.io/blogs/' },
   themeConfig: {
     logo: { dark: '/logo-dark.jpeg', light: '/logo.jpeg' },
     // https://vitepress.dev/reference/default-theme-config
     outline: 'deep',
     editLink: {
-      pattern: 'https://github.com/aShu-guo/blogs/docs/:path',
+      pattern: 'https://github.com/aShu-guo/blogs/tree/master/docs/:path',
     },
     search: { provider: 'local' },
     nav: [...MvvmNavs, ...BaseNavs, ...CoursesNavs, ...ServerNavs, ...HybridAppNavs],
@@ -44,6 +46,8 @@ export default defineConfig({
       ...Containerization,
       ...Network,
       ...Database,
+      ...ComputerGraphics,
+      ...Nest,
     },
 
     socialLinks: [{ icon: 'github', link: 'https://github.com/aShu-guo/blogs' }],

@@ -6,7 +6,7 @@
 
 ## $listener 和 $attrs
 
-### vue-2.x
+### vue-2.x <Badge type="tip" text="^2.x" />
 
 $listener: 包含传入当前组件所有`非native`事件的对象。
 $attrs: 包含了父组件传递给当前组件但在当前组件没有声明的`props`，不包括`class`、`style`
@@ -14,7 +14,7 @@ $attrs: 包含了父组件传递给当前组件但在当前组件没有声明的
 <iframe src="https://codesandbox.io/embed/busy-mcclintock-7gg85t?fontsize=14&hidenavigation=1&theme=dark" style="width:100%; height:300px; border:0; border-radius: 4px; overflow:hidden;" title="busy-mcclintock-7gg85t" allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking" sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts">
 </iframe>
 
-### vue-3.x
+### vue-3.x <Badge type="tip" text="^3.x" />
 
 $listener: 包含当前组件没有声明的所有`props`，而且包括`listener`
 $attrs: 废弃了，合并到`$attrs`中了

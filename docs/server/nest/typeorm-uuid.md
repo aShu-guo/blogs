@@ -17,7 +17,7 @@
 
 首先新建两张表：roles和users
 
-```mysql
+```sql
 -- auto-generated definition
 create table roles
 (
@@ -31,7 +31,7 @@ create table roles
 );
 ```
 
-```mysql
+```sql
 -- auto-generated definition
 create table users
 (
@@ -51,7 +51,7 @@ create table users
 
 ### 设置默认值
 
-```mysql
+```sql
 alter table users
     add uuid binary(16) default uuid_to_bin(uuid(), 1) null after id;
 ```
@@ -70,7 +70,7 @@ statement is unsafe because it uses a system function that may return a differen
 
 设置roles的`TRIGGER`，在插入数据时设置id
 
-```mysql
+```sql
 DELIMITER ;;
 CREATE TRIGGER before_insert_roles
 BEFORE INSERT ON roles
@@ -85,7 +85,7 @@ END
 
 设置users的`TRIGGER`，在插入数据时设置id
 
-```mysql
+```sql
 DELIMITER ;;
 CREATE TRIGGER before_insert_users
 BEFORE INSERT ON users
