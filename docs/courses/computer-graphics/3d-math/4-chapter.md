@@ -26,7 +26,7 @@
 
 ![img.png](/imgs/computes-course/vector-negative.png)
 
-#### 几何意义解释
+#### 几何解释
 
 负向量是原向量对应的一条反方向的、大小相同的向量
 
@@ -34,7 +34,7 @@
 
 ![img.png](/imgs/computes-course/vector-length.png)
 
-#### 几何意义解释
+#### 几何解释
 
 对于任意向量v，都可以构造出以v为斜边的直角三角形，并通过勾股定理计算三角形斜边的长度
 
@@ -52,7 +52,7 @@
 
 [负向量](#负向量)本质上是值为-1的标量与原向量相乘得到
 
-#### 几何意义解释
+#### 几何解释
 
 向量的放缩
 
@@ -67,7 +67,7 @@
 向量中的值除以向量的长度，最终得到标准化后的向量，任何向量标准化后的取值范围在0～1之间
 ![img.png](/imgs/computes-course/vector-normalize-2.png)
 
-#### 几何意义解释
+#### 几何解释
 
 标准化后的向量一定在长度为1的单位圆内（在三维坐标中是单位球）
 
@@ -79,7 +79,7 @@
 
 ![img.png](/imgs/computes-course/vector-plus-2.png)
 
-#### 几何意义解释
+#### 几何解释
 
 加法满足交换律：向量AB+向量AC=向量AC+向量AB。将向量AC平移到与AB尾部相连，相加的到的向量则是AD
 
@@ -96,18 +96,19 @@
 这也可以解释向量的位移序列
 ![img.png](/imgs/computes-course/vector-sub-3.png)
 
-### 两向量之间距离
-
-两向量相减得到的向量表达式，再计算出长度即是两向量之间距离
+:::info
+两向量相减，计算出长度即是两向量之间距离
 
 ![img.png](/imgs/computes-course/vector-length-1.png)
+
+:::
 
 ### 点乘
 
 又称为内积，两个相同维度的向量依据位置挨个相乘，将每个值相加的结果为点乘
 ![img.png](/imgs/computes-course/vector-point-1.png)
 
-#### 几何意义解释
+#### 几何解释
 
 点乘结果描述的是两个向量的“相似”程度，值越大越相似，返回的是一个标量
 
@@ -156,7 +157,7 @@
 
 计算顺序：y、z、x
 
-#### 几何意义解释
+#### 几何解释
 
 叉乘得到的向量是垂直于向量a、向量b所在的平面
 ![img.png](/imgs/computes-course/vector-cross-3.png)

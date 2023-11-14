@@ -1,26 +1,10 @@
-# 3D向量类
-
-## 支持的能力
-
-- 存取向量的各分量（x）
-- 向量间的赋值操作
-- 比较两向量是否相同
-- 将向量置为零向量
-- 向量求负
-- 求向量的模
-- 向量与标量的乘除法
-- 向量标准化
-- 向量加减法
-- 计算两点(点用向量表示)间距离
-- 向量点乘
-- 向量叉乘
-
-## 示例
-
-```ts
 class Vector3 {
   // 最好不要做缺省处理，如果偏好缺省处理，最好是初始化为零向量
-  constructor(x: number, y: number, z: number) {
+  constructor(
+    readonly x: number,
+    readonly y: number,
+    readonly z: number,
+  ) {
     this.x = x;
     this.y = y;
     this.z = z;
@@ -32,10 +16,8 @@ class Vector3 {
   }
 
   // 将向量置为零向量
-  zero() {
-    this.x = 0;
-    this.y = 0;
-    this.z = 0;
+  zero(): Vector3 {
+    return new Vector3(0, 0, 0);
   }
 
   // 向量加法
@@ -44,40 +26,39 @@ class Vector3 {
   }
 
   // 向量减法
-  subtract(vector: Vector3): Vector3 {
+  subtract(vector: Vector3) {
     return new Vector3(this.x - vector.x, this.y - vector.y, this.z - vector.z);
   }
 
-  // 向量与标量的乘积 和 点乘（向量与向量的乘积）
+  // 向量乘积和点乘
   multiply(factor: number | Vector3): number | Vector3 {
     if (factor instanceof Vector3) {
       // 向量点乘
       return this.x * factor.x + this.y * factor.y + this.z * factor.z;
     } else {
-      // 向量与标量相乘
       return new Vector3(factor * this.x, factor * this.y, factor * this.z);
     }
   }
 
-  // 向量与标量的除法
+  // 向量除法
   division(factor: number): Vector3 {
     return new Vector3(this.x / factor, this.y / factor, this.z / factor);
+  }
+
+  //   向量标准化
+  normalize(): Vector3 {
+    const length = this.vectorMag();
+    return new Vector3(this.x / length, this.y / length, this.z / length);
   }
 
   // 取向量的模
   vectorMag(): number {
     return Math.sqrt(this.x ** 2 + this.y ** 2 + this.z ** 2);
   }
-
-  // 向量标准化
-  normalize(): Vector3 {
-    const length = this.vectorMag();
-    return new Vector3(this.x / length, this.y / length, this.z / length);
-  }
 }
 
 class Vector3Helper {
-  private constructor() {}
+  constructor() {}
 
   // 两向量的叉乘
   static crossProduct(vector: Vector3, vector1: Vector3): Vector3 {
@@ -93,16 +74,3 @@ class Vector3Helper {
     return vector.subtract(vector1).vectorMag();
   }
 }
-```
-
-## 优化建议
-
-对于频繁创建/销毁对象场景，可以通过维护对象池减少频繁创建/销毁对象的开销。基本思想是：
-
-1. 需要创建对象时，从对象池去取
-2. 使用完对象后，放回对象池
-
-但是维护对象池会面临许多问题：
-
-1. 其他代码段一直保持这对象池中对象的引用，导致无法GC
-2. 对象池中的对象状态可能会在使用过程中改变

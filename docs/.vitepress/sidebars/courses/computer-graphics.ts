@@ -28,6 +28,10 @@ export default {
           text: '向量',
           link: '/courses/computer-graphics/3d-math/4-chapter',
         },
+        {
+          text: '3D向量类',
+          link: '/courses/computer-graphics/3d-math/5-chapter',
+        },
       ],
     },
   ],
