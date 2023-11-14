@@ -1,3 +1,13 @@
+---
+head:
+  - - meta
+    - name: description
+      content: 向量的代数公式和几何意义解释
+  - - meta
+    - name: keywords
+      content: ashu_guo 计算机图形学 3D数学 向量 代数公式 几何意义
+---
+
 # 向量
 
 ## 数学定义
@@ -24,7 +34,21 @@
 
 ### 负向量
 
-![img.png](/imgs/computes-course/vector-negative.png)
+$$
+-\begin{bmatrix}
+a_{1}
+\\a_{2}
+\\{\vdots}
+\\a_{n-1}
+\\a_{n}
+\end{bmatrix}=\begin{bmatrix}
+-a_{1}
+\\-a_{2}
+\\{\vdots}
+\\-a_{n-1}
+\\-a_{n}
+\end{bmatrix}
+$$
 
 #### 几何解释
 
@@ -32,7 +56,19 @@
 
 ### 长度
 
-![img.png](/imgs/computes-course/vector-length.png)
+代数公式：
+
+$$
+\begin{Vmatrix}
+v
+\end{Vmatrix}=\sqrt{v_{1}^{2}+v_{2}^{2}+{\cdots}++v_{n-1}^{2}+v_{n}^{2} }
+$$
+
+$$
+\begin{Vmatrix}
+v
+\end{Vmatrix}=\sqrt{\sum_{i=1}^{n} v_{i}^{2}   }
+$$
 
 #### 几何解释
 
@@ -48,7 +84,27 @@
 
 将标量挨个与向量中的值相乘。
 
-![img.png](/imgs/computes-course/vector-multiply.png)
+$$
+k\begin{bmatrix}
+a_{1}
+\\a_{2}
+\\{\vdots}
+\\a_{n-1}
+\\a_{n}
+\end{bmatrix}=\begin{bmatrix}
+a_{1}
+\\a_{2}
+\\{\vdots}
+\\a_{n-1}
+\\a_{n}
+\end{bmatrix}k=\begin{bmatrix}
+ka_{1}
+\\ka_{2}
+\\{\vdots}
+\\ka_{n-1}
+\\ka_{n}
+\end{bmatrix}
+$$
 
 [负向量](#负向量)本质上是值为-1的标量与原向量相乘得到
 
@@ -65,7 +121,12 @@
 ### 标准化
 
 向量中的值除以向量的长度，最终得到标准化后的向量，任何向量标准化后的取值范围在0～1之间
-![img.png](/imgs/computes-course/vector-normalize-2.png)
+
+$$
+v_{norm} = \frac{v}{\begin{Vmatrix}
+v
+\end{Vmatrix}} ,v\neq0
+$$
 
 #### 几何解释
 
@@ -77,7 +138,27 @@
 
 相同维度的向量支持相互加减，结果的维度与原向量维度相同。两个向量相加减，将向量中对应维度的值相加减即可。其中减法可以理解为加一个负向量
 
-![img.png](/imgs/computes-course/vector-plus-2.png)
+$$
+\begin{bmatrix}
+a_{1}
+\\a_{2}
+\\{\vdots}
+\\a_{n-1}
+\\a_{n}
+\end{bmatrix}+\begin{bmatrix}
+b_{1}
+\\b_{2}
+\\{\vdots}
+\\b_{n-1}
+\\b_{n}
+\end{bmatrix}=\begin{bmatrix}
+a_{1}+b_{1}
+\\a_{2}+b_{2}
+\\{\vdots}
+\\a_{n-1}+b_{n-1}
+\\a_{n}+b_{n}
+\end{bmatrix}
+$$
 
 #### 几何解释
 
@@ -106,23 +187,48 @@
 ### 点乘
 
 又称为内积，两个相同维度的向量依据位置挨个相乘，将每个值相加的结果为点乘
-![img.png](/imgs/computes-course/vector-point-1.png)
+
+$$
+\begin{bmatrix}
+a_{1}
+\\a_{2}
+\\{\vdots}
+\\a_{n-1}
+\\a_{n}
+\end{bmatrix}·\begin{bmatrix}
+b_{1}
+\\b_{2}
+\\{\vdots}
+\\b_{n-1}
+\\b_{n}
+\end{bmatrix}=a_{1}·b_{1}+a_{2}·b_{2}+{\cdots}+a_{n-1}·b_{n-1}+a_{n}·b_{n}
+$$
 
 #### 几何解释
 
 点乘结果描述的是两个向量的“相似”程度，值越大越相似，返回的是一个标量
 
-```text
-向量a和向量b的点乘 = 向量a的长度 * 向量b的长度 * cosθ
+$$
+v·n=\begin{Vmatrix}
+v
+\end{Vmatrix}·\begin{Vmatrix}
+n
+\end{Vmatrix}·\cos \theta
+$$
 
 等价于
 
-向量a的长度 * cosθ * 向量b的长度
-```
+$$
+v·n=\begin{Vmatrix}
+v
+\end{Vmatrix}·\cos \theta ·\begin{Vmatrix}
+n
+\end{Vmatrix}
+$$
 
-其中`向量a的长度 * cosθ`为向量a在向量b方向上的投影
+其中`向量v的长度 * cosθ`为向量v在向量n方向上的投影
 
-#### 向量v在向量n上的投影
+#### 水平投影和垂直投影
 
 给定向量v，向量n。可以将向量v分解成两个向量，这两个向量分别垂直、平行于向量v
 
@@ -167,7 +273,13 @@
 1. 叉乘向量的长度等于向量a、向量b构成平行四边形的面积
 2. 几何计算公式，n向量为向量a、向量b构成平面的单位向量
 
-![img.png](/imgs/computes-course/vector-cross-4.png)
+$$
+{\vec{a}  \times \vec{b}  =\begin{vmatrix}
+\vec{a}
+\end{vmatrix}\begin{vmatrix}
+\vec{b}
+\end{vmatrix}\sin \theta \vec{n}  }
+$$
 
 :::info
 计算顺序：叉乘、点乘、乘除、加减

@@ -2,9 +2,16 @@
 # https://vitepress.dev/reference/default-theme-home-page
 layout: home
 
+head:
+  - - meta
+    - name: description
+      content: 技术博客
+  - - meta
+    - name: keywords
+      content: ashu_guo vue rfcs翻译 图形学 3D数学
 hero:
-  name: "Ashu_Guo"
-#  text: "Technology Blog"
+  name: 'Ashu_Guo'
+  #  text: "Technology Blog"
   tagline: My great project tagline
   actions:
     - theme: brand
@@ -22,4 +29,3 @@ features:
   - title: Feature C
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
 ---
-

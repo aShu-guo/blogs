@@ -18,6 +18,10 @@ import Containerization from './sidebars/server/containerization';
 import Database from './sidebars/server/database';
 import ComputerGraphics from './sidebars/courses/computer-graphics';
 import Nest from './sidebars/server/nest';
+// 支持mathJax
+import mathjax3 from 'markdown-it-mathjax3';
+import { customElements } from './customElements';
+
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: 'Blogs',
@@ -25,6 +29,28 @@ export default defineConfig({
   base: '/blogs/',
   lastUpdated: true,
   sitemap: { hostname: 'https://ashu-guo.github.io/blogs/' },
+  head: [
+    [
+      'link',
+      {
+        rel: 'stylesheet',
+        href: 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css',
+        crossorigin: 'anonymous',
+      },
+    ],
+  ],
+  markdown: {
+    config: (md) => {
+      md.use(mathjax3);
+    },
+  },
+  vue: {
+    template: {
+      compilerOptions: {
+        isCustomElement: (tag) => customElements.includes(tag),
+      },
+    },
+  },
   themeConfig: {
     logo: { dark: '/logo-dark.jpeg', light: '/logo.jpeg' },
     // https://vitepress.dev/reference/default-theme-config

@@ -32,6 +32,10 @@ export default {
           text: '3D向量类',
           link: '/courses/computer-graphics/3d-math/5-chapter',
         },
+        {
+          text: '矩阵',
+          link: '/courses/computer-graphics/3d-math/6-chapter',
+        },
       ],
     },
   ],
