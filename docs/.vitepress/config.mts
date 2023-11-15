@@ -29,16 +29,6 @@ export default defineConfig({
   base: '/blogs/',
   lastUpdated: true,
   sitemap: { hostname: 'https://ashu-guo.github.io/blogs/' },
-  head: [
-    [
-      'link',
-      {
-        rel: 'stylesheet',
-        href: 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css',
-        crossorigin: 'anonymous',
-      },
-    ],
-  ],
   markdown: {
     config: (md) => {
       md.use(mathjax3);
