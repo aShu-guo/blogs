@@ -36,6 +36,14 @@ export default {
           text: '矩阵',
           link: '/courses/computer-graphics/3d-math/6-chapter',
         },
+        {
+          text: '矩阵与线性变换',
+          link: '/courses/computer-graphics/3d-math/7-chapter',
+          items: [
+            { text: '旋转', link: '/courses/computer-graphics/3d-math/7.1-chapter' },
+            { text: '放缩', link: '/courses/computer-graphics/3d-math/7.2-chapter' },
+          ],
+        },
       ],
     },
   ],
