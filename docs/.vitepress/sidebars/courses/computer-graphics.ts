@@ -48,6 +48,13 @@ export default {
             { text: '变换的组合', link: '/courses/computer-graphics/3d-math/7.6-chapter' },
           ],
         },
+        {
+          text: '矩阵的更多知识',
+          items: [
+            { text: '行列式', link: '/courses/computer-graphics/3d-math/8.1-chapter' },
+            { text: '矩阵的逆', link: '/courses/computer-graphics/3d-math/8.2-chapter' },
+          ],
+        },
       ],
     },
   ],
