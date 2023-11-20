@@ -43,6 +43,7 @@ export default {
             { text: '旋转', link: '/courses/computer-graphics/3d-math/7.1-chapter' },
             { text: '放缩', link: '/courses/computer-graphics/3d-math/7.2-chapter' },
             { text: '正交投影', link: '/courses/computer-graphics/3d-math/7.3-chapter' },
+            { text: '镜像', link: '/courses/computer-graphics/3d-math/7.4-chapter' },
           ],
         },
       ],
