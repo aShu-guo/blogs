@@ -45,6 +45,7 @@ export default {
             { text: '正交投影', link: '/courses/computer-graphics/3d-math/7.3-chapter' },
             { text: '镜像', link: '/courses/computer-graphics/3d-math/7.4-chapter' },
             { text: '切变', link: '/courses/computer-graphics/3d-math/7.5-chapter' },
+            { text: '变换的组合', link: '/courses/computer-graphics/3d-math/7.6-chapter' },
           ],
         },
       ],
