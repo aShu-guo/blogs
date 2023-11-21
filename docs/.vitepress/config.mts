@@ -29,6 +29,17 @@ export default defineConfig({
   base: '/blogs/',
   lastUpdated: true,
   sitemap: { hostname: 'https://ashu-guo.github.io/blogs/' },
+  head: [
+    ['script', { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-0H3Z4EZZYF' }],
+    [
+      'script',
+      {},
+      `window.dataLayer = window.dataLayer || [];
+       function gtag(){dataLayer.push(arguments);}
+       gtag('js', new Date());
+       gtag('config', 'G-0H3Z4EZZYF');`,
+    ],
+  ],
   markdown: {
     config: (md) => {
       md.use(mathjax3);
