@@ -12,7 +12,7 @@ head:
 hero:
   name: 'Ashu_Guo'
   #  text: "Technology Blog"
-  #  tagline:
+  tagline: 横渠四句
   actions:
     - theme: brand
       text: 3D数学

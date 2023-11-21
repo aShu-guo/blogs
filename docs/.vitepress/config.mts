@@ -31,7 +31,8 @@ export default defineConfig({
   sitemap: { hostname: 'https://ashu-guo.github.io/blogs/' },
   head: [
     //   google
-    // ['script', { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-0H3Z4EZZYF' }],
+    ['script', { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-0H3Z4EZZYF' }],
+    ['meta', { name: 'viewport', content: 'width=device-width, initial-scale=1' }],
     [
       'script',
       {},
