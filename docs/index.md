@@ -12,17 +12,23 @@ head:
 hero:
   name: 'Ashu_Guo'
   #  text: "Technology Blog"
-  tagline: My great project tagline
+  #  tagline:
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
-    - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: 3D数学
+      link: /courses/computer-graphics/3d-math/
+    - theme: brand
+      text: Vue-RFCs翻译
+      link: /ecology/vue/rfcs/
+    - theme: brand
+      text: Vue2.x源码解析
+      link: /ecology/vue/2.x/
+    - theme: brand
+      text: Vue3.x源码解析
+      link: /ecology/vue/3.x/
 
 features:
-  - title: Feature A
+  - title: Feature B
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
   - title: Feature B
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit

@@ -53,6 +53,7 @@ export default {
           items: [
             { text: '行列式', link: '/courses/computer-graphics/3d-math/8.1-chapter' },
             { text: '矩阵的逆', link: '/courses/computer-graphics/3d-math/8.2-chapter' },
+            { text: '正交矩阵', link: '/courses/computer-graphics/3d-math/8.3-chapter' },
           ],
         },
       ],
