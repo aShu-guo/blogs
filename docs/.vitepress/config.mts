@@ -31,7 +31,7 @@ export default defineConfig({
   sitemap: { hostname: 'https://ashu-guo.github.io/blogs/' },
   head: [
     //   google
-    ['script', { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-0H3Z4EZZYF' }],
+    // ['script', { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-0H3Z4EZZYF' }],
     [
       'script',
       {},
@@ -46,11 +46,11 @@ export default defineConfig({
       {},
       `var _hmt = _hmt || [];
       (function() {
-          var hm = document.createElement("script");
-          hm.src = "https://hm.baidu.com/hm.js?1018dd87d1b5e3227f4af1ff2ea60dea";
-          var s = document.getElementsByTagName("script")[0]; 
-          s.parentNode.insertBefore(hm, s);
-      })();');`,
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?1018dd87d1b5e3227f4af1ff2ea60dea";
+        var s = document.getElementsByTagName("script")[0]; 
+        s.parentNode.insertBefore(hm, s);
+      })();`,
     ],
   ],
   markdown: {
