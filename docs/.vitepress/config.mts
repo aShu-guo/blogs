@@ -73,7 +73,14 @@ export default defineConfig({
     editLink: {
       pattern: 'https://github.com/aShu-guo/blogs/tree/master/docs/:path',
     },
-    search: { provider: 'local' },
+    search: {
+      provider: 'algolia',
+      options: {
+        appId: 'ODV7UOFLSM',
+        apiKey: '5881c564a5e46e5221b51e548bc2aa35',
+        indexName: 'ashu-guoio',
+      },
+    },
     nav: [...MvvmNavs, ...BaseNavs, ...CoursesNavs, ...ServerNavs, ...HybridAppNavs],
     sidebar: {
       ...RfcTranslate,
