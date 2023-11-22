@@ -15,5 +15,3 @@
 如果存在这样的关系：aM=b，则称矩阵M可以将向量a转换为向量b
 
 ![img.png](/imgs/computes-course/matrix-transform.png)
-
-## 旋转

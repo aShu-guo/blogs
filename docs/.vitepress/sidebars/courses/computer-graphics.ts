@@ -57,6 +57,15 @@ export default {
             { text: '4x4齐次矩阵', link: '/courses/computer-graphics/3d-math/8.4-chapter' },
           ],
         },
+        {
+          text: '3D中的方位与角位移',
+          link: '/courses/computer-graphics/3d-math/9-chapter',
+          items: [
+            { text: '矩阵', link: '/courses/computer-graphics/3d-math/9.1-chapter' },
+            { text: '欧拉角', link: '/courses/computer-graphics/3d-math/9.2-chapter' },
+            { text: '四元数', link: '/courses/computer-graphics/3d-math/9.3-chapter' },
+          ],
+        },
       ],
     },
   ],
