@@ -1,9 +1,9 @@
 {
   "index_name": "ashu-guoio",
   "rateLimit": 8,
-  "startUrls": ["https://ashu-guo.github.io/blogs/"],
+  "start_urls": ["https://ashu-guo.github.io/blogs/"],
   "renderJavaScript": false,
-  "sitemaps": [],
+  "sitemaps": ["https://ashu-guo.github.io/blogs/sitemap.xml"],
   "exclusionPatterns": [],
   "ignoreCanonicalTo": false,
   "discoveryPatterns": ["https://ashu-guo.github.io/blogs/**"],
