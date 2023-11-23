@@ -63,7 +63,14 @@ export default {
           items: [
             { text: '矩阵', link: '/courses/computer-graphics/3d-math/9.1-chapter' },
             { text: '欧拉角', link: '/courses/computer-graphics/3d-math/9.2-chapter' },
-            { text: '四元数', link: '/courses/computer-graphics/3d-math/9.3-chapter' },
+            {
+              text: '四元数',
+              link: '/courses/computer-graphics/3d-math/9.3-chapter',
+              items: [
+                { text: '复数', link: '/courses/computer-graphics/3d-math/9.3.1-chapter' },
+                { text: '四元数', link: '/courses/computer-graphics/3d-math/9.3.2-chapter' },
+              ],
+            },
           ],
         },
       ],
