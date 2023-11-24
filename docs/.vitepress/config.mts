@@ -28,6 +28,7 @@ export default defineConfig({
   description: 'A VitePress Site',
   base: '/blogs/',
   lastUpdated: true,
+  lang: '',
   sitemap: { hostname: 'https://ashu-guo.github.io/blogs/' },
   head: [
     //   google
