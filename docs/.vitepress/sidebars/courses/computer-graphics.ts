@@ -71,6 +71,7 @@ export default {
                 { text: '四元数', link: '/courses/computer-graphics/3d-math/9.3.2-chapter' },
               ],
             },
+            { text: '总结', link: '/courses/computer-graphics/3d-math/9.4-chapter' },
           ],
         },
       ],
