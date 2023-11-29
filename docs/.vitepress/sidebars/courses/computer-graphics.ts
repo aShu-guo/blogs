@@ -74,6 +74,16 @@ export default {
             { text: '总结', link: '/courses/computer-graphics/3d-math/9.4-chapter' },
           ],
         },
+        {
+          text: '代码实现',
+          link: '/courses/computer-graphics/3d-math/10-chapter',
+          items: [
+            { text: 'EulerAngles', link: '/courses/computer-graphics/3d-math/10.1-chapter' },
+            { text: 'Quaternion', link: '/courses/computer-graphics/3d-math/10.2-chapter' },
+            { text: 'RotationMatrix', link: '/courses/computer-graphics/3d-math/10.3-chapter' },
+            { text: 'Matrix4x3', link: '/courses/computer-graphics/3d-math/10.4-chapter' },
+          ],
+        },
       ],
     },
   ],
