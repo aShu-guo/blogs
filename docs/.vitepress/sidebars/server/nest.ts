@@ -16,7 +16,7 @@ export default {
           link: '/server/nest/typeorm-uuid',
         },
         {
-          text: '前言',
+          text: '与mvc模式的术语映射',
           link: '/server/nest/mvc-mapping',
         },
         {
