@@ -84,6 +84,18 @@ export default {
             { text: 'Matrix4x3', link: '/courses/computer-graphics/3d-math/10.4-chapter' },
           ],
         },
+        {
+          text: '几何图元',
+          link: '/courses/computer-graphics/3d-math/11-chapter',
+          items: [
+            { text: '直线和射线', link: '/courses/computer-graphics/3d-math/11.1-chapter' },
+            { text: '球和圆', link: '/courses/computer-graphics/3d-math/11.2-chapter' },
+            { text: '矩形边界框', link: '/courses/computer-graphics/3d-math/11.3-chapter' },
+            { text: '平面', link: '/courses/computer-graphics/3d-math/11.4-chapter' },
+            { text: '三角形', link: '/courses/computer-graphics/3d-math/11.5-chapter' },
+            { text: '多边形', link: '/courses/computer-graphics/3d-math/11.6-chapter' },
+          ],
+        },
       ],
     },
   ],
