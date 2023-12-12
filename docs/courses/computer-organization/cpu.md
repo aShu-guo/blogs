@@ -16,7 +16,7 @@
 
 CPU 流水线指的是将 CPU 执行分为几个步骤，并且每个时钟时序每个步骤都在工作，相当于并行同时执行 n 条指令，n 为流水线步数
 
-![img.png](/imgs/computes-course/cpu-pipline.png)
+![img.png](/imgs/visual/3d-math/cpu-pipline.png)
 
 特点：
 

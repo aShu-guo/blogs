@@ -16,7 +16,7 @@ hero:
   actions:
     - theme: brand
       text: 3D数学
-      link: /courses/computer-graphics/3d-math/
+      link: /visual/3d-math/
     - theme: brand
       text: Vue-RFCs翻译
       link: /ecology/vue/rfcs/

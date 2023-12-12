@@ -2,7 +2,7 @@
 
 存储金字塔结构
 
-![img.png](/imgs/computes-course/cache-tower.png)
+![img.png](/imgs/visual/3d-math/cache-tower.png)
 
 :::warning
 
@@ -22,7 +22,7 @@ Cache -> 片上缓存
 
 此外，每个缓存块还可对应若干标志位，包括有效位（valid bit）、脏位（dirty bit）、使用位（use bit）等。这些位在保证正确性、排除冲突、优化性能等方面起着重要作用。
 
-![img.png](/imgs/computes-course/cache-structure.png)
+![img.png](/imgs/visual/3d-math/cache-structure.png)
 14*1+17*3+16*2+20*2
 14+51+38+40
 14+
@@ -49,7 +49,7 @@ Cache -> 片上缓存
 
 Cache块总数：8 = 2<sup>3</sup>
 
-![img.png](/imgs/computes-course/cache-mapping-1.png)
+![img.png](/imgs/visual/3d-math/cache-mapping-1.png)
 
 总结：
 
@@ -60,7 +60,7 @@ Cache块总数：8 = 2<sup>3</sup>
 
 将Cache块在内部分为多个组，例如：2块为1组，每个主存块可以存放在特定组内的任意行。Cache中的组号 = 主存块号 % Cache组数
 
-![img.png](/imgs/computes-course/cache-mapping-2.png)
+![img.png](/imgs/visual/3d-math/cache-mapping-2.png)
 
 总结
 
@@ -71,7 +71,7 @@ Cache块总数：8 = 2<sup>3</sup>
 
 内存中的数据块可以被放置到Cache的任意行
 
-![img.png](/imgs/computes-course/cache-mapping-3.png)
+![img.png](/imgs/visual/3d-math/cache-mapping-3.png)
 
 总结
 
