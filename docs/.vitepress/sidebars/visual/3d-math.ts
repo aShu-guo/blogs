@@ -94,11 +94,10 @@ export default {
             {
               text: '最近点',
               items: [
-                { text: '2D隐式直线上的最近点', link: '/visual/3d-math/12.1-chapter' },
+                { text: '直线和平面上的最近点', link: '/visual/3d-math/12.1-chapter' },
                 { text: '参数射线上的最近点', link: '/visual/3d-math/12.2-chapter' },
-                { text: '平面上的最近点', link: '/visual/3d-math/12.3-chapter' },
-                { text: '圆或球上的最近点', link: '/visual/3d-math/12.4-chapter' },
-                { text: 'aabb上的最近点', link: '/visual/3d-math/12.5-chapter' },
+                { text: '圆或球上的最近点', link: '/visual/3d-math/12.3-chapter' },
+                { text: 'AABB上的最近点', link: '/visual/3d-math/12.4-chapter' },
               ],
             },
             {
