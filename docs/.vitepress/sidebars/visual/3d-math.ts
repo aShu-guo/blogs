@@ -87,6 +87,38 @@ export default {
             { text: '多边形', link: '/visual/3d-math/11.6-chapter' },
           ],
         },
+        {
+          text: '几何检测',
+          link: '/visual/3d-math/12-chapter',
+          items: [
+            {
+              text: '最近点',
+              items: [
+                { text: '2D隐式直线上的最近点', link: '/visual/3d-math/12.1-chapter' },
+                { text: '参数射线上的最近点', link: '/visual/3d-math/12.2-chapter' },
+                { text: '平面上的最近点', link: '/visual/3d-math/12.3-chapter' },
+                { text: '圆或球上的最近点', link: '/visual/3d-math/12.4-chapter' },
+                { text: 'aabb上的最近点', link: '/visual/3d-math/12.5-chapter' },
+              ],
+            },
+            {
+              text: '相交性检测',
+              items: [
+                { text: '在2D中两条隐式直线的相交性检测', link: '/visual/3d-math/12.6-chapter' },
+                { text: '在3D中两条射线的相交性检测', link: '/visual/3d-math/12.7-chapter' },
+                { text: '三个平面间的相交性检测', link: '/visual/3d-math/12.8-chapter' },
+                { text: '射线和圆/球的相交性检测', link: '/visual/3d-math/12.9-chapter' },
+                { text: '两个圆/球的相交性检测', link: '/visual/3d-math/12.10-chapter' },
+                { text: '球和aabb的相交性检测', link: '/visual/3d-math/12.11-chapter' },
+                { text: '球和平面的相交性检测', link: '/visual/3d-math/12.12-chapter' },
+                { text: '射线和三角形的相交性检测', link: '/visual/3d-math/12.13-chapter' },
+                { text: '射线和aabb的相交性检测', link: '/visual/3d-math/12.14-chapter' },
+                { text: '两个aabb的相交性检测', link: '/visual/3d-math/12.15-chapter' },
+                { text: '其他种类的相交性检测', link: '/visual/3d-math/12.16-chapter' },
+              ],
+            },
+          ],
+        },
       ],
     },
   ],
