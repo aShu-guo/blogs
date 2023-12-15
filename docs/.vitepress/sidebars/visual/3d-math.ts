@@ -105,7 +105,8 @@ export default {
               text: '相交性检测',
               link: '/visual/3d-math/12.2-chapter',
               items: [
-                { text: '两条隐式直线的相交性检测', link: '/visual/3d-math/12.2.1-chapter' },
+                { text: '两条隐式直线', link: '/visual/3d-math/12.2.1-chapter' },
+                { text: '射线与其他图元', link: '/visual/3d-math/12.2.2-chapter' },
                 { text: '三个平面间的相交性检测', link: '/visual/3d-math/12.8-chapter' },
                 { text: '射线和圆/球的相交性检测', link: '/visual/3d-math/12.9-chapter' },
                 { text: '两个圆/球的相交性检测', link: '/visual/3d-math/12.10-chapter' },
