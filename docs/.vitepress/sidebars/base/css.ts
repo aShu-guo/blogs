@@ -41,8 +41,8 @@ export default {
           text: '单位',
           items: [
             {
-              text: 'px',
-              link: '/base/css/unit/px',
+              text: 'dpr、ppi、dpi辨析',
+              link: '/base/css/unit/dpr',
             },
             {
               text: 'viewport',

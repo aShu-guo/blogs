@@ -115,6 +115,15 @@ export default {
             },
           ],
         },
+        {
+          text: '图形数学',
+          link: '/visual/3d-math/13-chapter',
+          items: [
+            { text: '图形管道', link: '/visual/3d-math/13.1-chapter' },
+            { text: '设定视图参数', link: '/visual/3d-math/13.2-chapter' },
+
+          ],
+        },
       ],
     },
   ],
