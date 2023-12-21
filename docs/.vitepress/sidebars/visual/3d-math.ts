@@ -122,6 +122,8 @@ export default {
             { text: '图形管道', link: '/visual/3d-math/13.1-chapter' },
             { text: '设定视图参数', link: '/visual/3d-math/13.2-chapter' },
             { text: '坐标空间', link: '/visual/3d-math/13.3-chapter' },
+            { text: '光照和雾化', link: '/visual/3d-math/13.4-chapter' },
+
           ],
         },
       ],
