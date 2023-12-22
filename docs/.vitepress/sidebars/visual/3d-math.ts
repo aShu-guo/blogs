@@ -123,7 +123,9 @@ export default {
             { text: '设定视图参数', link: '/visual/3d-math/13.2-chapter' },
             { text: '坐标空间', link: '/visual/3d-math/13.3-chapter' },
             { text: '光照和雾化', link: '/visual/3d-math/13.4-chapter' },
-
+            { text: '缓存', link: '/visual/3d-math/13.5-chapter' },
+            { text: '纹理映射', link: '/visual/3d-math/13.6-chapter' },
+            { text: '几何体的生成和提交', link: '/visual/3d-math/13.7-chapter' },
           ],
         },
       ],
