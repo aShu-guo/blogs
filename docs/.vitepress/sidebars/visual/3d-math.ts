@@ -126,6 +126,10 @@ export default {
             { text: '缓存', link: '/visual/3d-math/13.5-chapter' },
             { text: '纹理映射', link: '/visual/3d-math/13.6-chapter' },
             { text: '几何体的生成和提交', link: '/visual/3d-math/13.7-chapter' },
+            { text: '变换和光照', link: '/visual/3d-math/13.8-chapter' },
+            { text: '背面剔除和裁剪', link: '/visual/3d-math/13.9-chapter' },
+            { text: '光栅化', link: '/visual/3d-math/13.10-chapter' },
+
           ],
         },
       ],
