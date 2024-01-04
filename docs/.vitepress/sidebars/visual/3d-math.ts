@@ -129,7 +129,14 @@ export default {
             { text: '变换和光照', link: '/visual/3d-math/13.8-chapter' },
             { text: '背面剔除和裁剪', link: '/visual/3d-math/13.9-chapter' },
             { text: '光栅化', link: '/visual/3d-math/13.10-chapter' },
-
+          ],
+        },
+        {
+          text: '可见行检测',
+          link: '/visual/3d-math/14-chapter',
+          items: [
+            { text: '包围体检测', link: '/visual/3d-math/14.1-chapter' },
+            { text: '空间分割技术', link: '/visual/3d-math/14.2-chapter' },
           ],
         },
       ],
