@@ -3,30 +3,12 @@ export default {
     {
       text: '3D数学基础',
       items: [
-        {
-          text: '前言',
-          link: '/visual/3d-math/',
-        },
-        {
-          text: '笛卡尔坐标系',
-          link: '/visual/3d-math/2-chapter',
-        },
-        {
-          text: '多坐标系',
-          link: '/visual/3d-math/3-chapter',
-        },
-        {
-          text: '向量',
-          link: '/visual/3d-math/4-chapter',
-        },
-        {
-          text: '3D向量类',
-          link: '/visual/3d-math/5-chapter',
-        },
-        {
-          text: '矩阵',
-          link: '/visual/3d-math/6-chapter',
-        },
+        { text: '前言', link: '/visual/3d-math/' },
+        { text: '笛卡尔坐标系', link: '/visual/3d-math/2-chapter' },
+        { text: '多坐标系', link: '/visual/3d-math/3-chapter' },
+        { text: '向量', link: '/visual/3d-math/4-chapter' },
+        { text: '3D向量类', link: '/visual/3d-math/5-chapter' },
+        { text: '矩阵', link: '/visual/3d-math/6-chapter' },
         {
           text: '矩阵与线性变换',
           link: '/visual/3d-math/7-chapter',

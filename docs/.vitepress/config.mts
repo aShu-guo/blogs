@@ -20,6 +20,7 @@ import Database from './sidebars/server/database';
 import Nest from './sidebars/server/nest';
 import Math from './sidebars/visual/3d-math';
 import ComputerGraphics from './sidebars/visual/computer-graphics';
+import JavaScript from './sidebars/base/js';
 // 支持mathJax
 import mathjax3 from 'markdown-it-mathjax3';
 import { customElements } from './customElements';
@@ -100,6 +101,7 @@ export default defineConfig({
       ...ComputerGraphics,
       ...Nest,
       ...Math,
+      ...JavaScript,
     },
 
     socialLinks: [{ icon: 'github', link: 'https://github.com/aShu-guo/blogs' }],
