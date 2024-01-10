@@ -86,4 +86,4 @@ export const customElements = [
   'semantics',
   'annotation',
   'annotation-xml',
-];
+] as string[];

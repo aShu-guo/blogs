@@ -6,6 +6,7 @@ import CoursesNavs from './navs/courses';
 import ServerNavs from './navs/server';
 import HybridAppNavs from './navs/hybrid-app';
 import VisualNavs from './navs/visual';
+import LifeNavs from './navs/life';
 // 导出sidebars
 import RfcTranslate from './sidebars/ecology/vue/rfc-translate';
 import Version2 from './sidebars/ecology/vue/version2';
@@ -21,6 +22,8 @@ import Nest from './sidebars/server/nest';
 import Math from './sidebars/visual/3d-math';
 import ComputerGraphics from './sidebars/visual/computer-graphics';
 import JavaScript from './sidebars/base/js';
+import ThreeJs from './sidebars/visual/threejs';
+import Exam from './sidebars/life/exam';
 // 支持mathJax
 import mathjax3 from 'markdown-it-mathjax3';
 import { customElements } from './customElements';
@@ -85,7 +88,7 @@ export default defineConfig({
         indexName: 'ashu-guoio',
       },
     },
-    nav: [...MvvmNavs, ...BaseNavs, ...CoursesNavs, ...VisualNavs, ...ServerNavs, ...HybridAppNavs],
+    nav: [...BaseNavs, ...MvvmNavs, ...CoursesNavs, ...VisualNavs, ...ServerNavs, ...HybridAppNavs, ...LifeNavs],
     sidebar: {
       ...RfcTranslate,
       ...Version2,
@@ -102,6 +105,8 @@ export default defineConfig({
       ...Nest,
       ...Math,
       ...JavaScript,
+      ...ThreeJs,
+      ...Exam,
     },
 
     socialLinks: [{ icon: 'github', link: 'https://github.com/aShu-guo/blogs' }],
