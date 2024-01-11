@@ -11,8 +11,8 @@ head:
       content: ashu_guo vue rfcs翻译 图形学 3D数学
 hero:
   name: 'Ashu_Guo'
-  #  text: "Technology Blog"
-  #  tagline: 横渠四句
+  #  text: '加油更新中'
+  tagline: 加油更新中
   actions:
     - theme: brand
       text: 3D数学
