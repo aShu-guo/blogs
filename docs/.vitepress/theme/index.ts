@@ -8,7 +8,6 @@ import './index.css';
 
 export default {
   ...DefaultTheme,
-
   setup() {
     const route = useRoute();
     const initZoom = () => {

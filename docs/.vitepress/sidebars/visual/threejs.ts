@@ -4,7 +4,14 @@ export default {
       text: 'Three学习',
       items: [
         { text: '前言', link: '/visual/three/' },
-        { text: '入门与调试', link: '/visual/three/chapter-1' },
+        {
+          text: '入门与调试',
+          link: '/visual/three/chapter-1',
+          items: [
+            { text: 'gsap', link: '/visual/three/chapter-1.1' },
+            { text: 'dat.gui', link: '/visual/three/chapter-1.2' },
+          ],
+        },
       ],
     },
   ],

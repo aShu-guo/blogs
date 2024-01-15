@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Three调试</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.9/dat.gui.min.js"
+      integrity="sha512-WoO4Ih0CDOSLYafy22wZD/mcJ7k0ESLqtQsFa6zFKnEUrbtuGU+GkLtVhgt93xa2qewG5gKEC6CWlN8OaCTSVg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <style>
+      body {
+        margin: 0;
+        display: flex;
+        place-items: center;
+        min-width: 320px;
+        min-height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <canvas id="cube" width="1920" height="1080"></canvas>
+    </div>
+    <script type="module">
+      import {
+        AxesHelper,
+        BoxGeometry,
+        Clock,
+        Mesh,
+        MeshBasicMaterial,
+        PerspectiveCamera,
+        Scene,
+        WebGLRenderer,
+      } from 'three';
+
+      import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+      // 创建场景
+      const scene = new Scene();
+
+      // 创建相机
+      const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      // 设置相机位置
+      camera.position.set(0, 0, 10);
+      scene.add(camera);
+
+      // 创建几何体
+      const geometry = new BoxGeometry(1, 1, 1);
+      const material = new MeshBasicMaterial({ color: 0x00ff00 });
+      const cube = new Mesh(geometry, material);
+      // cube.position.set(0, 2, 0);
+      scene.add(cube);
+
+      // 创建坐标轴辅助器
+      const axesHelper = new AxesHelper(5);
+      scene.add(axesHelper);
+
+      const anmi = gsap.to(cube.position, { y: 5, duration: 3, ease: 'power1.in', repeat: -1, yoyo: true });
+
+      const gui = new dat.GUI();
+      gui.add(cube.position, 'x').min(0).max(5).step(0.01).name('x轴');
+      gui.add(cube.position, 'y').min(0).max(5).step(0.01).name('y轴');
+      gui.add(cube, 'visible');
+      const params = {
+        color: '#00ff00',
+        fn: () => {
+          console.log('>>>: ', anmi.isActive());
+          if (anmi.isActive()) {
+            anmi.pause();
+          } else {
+            anmi.play();
+          }
+        },
+      };
+      gui.addColor(params, 'color').onChange((value) => {
+        cube.material.color.set(value);
+      });
+      gui.add(params, 'fn').name('继续/暂停');
+
+      const folder = gui.addFolder('网格');
+      folder.add(cube.material, 'wireframe');
+
+      // 初始化渲染器
+      const renderer = new WebGLRenderer({ antialias: true, canvas: document.getElementById('cube') });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+
+      const animate = () => {
+        // console.log(clock.getElapsedTime());
+        // console.log(clock.getDelta());
+        // console.log(clock.getDelta() * 1000 + 'ms');
+
+        renderer.render(scene, camera);
+        /*if (cube.position.y >= 5) {
+          cube.position.y = 0;
+        } else {
+          cube.position.setY(cube.position.y + 0.01);
+          cube.rotation.y -= 0.01;
+        }*/
+        controls.update();
+        requestAnimationFrame(animate);
+      };
+
+      animate();
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    </script>
+  </body>
+</html>
