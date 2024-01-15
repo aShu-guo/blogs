@@ -12,6 +12,7 @@ export default {
             { text: 'dat.gui', link: '/visual/three/chapter-1.2' },
           ],
         },
+        { text: '几何体', link: '/visual/three/chapter-2' },
       ],
     },
   ],

@@ -2,11 +2,15 @@
 
 它是一个专业的动画库，内容非常多，经常用到的是to、from等API
 
+## 初始化
+
 ```js
 import gsap from 'gsap';
 
 const anmi = gsap.to(cube.position, { y: 5, duration: 3, ease: 'power1.in', repeat: -1, yoyo: true });
 ```
+
+## 常用方法
 
 - gsap.to()：这是一种最常用的tween动画，就是让元素从`初始状态`变化到`目标状态`。
 - gsap.from()：让元素从`目标状态`变化到`初始状态`，与to函数的变化方向是相反的。

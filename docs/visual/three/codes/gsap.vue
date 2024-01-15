@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { gsap } from 'https://cdn.skypack.dev/gsap';
+import gsap from 'gsap';
 import { nextTick, onMounted, ref } from 'vue';
 defineOptions({ name: 'gasp' });
 
@@ -93,6 +93,4 @@ const changeHandler = (e) => {
       break;
   }
 };
-
-onMounted(() => {});
 </script>
