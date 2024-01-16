@@ -1,0 +1,84 @@
+<template>
+  <div>
+    <canvas id="cube" width="720" height="405"></canvas>
+  </div>
+</template>
+
+<script setup lang="ts">
+import {
+  AxesHelper,
+  BoxGeometry,
+  BufferAttribute,
+  BufferGeometry,
+  Color,
+  DoubleSide,
+  LinearFilter,
+  Mesh,
+  MeshBasicMaterial,
+  MirroredRepeatWrapping,
+  NearestFilter,
+  PerspectiveCamera,
+  RepeatWrapping,
+  Scene,
+  TextureLoader,
+  WebGLRenderer,
+} from 'three';
+import { onMounted, shallowRef } from 'vue';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import logo from './logo.jpeg';
+import alphaMap from './alpha-map.png';
+
+defineOptions({ name: 'Material' });
+
+const renderer = shallowRef<WebGLRenderer>();
+// 创建场景
+const scene = new Scene();
+
+// 创建相机
+const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+// 设置相机位置
+camera.position.set(0, 0, 10);
+scene.add(camera);
+
+// 设置物体
+const geometry = new BoxGeometry(3, 3, 3);
+
+const textureLoader = new TextureLoader();
+const texture = textureLoader.load(logo as string);
+
+// 加载alpha map
+const alphaTexture = textureLoader.load(alphaMap as string);
+
+const basicMaterial = new MeshBasicMaterial({
+  map: texture,
+  alphaMap: alphaTexture,
+  transparent: true,
+  // opacity: 0.3,
+  side: DoubleSide,
+});
+
+const mesh = new Mesh(geometry, basicMaterial);
+scene.add(mesh);
+
+// 创建坐标轴辅助器
+const axesHelper = new AxesHelper(5);
+scene.add(axesHelper);
+
+onMounted(() => {
+  // 初始化渲染器
+  renderer.value = new WebGLRenderer({ antialias: true, canvas: document.getElementById('cube') as HTMLCanvasElement });
+  renderer.value.setSize(720, 405);
+
+  const controls = new OrbitControls(camera, renderer.value.domElement);
+  controls.enableDamping = true;
+
+  const animate = () => {
+    renderer.value?.render(scene, camera);
+
+    controls.update();
+    requestAnimationFrame(animate);
+  };
+
+  animate();
+});
+</script>

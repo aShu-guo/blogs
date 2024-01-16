@@ -13,6 +13,7 @@ export default {
           ],
         },
         { text: '几何体', link: '/visual/three/chapter-2' },
+        { text: '材质和纹理', link: '/visual/three/chapter-3' },
       ],
     },
   ],
