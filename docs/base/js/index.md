@@ -6,3 +6,27 @@
 
 - JavaScript: The Definitive Guide: Master the World's Most-Used Programming Language 第7版
 - JavaScript高级程序设计（第4版）
+
+## 约定
+
+- nullish：值为null或undefined
+- falsy：值为null、undefined、false、0、''
+- truthy
+
+```js
+if (true)
+if ({})
+if ([])
+if (42)
+if ("0")
+if ("false")
+if (new Date())
+if (-42)
+if (12n)
+if (3.14)
+if (-3.14)
+if (Infinity)
+if (-Infinity)
+```
+
+![img.png](/imgs/base/js/expression-4.png)
