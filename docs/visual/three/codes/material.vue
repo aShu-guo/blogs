@@ -25,8 +25,9 @@ import {
 } from 'three';
 import { onMounted, shallowRef } from 'vue';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import logo from './logo.jpeg';
-import alphaMap from './alpha-map.png';
+import door from '../assets/door/color.jpg';
+import alpha from '../assets/door/alpha.jpg';
+import ambientOcclusion from '../assets/door/ambientOcclusion.jpg';
 
 defineOptions({ name: 'Material' });
 
@@ -42,16 +43,12 @@ scene.add(camera);
 
 // 设置物体
 const geometry = new BoxGeometry(3, 3, 3);
-
 const textureLoader = new TextureLoader();
-const texture = textureLoader.load(logo as string);
-
-// 加载alpha map
-const alphaTexture = textureLoader.load(alphaMap as string);
 
 const basicMaterial = new MeshBasicMaterial({
-  map: texture,
-  alphaMap: alphaTexture,
+  map: textureLoader.load(door as string), // 加载纹理贴图
+  alphaMap: textureLoader.load(alpha as string), // 加载alpha map
+  aoMap: textureLoader.load(ambientOcclusion as string),
   transparent: true,
   // opacity: 0.3,
   side: DoubleSide,
@@ -59,6 +56,8 @@ const basicMaterial = new MeshBasicMaterial({
 
 const mesh = new Mesh(geometry, basicMaterial);
 scene.add(mesh);
+
+geometry.setAttribute('uav2', new BufferAttribute(geometry.attributes.uv.array, 2));
 
 // 创建坐标轴辅助器
 const axesHelper = new AxesHelper(5);

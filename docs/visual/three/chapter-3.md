@@ -1,5 +1,7 @@
 # 材质和纹理
 
+相关API实践
+
 ## 材质
 
 材质，又称为材料，是人类可以利用制作有用构件、器件或物品的物质。
@@ -66,7 +68,7 @@ texture.rotation = Math.PI / 4;
 
 ### 重复
 
-纹理改成如logo图，重复时更明显。可以通过设置repeat属性改变水平、垂直方向上的重复次数
+纹理改成如`logo图`，重复时更明显。可以通过设置repeat属性改变水平、垂直方向上的重复次数
 
 ```ts
 texture.repeat.set(3, 2);
@@ -112,13 +114,23 @@ texture.minFilter = NearestFilter;
 为了加快渲染速度和减少图像锯齿，将贴图处理处理成由一系列被预先计算和优化过的图片组成的文件,这样的贴图被称为 MIP map 或者 mipmap。
 :::
 
-### 透明度
+### 渲染面
+
+设置side属性控制webgl渲染哪一面， 默认为THREE.FrontSide：
+
+- THREE.FrontSide：只渲染前面
+- THREE.BackSide：只渲染后面
+- THREE.DoubleSide：渲染前面、后面
+
+![img.png](/imgs/visual/threejs/texture-7.png)
+
+### 透明贴图
 
 可以通过设置alphaMap属性来控制物体的透明度，主要要同时设置`transparent`属性为`true`
 
 alphaMap对应的图如下
 
-![img.png](/imgs/visual/threejs/texture-6.png)
+<img src="/imgs/visual/threejs/texture-8.jpg" style="width: 50%">
 
 在alphaMap图中对应的`黑色为透明`，`白色为不透明`
 
@@ -135,17 +147,15 @@ const basicMaterial = new MeshBasicMaterial({
 });
 ```
 
-### 渲染面
-
-设置side属性控制webgl渲染哪一面， 默认为THREE.FrontSide：
-
-- THREE.FrontSide：只渲染前面
-- THREE.BackSide：只渲染后面
-- THREE.DoubleSide：渲染前面、后面
+![img.png](/imgs/visual/threejs/texture-9.png)
 
 ### 环境遮挡贴图
 
-通过设置aoMap属性添加环境遮挡贴图，是物体看起来更像三维的。设置aoMap时，需要同时设置第二组UV
+通过设置aoMap属性添加环境遮挡贴图，是物体看起来更像三维的。设置aoMap时，需要同时对物体设置第二组UV
+
+<img src="/imgs/visual/threejs/texture-10.jpg" style="width: 50%">
+
+渲染结果如下：
 
 <script setup>
 import Material from './codes/material.vue'

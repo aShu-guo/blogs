@@ -15,8 +15,8 @@ hero:
   tagline: 加油更新中
   actions:
     - theme: brand
-      text: 3D数学
-      link: /visual/3d-math/
+      text: JavaScript
+      link: /base/js/
     - theme: brand
       text: Vue-RFCs翻译
       link: /ecology/vue/rfcs/
@@ -26,12 +26,21 @@ hero:
     - theme: brand
       text: Vue3.x源码解析
       link: /ecology/vue/3.x/
+    - theme: brand
+      text: 3D数学
+      link: /visual/3d-math/
+    - theme: brand
+      text: Three
+      link: /visual/three/
+    - theme: brand
+      text: blender
+      link: /visual/three/
 
 features:
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: 重学JS
+    details: 根据JS权威指南第7版、JS高级程序设计第4版，对JS知识进行系统学习、查漏补缺
+  - title: 可视化
+    details: 从入门到进阶，章节包含3D数学、Three入门到进阶、Blander指南
   - title: Feature C
     details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
 ---
