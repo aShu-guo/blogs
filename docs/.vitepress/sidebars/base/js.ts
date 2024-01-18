@@ -7,6 +7,7 @@ export default {
         { text: '词法结构', link: '/base/js/1-chapter' },
         { text: '类型、值和变量', link: '/base/js/3-chapter' },
         { text: '表达式与操作符', link: '/base/js/4-chapter' },
+        { text: '模块', link: '/base/js/10-chapter' },
       ],
     },
     {

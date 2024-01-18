@@ -9,17 +9,12 @@ import {
   AxesHelper,
   BoxGeometry,
   BufferAttribute,
-  BufferGeometry,
-  Color,
   DoubleSide,
-  LinearFilter,
   Mesh,
   MeshBasicMaterial,
-  MirroredRepeatWrapping,
-  NearestFilter,
   PerspectiveCamera,
-  RepeatWrapping,
   Scene,
+  SRGBColorSpace,
   TextureLoader,
   WebGLRenderer,
 } from 'three';
@@ -45,8 +40,11 @@ scene.add(camera);
 const geometry = new BoxGeometry(3, 3, 3);
 const textureLoader = new TextureLoader();
 
+const map = textureLoader.load(door as string);
+map.colorSpace = SRGBColorSpace;
+
 const basicMaterial = new MeshBasicMaterial({
-  map: textureLoader.load(door as string), // 加载纹理贴图
+  map: map, // 加载纹理贴图
   alphaMap: textureLoader.load(alpha as string), // 加载alpha map
   aoMap: textureLoader.load(ambientOcclusion as string),
   transparent: true,
@@ -67,7 +65,6 @@ onMounted(() => {
   // 初始化渲染器
   renderer.value = new WebGLRenderer({ antialias: true, canvas: document.getElementById('cube') as HTMLCanvasElement });
   renderer.value.setSize(720, 405);
-
   const controls = new OrbitControls(camera, renderer.value.domElement);
   controls.enableDamping = true;
 

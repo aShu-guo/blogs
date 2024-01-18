@@ -16,7 +16,10 @@ export default {
         {
           text: '材质和纹理',
           link: '/visual/three/chapter-3',
-          items: [{ text: '纹理', link: '/visual/three/chapter-3.1' }],
+          items: [
+            { text: '纹理', link: '/visual/three/chapter-3.1' },
+            { text: '色彩空间', link: '/visual/three/chapter-3.2' },
+          ],
         },
         { text: 'PBR', link: '/visual/three/chapter-4' },
       ],

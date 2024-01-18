@@ -153,9 +153,40 @@ const basicMaterial = new MeshBasicMaterial({
 
 通过设置aoMap属性添加环境遮挡贴图，是物体看起来更像三维的。设置aoMap时，需要同时对物体设置第二组UV
 
-<img src="/imgs/visual/threejs/texture-10.jpg" style="width: 50%">
+<img src="/imgs/visual/threejs/textures/ambientOcclusion.jpg" style="width: 50%">
 
-渲染结果如下：
+```ts
+// 设置aoMap
+const basicMaterial = new MeshBasicMaterial({
+  map: map, // 加载纹理贴图
+  alphaMap: textureLoader.load(alpha as string), // 加载alpha map
+  aoMap: textureLoader.load(ambientOcclusion as string),
+  transparent: true,
+  // opacity: 0.3,
+  side: DoubleSide,
+});
+
+// 为物体添加第二组uv
+geometry.setAttribute('uav2', new BufferAttribute(geometry.attributes.uv.array, 2));
+```
+
+渲染结果如下
+
+![img.png](/imgs/visual/threejs/texture-11.png)
+
+可以看到渲染结果与`color纹理`相比，颜色上有很大差异。texture和renderer的颜色空间不一致，则会导致严重的色差。
+
+<img src="/imgs/visual/threejs/textures/color.jpg" style="width: 50%">
+
+在之前的three版本中，加载后的texture的颜色空间模默认值为`THREE.LinearEncoding`，renderer的颜色空间模默认值也为`THREE.LinearEncoding`，因此在加载texture时无需显示指定即可正常渲染。
+
+但是在最新的版本（`0.160.0`）中，加载后的texture的颜色空间模默认值为`THREE.NoColorSpace`，renderer的颜色空间为`THREE.SRGBColorSpace`，两者不同则导致了严重的色差。
+
+因此需要显式指定texture的colorSpace与renderer保持一致
+
+```ts
+texture.colorSpace = SRGBColorSpace;
+```
 
 <script setup>
 import Material from './codes/material.vue'
@@ -164,3 +195,7 @@ import Material from './codes/material.vue'
 <ClientOnly>
     <Material></Material>
 </ClientOnly>
+
+参考：
+
+【1】[纹理encoding和渲染器](http://www.webgl3d.cn/pages/c2fd5c/#webgl%E6%B8%B2%E6%9F%93%E5%99%A8-outputencoding)
