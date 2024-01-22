@@ -8,6 +8,7 @@ export default {
         { text: '类型、值和变量', link: '/base/js/3-chapter' },
         { text: '表达式与操作符', link: '/base/js/4-chapter' },
         { text: '模块', link: '/base/js/10-chapter' },
+        { text: '异步', link: '/base/js/13-chapter' },
       ],
     },
     {
@@ -16,6 +17,7 @@ export default {
         { text: 'delete关键字', link: '/base/js/delete' },
         { text: '闭包与垃圾回收', link: '/base/js/closure与gc' },
         { text: 'BigInt与IEEE-754', link: '/base/js/safe-number' },
+        { text: 'regenerator', link: '/base/js/regenerator' },
       ],
     },
   ],
