@@ -33,11 +33,25 @@
 
 ### 高度纹理
 
-### 法线纹理
+模拟物体不同部位的凹凸，白色表示凸起程度高，黑色表示凸起程度低
+
+<img src="/imgs/visual/threejs/textures/height.jpg" style="width: 50%">
 
 ### 粗糙度纹理
 
+模拟物体表面的粗糙度
+
+<img src="/imgs/visual/threejs/textures/roughness.jpg" style="width: 50%">
+
 ### 金属度纹理
+
+控制物体上哪些部分是金属，哪些部分不是金属。其中白色的部分表示金属，越黑则越不是金属。下图中灰色的部分是生锈的金属
+
+<img src="/imgs/visual/threejs/textures/metalness.jpg" style="width: 50%">
+
+### 法线纹理
+
+<img src="/imgs/visual/threejs/textures/normal.jpg" style="width: 50%">
 
 参考：
 

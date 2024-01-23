@@ -263,7 +263,7 @@ function test() {
 
 使用var声明变量与let、const有以下不同：
 
-1. 没有块作用域，只有函数作用域和全局作用域。使用`var声明变量`，会`自动将变量添加到最接近的作用域`中。这也是模块化方案没出现之前，`IIFE普遍使用的原因`
+1. 没有块作用域，只有函数作用域和全局作用域。使用`var声明变量`，会自动将变量添加到`最接近`的作用域中。这也是模块化方案没出现之前，`IIFE普遍使用的原因`
 
 ```js
 // 全局作用域
@@ -275,7 +275,7 @@ console.log(test); // true
 ```
 
 ```js
-// 函数作用域
+// 函数作用域：case1
 
 function test() {
   if (true) {
@@ -287,6 +287,19 @@ test();
 console.log(a); // Uncaught ReferenceError: a is not defined
 ```
 
+```js
+// 函数作用域：case2
+
+function test() {
+  if (true) {
+    var a = true;
+  }
+  console.log(a);
+}
+
+test(); // true
+```
+
 其中，在全局作用域中使用var声明的变量，可以理解为在globalThis对象上添加属性
 
 ```js
@@ -294,7 +307,7 @@ var a = 123;
 console.log(globalThis.a); // 123
 ```
 
-2. 作用域提升（hoisting），使用var声明的变量会提升到作用域的顶部
+2. 作用域提升（hoisting），使用var声明的变量会提升到`当前作用域`的顶部
 
 提升（hoisting）意味着可以在变量未声明之前访问，并且不会抛出异常
 
@@ -350,3 +363,49 @@ console.log(a); // 1
 :::info
 在ES6之前，JS只有两个作用域：`函数作用域`和`全局作用域`。但是在ES6之后，出现了另外一种作用域：`块级作用域`，即用花括号包裹的部分
 :::
+
+## 面试题
+
+1. 使用var声明变量的for循环中，迭代执行setTimeout
+
+```js
+for (var i = 0; i < 5; i++) {
+  setTimeout(() => {
+    console.log(i);
+  }, 1000);
+}
+/*
+5
+5
+5
+5
+5
+ */
+```
+
+原因：
+
+var声明的变量存在变量提升，导致setTimeout宏任务中访问的变量i，实际上是访问的全局变量中的i
+
+解决方案：
+
+- 使用let声明i
+- 利用IIFE
+
+```js
+for (var i = 0; i < 5; i++) {
+  (function (j) {
+    setTimeout(() => {
+      console.log(j);
+    }, 1000);
+  })(i);
+}
+```
+
+- 使用setTimeout的第三个参数
+
+```js
+for (var i = 0; i < 5; i++) {
+  setTimeout(console.log, 1000, i);
+}
+```

@@ -361,6 +361,42 @@ ES2017解释器是将函数体分割成一系列独立的子函数，每个子�
 
 :::
 
+## 异步迭代
+
+ES2018提供了一种迭代异步操作的解决方案：for await ... of。使用场景是只有在前一个promise对象兑现时，才会去执行下一个promise对象
+
+例如，请求一个url集合，并且依次串行请求
+
+```js
+const urls = [url1, url2, url3];
+const promises = urls.map(fetch);
+```
+
+使用常规for/of进行迭代
+
+```js
+for (let promise of promises) {
+  const response = await promise();
+  handle(response);
+}
+```
+
+使用新语法简化
+
+```js
+for await (const response of promises) {
+  handle(response);
+}
+```
+
+:::warning
+注意，for await ... of`只适用于`异步可迭代
+:::
+
+### 异步迭代器
+
+与常规迭代器（[Symbol.iterator]）不同，异步迭代器使用（[Symbol.asyncIterator]）定义，异步迭代器对象提供一个next对象并返回一个promise对象。
+
 参考：
 
 【1】[ES6 transpilation ES5(Babel.js)](https://jstool.gitlab.io/babel-es6-to-es5/)

@@ -27,6 +27,8 @@ import door from '../assets/door/color.jpg';
 import alpha from '../assets/door/alpha.jpg';
 import ambientOcclusion from '../assets/door/ambientOcclusion.jpg';
 import height from '../assets/door/height.jpg';
+import roughness from '../assets/door/roughness.jpg';
+import normal from '../assets/door/normal.jpg';
 
 defineOptions({ name: 'PRBMaterial' });
 
@@ -35,13 +37,18 @@ const renderer = shallowRef<WebGLRenderer>();
 const scene = new Scene();
 
 // 创建相机
-const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new PerspectiveCamera(
+  75,
+  window.innerWidth / window.innerHeight,
+  0.1,
+  1000,
+);
 // 设置相机位置
 camera.position.set(0, 0, 10);
 scene.add(camera);
 
 // 设置物体
-const geometry = new BoxGeometry(3, 3, 3, 200, 200, 200);
+const geometry = new BoxGeometry(3, 3, 3, 100, 100, 100);
 const textureLoader = new TextureLoader();
 
 const map = textureLoader.load(door as string);
@@ -52,7 +59,10 @@ const basicMaterial = new MeshStandardMaterial({
   alphaMap: textureLoader.load(alpha as string), // 加载alpha map
   aoMap: textureLoader.load(ambientOcclusion as string),
   displacementMap: textureLoader.load(height as string),
-  displacementScale: 0.2,
+  displacementScale: 0.1,
+  roughnessMap: textureLoader.load(roughness as string),
+  roughness: 1,
+  normalMap: textureLoader.load(normal as string),
   transparent: true,
   // opacity: 0.3,
   side: DoubleSide,
@@ -61,14 +71,17 @@ const basicMaterial = new MeshStandardMaterial({
 const mesh = new Mesh(geometry, basicMaterial);
 scene.add(mesh);
 
-geometry.setAttribute('uav2', new BufferAttribute(geometry.attributes.uv.array, 2));
+geometry.setAttribute(
+  'uav2',
+  new BufferAttribute(geometry.attributes.uv.array, 2),
+);
 
 // 设置环境光
 const light = new AmbientLight(0xffffff, 0.5);
 scene.add(light);
 // 设置平行光，模拟太阳光照
 const directionLight = new DirectionalLight(0xffffff, 1);
-directionLight.position.set(2, 2, 2);
+directionLight.position.set(10, 10, 10);
 scene.add(directionLight);
 
 // 创建坐标轴辅助器
@@ -77,7 +90,10 @@ scene.add(axesHelper);
 
 onMounted(() => {
   // 初始化渲染器
-  renderer.value = new WebGLRenderer({ antialias: true, canvas: document.getElementById('cube') as HTMLCanvasElement });
+  renderer.value = new WebGLRenderer({
+    antialias: true,
+    canvas: document.getElementById('cube') as HTMLCanvasElement,
+  });
   renderer.value.setSize(720, 405);
   const controls = new OrbitControls(camera, renderer.value.domElement);
   controls.enableDamping = true;
