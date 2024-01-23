@@ -51,6 +51,8 @@
 
 ### 法线纹理
 
+模拟出几何体表面的`微小细节`，例如凹陷、凸起、皱褶等等，增加几何体表面的`真实感`和细节。
+
 <img src="/imgs/visual/threejs/textures/normal.jpg" style="width: 50%">
 
 参考：

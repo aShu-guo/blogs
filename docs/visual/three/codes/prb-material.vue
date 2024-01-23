@@ -57,7 +57,7 @@ map.colorSpace = SRGBColorSpace;
 const basicMaterial = new MeshStandardMaterial({
   map: map, // 加载纹理贴图
   alphaMap: textureLoader.load(alpha as string), // 加载alpha map
-  aoMap: textureLoader.load(ambientOcclusion as string),
+  // aoMap: textureLoader.load(ambientOcclusion as string),
   displacementMap: textureLoader.load(height as string),
   displacementScale: 0.1,
   roughnessMap: textureLoader.load(roughness as string),
@@ -71,10 +71,10 @@ const basicMaterial = new MeshStandardMaterial({
 const mesh = new Mesh(geometry, basicMaterial);
 scene.add(mesh);
 
-geometry.setAttribute(
+/*geometry.setAttribute(
   'uav2',
   new BufferAttribute(geometry.attributes.uv.array, 2),
-);
+);*/
 
 // 设置环境光
 const light = new AmbientLight(0xffffff, 0.5);

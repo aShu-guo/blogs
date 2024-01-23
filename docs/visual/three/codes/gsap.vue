@@ -2,7 +2,12 @@
   <div style="width: 100%; background: white; color: black; padding: 20px">
     <div
       id="gsap-radio-box"
-      style="display: flex; justify-content: space-between; width: 70%; margin: 0 auto"
+      style="
+        display: flex;
+        justify-content: space-between;
+        width: 70%;
+        margin: 0 auto;
+      "
       @click="changeHandler"
     >
       <div>
@@ -23,14 +28,37 @@
       </div>
     </div>
     <div style="display: flex; margin-top: 20px; justify-content: center">
-      <div style="width: 100px; height: 100px; border-radius: 50%; border: dashed 1px"></div>
+      <div
+        style="
+          width: 100px;
+          height: 100px;
+          border-radius: 50%;
+          border: dashed 1px;
+        "
+      ></div>
       <div
         id="geometry"
-        style="width: 100px; height: 100px; border-radius: 50%; background: red; margin: 0 100px"
+        style="
+          width: 100px;
+          height: 100px;
+          border-radius: 50%;
+          background: red;
+          margin: 0 100px;
+        "
       ></div>
-      <div style="width: 100px; height: 100px; border-radius: 50%; border: dashed 1px"></div>
+      <div
+        style="
+          width: 100px;
+          height: 100px;
+          border-radius: 50%;
+          border: dashed 1px;
+        "
+      ></div>
     </div>
-    <div v-if="code" style="display: flex; justify-content: center; margin-top: 20px">
+    <div
+      v-if="code"
+      style="display: flex; justify-content: center; margin-top: 20px"
+    >
       <code>{{ code }}</code>
     </div>
   </div>
@@ -38,7 +66,8 @@
 
 <script setup>
 import gsap from 'gsap';
-import { nextTick, onMounted, ref } from 'vue';
+import { ref } from 'vue';
+
 defineOptions({ name: 'gasp' });
 
 const code = ref('');
@@ -78,7 +107,8 @@ const changeHandler = (e) => {
           duration: 3,
         },
       );
-      code.value = "gsap.fromTo('#geometry', { x: -200 }, { x: 200, duration: 3 })";
+      code.value =
+        "gsap.fromTo('#geometry', { x: -200 }, { x: 200, duration: 3 })";
       break;
     case 'set':
       gsap.fromTo(

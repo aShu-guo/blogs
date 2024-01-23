@@ -7,7 +7,13 @@
 ```js
 import gsap from 'gsap';
 
-const anmi = gsap.to(cube.position, { y: 5, duration: 3, ease: 'power1.in', repeat: -1, yoyo: true });
+const anmi = gsap.to(cube.position, {
+  y: 5,
+  duration: 3,
+  ease: 'power1.in',
+  repeat: -1,
+  yoyo: true,
+});
 ```
 
 ## 常用方法
@@ -19,14 +25,6 @@ const anmi = gsap.to(cube.position, { y: 5, duration: 3, ease: 'power1.in', repe
 
 - gsap.fromTo()：需要自己定义两个状态的数据，然后从`前一个`变化到`后一个`。
 - gsap.set()：直接设置成想要的状态，`没有任何过度与动画效果`。本质上就是duration为0的 .to 方法
-
-<script setup>
-import gasp from './codes/gsap.vue'
-</script>
-
-<ClientOnly>
-    <gasp></gasp>
-</ClientOnly>
 
 ## 属性
 
