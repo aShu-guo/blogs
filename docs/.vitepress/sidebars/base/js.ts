@@ -18,6 +18,7 @@ export default {
         { text: '闭包与垃圾回收', link: '/base/js/closure与gc' },
         { text: 'BigInt与IEEE-754', link: '/base/js/safe-number' },
         { text: 'regenerator', link: '/base/js/regenerator' },
+        { text: 'Unicode与ASCII', link: '/base/js/unicode与ascii' },
       ],
     },
   ],
