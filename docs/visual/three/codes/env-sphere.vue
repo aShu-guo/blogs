@@ -28,10 +28,9 @@ import py from '../assets/env/posy.png';
 import ny from '../assets/env/negy.png';
 import pz from '../assets/env/posz.png';
 import nz from '../assets/env/negz.png';
-import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import hdr2k from '../assets/env/rgbe-2k.hdr?url';
 import hdr4k from '../assets/env/rgbe-4k.hdr?url';
-
 
 defineOptions({ name: 'EnvSphere' });
 
