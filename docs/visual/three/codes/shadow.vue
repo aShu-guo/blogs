@@ -22,7 +22,6 @@ import {
   TextureLoader,
   WebGLRenderer,
 } from 'three';
-import * as dat from 'dat.gui';
 import { onMounted, shallowRef } from 'vue';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import door from '../assets/door/color.jpg';
@@ -54,6 +53,8 @@ const camera = new PerspectiveCamera(
 // 设置相机位置
 camera.position.set(0, 0, 10);
 scene.add(camera);
+const shadowCameraHelper1 = new CameraHelper(camera);
+scene.add(shadowCameraHelper1);
 
 // 初始化texture loader
 const textureLoader = new TextureLoader();

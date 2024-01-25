@@ -50,6 +50,8 @@ directionLight.shadow.camera.right = 5;
 
 ![img.png](/imgs/visual/threejs/shadow.png)
 
+开启`directionLight.shadow.camera`、场景中相机的`cameraHelper`
+
 <script setup>
 import Shadow from './codes/shadow.vue'
 </script>
