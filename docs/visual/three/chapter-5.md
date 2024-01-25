@@ -61,3 +61,18 @@ import Shadow from './codes/shadow.vue'
 </ClientOnly>
 
 ## 光源
+
+### 聚光灯
+
+以上示例使用的都是平行光（即模拟真实世界的太阳光），聚光灯示例可参考
+
+![img.png](/imgs/visual/threejs/shadow-1.png)
+
+<a href="/blogs/three/spot-light.html" target="_blank">聚光灯</a>
+
+### 点光灯
+
+![img.png](/imgs/visual/threejs/shadow-2.gif)
+
+
+<a href="/blogs/three/point-light.html" target="_blank">点光灯</a>
