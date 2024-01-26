@@ -5,6 +5,12 @@
 - 子类可以访问父类的属性和方法
 - `instanceof`行为正确
 - `construct`指向正确
+  - 子类的`__proto__`属性指向构造函数的`prototype`
+
+:::info
+`__proto__`属性是对象独有的，`prototype`属性是函数所独有的，又因为函数是对象，所以函数既有`__proto__`属性，又有`prototype`属性；
+
+:::
 
 其他需要满足的可选条件：
 
@@ -12,38 +18,7 @@
 
 ## 组合继承
 
-```ts
-const Device = function (model, weight, battery) {
-    // 型号
-    this.model = model
-    // 重量
-    this.weight = weight
-    // 电池容量
-    this.battery = battery
-    this.introduce = function () {
-        console.log(`[{model: ${this.model}, weight: ${this.weight}, battery: ${this.battery}]`)
-    }
-
-    this.modifyModel = function (model) {
-        this.model = model
-        this.introduce()
-    }
-}
-
-const Airport = function (position, model, weight, battery) {
-    Device.call(this, model, weight, battery)
-    // 机场位置
-    this.position = position
-    this.fly = function () {
-        console.log('机场')
-    }
-    this.sendSignal = function (uav) {
-        console.log('向无人机:' + uav + '发送信号')
-    }
-}
-Airport.prototype = new Device('DJIxxxx-xxxx', '98kg', '60%')
-Airport.prototype.constructor = Airport
-```
+<<< @/base/js/codes/extends.ts{21,32-33}
 
 ### 缺点
 
@@ -53,13 +28,24 @@ Airport.prototype.constructor = Airport
 
 将上述修改为`寄生组合继承`只需要将`new Device`修改为`Object.create(Device.prototype)`
 
+```js
+Airport.prototype = new Device('DJIxxxx-xxxx', '98kg', '60%'); // [!code --]
+Airport.prototype = Object.create(Device.prototype); // [!code ++]
+```
+
 `Object.create()`做了哪些操作呢？
 
 ```ts
-function object(obj) {
-    function F() {
-    } // 新的构造函数
-    F.prototype = obj;    // 继承传入的参数obj
-    return new F();        // 返回新的函数对象    
-} 
+function create(obj) {
+  function F() {} // 新的构造函数
+  F.prototype = obj; // 继承传入的参数obj
+  return new F(); // 返回新的函数对象
+}
+```
+
+当然也可以替换为`Object.setPrototypeOf`
+
+```js
+Airport.prototype = new Device('DJIxxxx-xxxx', '98kg', '60%'); // [!code --]
+Object.setPrototypeOf(Airport.prototype, Device.prototype); // [!code ++]
 ```

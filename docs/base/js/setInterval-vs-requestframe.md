@@ -24,22 +24,21 @@
 
 ```js
 const promise = new Promise((resolve) => {
-    console.log('promise')
-    resolve()
-})
+  console.log('promise');
+  resolve();
+});
 
-promise.then(res => {
-    console.log('promise then')
-})
-
+promise.then((res) => {
+  console.log('promise then');
+});
 
 setTimeout(() => {
-    console.log('setTimeout')
-})
+  console.log('setTimeout');
+});
 
 requestAnimationFrame(() => {
-    console.log('requestAnimationFrame')
-})
+  console.log('requestAnimationFrame');
+});
 
 /*
 如果是 微任务，输出顺序微：
@@ -66,9 +65,8 @@ requestAnimationFrame
 在页面重新绘制之前有渲染时机的判断`Rendering opportunities`，用来减少不必要的渲染。也就是说，如果`setTimeout`
 回调执行了多次之后，浏览器发现还不到渲染时机，那么便不会执行重绘。例如在1帧之内执行多次`setTimeout`，并不会立刻渲染，这会导致渲染的DOM出现掉帧
 
-
 参考：
+
 【1】[requestAnimationFrame 执行机制探索](https://segmentfault.com/a/1190000040945949)
+
 【2】[8.6 Timers](https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html#dom-settimeout)
-
-

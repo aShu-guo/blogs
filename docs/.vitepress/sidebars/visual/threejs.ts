@@ -23,6 +23,8 @@ export default {
         },
         { text: 'PBR', link: '/visual/three/chapter-4' },
         { text: '阴影与灯光', link: '/visual/three/chapter-5' },
+        { text: '点', link: '/visual/three/chapter-6' },
+
       ],
     },
   ],

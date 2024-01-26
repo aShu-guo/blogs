@@ -20,6 +20,12 @@ export default {
         { text: 'BigInt与IEEE-754', link: '/base/js/safe-number' },
         { text: 'regenerator', link: '/base/js/regenerator' },
         { text: 'Unicode与ASCII', link: '/base/js/unicode与ascii' },
+        { text: '手动实现继承', link: '/base/js/extends' },
+        {
+          text: 'setInterval与requestFrame',
+          link: '/base/js/setInterval-vs-requestframe',
+        },
+        { text: '解构', link: '/base/js/unconstruct' },
       ],
     },
   ],
