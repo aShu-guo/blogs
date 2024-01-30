@@ -1,4 +1,4 @@
-# 特殊的类型
+# 特殊类型
 
 在ts中除了基本类型之外，还有5个特殊的类型：`any`、`unknown`、`never`、`null`、`undefined`
 

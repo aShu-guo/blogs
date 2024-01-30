@@ -22,6 +22,7 @@ import Nest from './sidebars/server/nest';
 import Math from './sidebars/visual/3d-math';
 import ComputerGraphics from './sidebars/visual/computer-graphics';
 import JavaScript from './sidebars/base/js';
+import TypeScript from './sidebars/base/ts';
 import ThreeJs from './sidebars/visual/threejs';
 import Exam from './sidebars/life/exam';
 // 支持mathJax
@@ -38,8 +39,17 @@ export default defineConfig({
   sitemap: { hostname: 'https://ashu-guo.github.io/blogs/' },
   head: [
     //   google
-    ['script', { async: '', src: 'https://www.googletagmanager.com/gtag/js?id=G-0H3Z4EZZYF' }],
-    ['meta', { name: 'viewport', content: 'width=device-width, initial-scale=1' }],
+    [
+      'script',
+      {
+        async: '',
+        src: 'https://www.googletagmanager.com/gtag/js?id=G-0H3Z4EZZYF',
+      },
+    ],
+    [
+      'meta',
+      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+    ],
     [
       'script',
       {},
@@ -88,7 +98,15 @@ export default defineConfig({
         indexName: 'ashu-guoio',
       },
     },
-    nav: [...BaseNavs, ...MvvmNavs, ...CoursesNavs, ...VisualNavs, ...ServerNavs, ...HybridAppNavs, ...LifeNavs],
+    nav: [
+      ...BaseNavs,
+      ...MvvmNavs,
+      ...CoursesNavs,
+      ...VisualNavs,
+      ...ServerNavs,
+      ...HybridAppNavs,
+      ...LifeNavs,
+    ],
     sidebar: {
       ...RfcTranslate,
       ...Version2,
@@ -105,10 +123,13 @@ export default defineConfig({
       ...Nest,
       ...Math,
       ...JavaScript,
+      ...TypeScript,
       ...ThreeJs,
       ...Exam,
     },
 
-    socialLinks: [{ icon: 'github', link: 'https://github.com/aShu-guo/blogs' }],
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/aShu-guo/blogs' },
+    ],
   },
 });

@@ -9,7 +9,11 @@ export default {
         { text: '表达式与操作符', link: '/base/js/4-chapter' },
         { text: '模块', link: '/base/js/10-chapter' },
         { text: '异步', link: '/base/js/13-chapter' },
-        { text: '元编程', link: '/base/js/14-chapter' },
+        {
+          text: '元编程',
+          link: '/base/js/14-chapter',
+          items: [{ text: 'Proxy', link: '/base/js/14.1-chapter' }],
+        },
       ],
     },
     {

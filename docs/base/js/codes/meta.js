@@ -1,12 +1,13 @@
-let a = {};
-Object.create(a, {
-  name: {
-    value: 'hello world',
-    writable: true,
-    /*get() {
-      return this.name;
-    },*/
+let map = new Map();
+
+let proxy = new Proxy(map, {
+  get(target, p, receiver) {
+    let value = Reflect.get(...arguments);
+    // console.log('>>>>value:', value === target.get);
+    // console.log('>>>>value:', value === map.get);
+
+    return typeof value === 'function' ? value.bind(target) : value;
   },
 });
 
-console.log(a.name);
+proxy.set('test', 1); // Error
