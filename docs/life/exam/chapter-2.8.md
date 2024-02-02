@@ -42,7 +42,7 @@
 
 ## Redis和Memcache区别
 
-![img.png](/imgs/life/exam-24.png)
+![img.png](/imgs/life/exam/exam-24.png)
 
 ## Redis与Mysql常见同步方案
 

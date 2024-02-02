@@ -25,6 +25,8 @@ import JavaScript from './sidebars/base/js';
 import TypeScript from './sidebars/base/ts';
 import ThreeJs from './sidebars/visual/threejs';
 import Exam from './sidebars/life/exam';
+import Pregnancy from './sidebars/life/pregnancy';
+
 // 支持mathJax
 import mathjax3 from 'markdown-it-mathjax3';
 import { customElements } from './customElements';
@@ -126,6 +128,7 @@ export default defineConfig({
       ...TypeScript,
       ...ThreeJs,
       ...Exam,
+      ...Pregnancy,
     },
 
     socialLinks: [

@@ -1,6 +1,6 @@
 # 公用模版
 
-![img.png](/imgs/life/exam-13.png)
+![img.png](/imgs/life/exam/exam-13.png)
 
 
 【概要】

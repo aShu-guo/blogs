@@ -46,7 +46,7 @@ D1-D4：房主信息文件、租赁者信息文件、房屋信息文件、看房
 
 ERD图作用
 
-![img.png](/imgs/life/exam-23.png)
+![img.png](/imgs/life/exam/exam-23.png)
 
 ### 问题3（0分）
 
@@ -64,7 +64,7 @@ Real User Case表示的是真实世界中存在的需求。在系统中可以支
 
 分布式数据库缓存：去中心化的将数据分布存储在不同的数据库，并且将热点数据存放缓存中，以此来提高系统性能
 
-![img.png](/imgs/life/exam-24.png)
+![img.png](/imgs/life/exam/exam-24.png)
 
 ### 问题2（8分）
 

@@ -4,7 +4,7 @@
 
 ### 问题1（9分）
 
-![img.png](/imgs/life/exam-17.png)
+![img.png](/imgs/life/exam/exam-17.png)
 
 ### 问题2
 
@@ -22,14 +22,14 @@
 
 ### 问题1
 
-![img.png](/imgs/life/exam-18.png)
+![img.png](/imgs/life/exam/exam-18.png)
 
 3-8系统管理员：a、c、f、h、I、j
 9-12患者：b、d、e、g
 
 ### 问题2
 
-![img.png](/imgs/life/exam-19.png)
+![img.png](/imgs/life/exam/exam-19.png)
 
 顺序图：又称为时序图，关注交互消息的时间顺序
 

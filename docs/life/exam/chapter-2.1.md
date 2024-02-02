@@ -6,7 +6,7 @@
 
 ### 问题1
 
-![img.png](/imgs/life/exam-14.png)
+![img.png](/imgs/life/exam/exam-14.png)
 
 ### 问题2
 
@@ -30,7 +30,7 @@
 
 ### 问题1
 
-![img.png](/imgs/life/exam-15.png)
+![img.png](/imgs/life/exam/exam-15.png)
 
 ### 问题2
 
@@ -55,7 +55,7 @@ Memcache和redis都是nosql数据库的代表，其中数据类型方面，redis
 
 ### 问题2
 
-![img.png](/imgs/life/exam-16.png)
+![img.png](/imgs/life/exam/exam-16.png)
 
 ### 问题3
 

@@ -4,7 +4,7 @@
 
 ### 问题1（12分）
 
-![img.png](/imgs/life/exam-20.png)
+![img.png](/imgs/life/exam/exam-20.png)
 
 ### 问题2
 
@@ -18,13 +18,13 @@
 
 ### 问题1（6分）
 
-![img.png](/imgs/life/exam-21.png)
+![img.png](/imgs/life/exam/exam-21.png)
 
 数据平衡原则：
 
 ### 问题2（9分）
 
-![img.png](/imgs/life/exam-22.png)
+![img.png](/imgs/life/exam/exam-22.png)
 
 ### 问题3（3分）
 
