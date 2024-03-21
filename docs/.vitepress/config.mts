@@ -16,6 +16,7 @@ import Network from './sidebars/base/network';
 import Css from './sidebars/base/css';
 import Git from './sidebars/base/version-control';
 import ComputerOrganization from './sidebars/courses/computer-organization';
+import C11 from './sidebars/courses/c11';
 import Containerization from './sidebars/server/containerization';
 import Database from './sidebars/server/database';
 import Nest from './sidebars/server/nest';
@@ -27,8 +28,6 @@ import ThreeJs from './sidebars/visual/threejs';
 import Exam from './sidebars/life/exam';
 import Pregnancy from './sidebars/life/pregnancy';
 
-// 支持mathJax
-import mathjax3 from 'markdown-it-mathjax3';
 import { customElements } from './customElements';
 
 // https://vitepress.dev/reference/site-config
@@ -74,9 +73,8 @@ export default defineConfig({
     ],
   ],
   markdown: {
-    config: (md) => {
-      md.use(mathjax3);
-    },
+    // 支持mathJax
+    math: true,
   },
   vue: {
     template: {
@@ -118,6 +116,7 @@ export default defineConfig({
       ...Css,
       ...Git,
       ...ComputerOrganization,
+      ...C11,
       ...Containerization,
       ...Network,
       ...Database,
