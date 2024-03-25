@@ -13,6 +13,6 @@
   "dependencies": {
     "gsap": "^3.12.4",
     "three": "^0.160.0",
-    "vitepress": "^1.0.0-rc.41"
+    "vitepress": "^1.0.0"
   }
 }
