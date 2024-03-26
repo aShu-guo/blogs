@@ -15,6 +15,7 @@ import Nuxt from './sidebars/ecology/vue/nuxt';
 import Network from './sidebars/base/network';
 import Css from './sidebars/base/css';
 import Git from './sidebars/base/version-control';
+import Npm from './sidebars/base/npm';
 import ComputerOrganization from './sidebars/courses/computer-organization';
 import C11 from './sidebars/courses/c11';
 import Containerization from './sidebars/server/containerization';
@@ -115,6 +116,7 @@ export default defineConfig({
       ...Network,
       ...Css,
       ...Git,
+      ...Npm,
       ...ComputerOrganization,
       ...C11,
       ...Containerization,

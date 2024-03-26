@@ -8,6 +8,7 @@ export default [
           { text: '计算机网络', link: '/base/network/' },
           { text: 'markdown', link: '/base/markdown/' },
           { text: '版本控制工具', link: '/base/version-control/' },
+          { text: 'npm', link: '/base/npm/' },
         ],
       },
       {
