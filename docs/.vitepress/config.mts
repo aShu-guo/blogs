@@ -35,7 +35,7 @@ import { customElements } from './customElements';
 export default defineConfig({
   title: 'Blogs',
   description: 'A VitePress Site',
-  base: '/blogs/',
+  // base: '/blogs/',
   lastUpdated: true,
   lang: ' ',
   sitemap: { hostname: 'https://ashu-guo.github.io/blogs/' },
