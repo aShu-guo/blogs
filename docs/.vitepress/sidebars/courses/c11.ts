@@ -2,6 +2,7 @@ export default {
   '/courses/c11/': [
     {
       text: 'C语言',
+      link: '/courses/c11/',
       items: [
         {
           text: '类型',
@@ -27,10 +28,18 @@ export default {
               text: '类型转换',
               link: '/courses/c11/chapter-1.5',
             },
+            {
+              text: 'void类型',
+              link: '/courses/c11/chapter-1.6',
+            },
+            {
+              text: '输入与输出',
+              link: '/courses/c11/chapter-1.7',
+            },
           ],
         },
         {
-          text: '指针',
+          text: '分支结构',
           link: '/courses/c11/chapter-2',
         },
       ],

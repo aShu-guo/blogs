@@ -13,7 +13,13 @@ export default {
         },
         {
           text: '缓存系统',
-          link: '/courses/computer-organization/cache',
+          link: '/courses/computer-organization/cache/',
+          items:[
+            {
+              text: 'DMA',
+              link: '/courses/computer-organization/cache/dma',
+            },
+          ]
         },
         {
           text: 'IO',
