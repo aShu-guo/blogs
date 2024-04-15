@@ -42,6 +42,10 @@ export default {
           text: '分支结构',
           link: '/courses/c11/chapter-2',
         },
+        {
+          text: '循环结构',
+          link: '/courses/c11/chapter-3',
+        },
       ],
     },
   ],
