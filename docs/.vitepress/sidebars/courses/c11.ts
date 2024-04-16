@@ -46,6 +46,10 @@ export default {
           text: '循环结构',
           link: '/courses/c11/chapter-3',
         },
+        {
+          text: '函数',
+          link: '/courses/c11/chapter-4',
+        },
       ],
     },
   ],
