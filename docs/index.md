@@ -41,8 +41,8 @@ features:
     details: 根据JS权威指南第7版、JS高级程序设计第4版，对JS知识进行系统学习、查漏补缺
   - title: 可视化
     details: 从入门到进阶，章节包含3D数学、Three入门到进阶、Blander指南
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: 计算机课程知识
+    details: 复习计算机组成原理、网络、数据结构、操作系统，并且加入了c语言的入门指南
 ---
 
 ## <div style="display:flex; align-items: center;"><img style="margin-right: 10px;" src="https://raw.githubusercontent.com/ashu-guo/ashu-guo/main/assets/wave.gif" width="50px" height="50px"></img> About Me</div>
@@ -55,7 +55,7 @@ features:
 - 🌱 I’m currently learning `webgl` and `threejs`
 - 👯 I’m looking to collaborate with Fullstack Web and Frontend visualization Developers.
 - 🤔 I’m looking for help with Open source Contribution.
-- ⚙️ I use daily: `.js`, `.vue`, `.jsx`, `.css`, `.less`, `.ts`
+- ⚙️ I use daily: `.js`, `.ts`, `.vue`, `.jsx`, `.css`, `.less`
 - 💬 Ping me about **vue**, **fullstack**, **development**, **design**
 
 </td>
@@ -204,7 +204,7 @@ features:
 
 ## <div style="display:flex; align-items: center;"><img style="margin-right: 10px;" src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width="50px" height="50px"> My Statistics</div>
 
-<table align="center">
+<table align="center" style="display: flex;justify-content: center">
 <tr border="none">
 <td width="50%" align="center">
 
@@ -224,7 +224,7 @@ features:
     <picture align="center">
       <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/ashu-guo/ashu-guo/master/assets/github-contribution-grid-snake.svg">
       <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/ashu-guo/ashu-guo/master/assets/github-contribution-grid-snake.svg">
-      <img alt="github contribution grid snake animation" src="https://raw.githubusercontent.com/ashu-guo/ashu-guo/master/assets/github-contribution-grid-snake.svg">
+      <img style="width: 100%" alt="github contribution grid snake animation" src="https://raw.githubusercontent.com/ashu-guo/ashu-guo/master/assets/github-contribution-grid-snake.svg">
     </picture>
 </p>
 
@@ -246,5 +246,5 @@ features:
 
 <div align="center">
   😍 Thanks for watching my profile! Have a nice day! 🎊 <br/>
-  &copy; 2024 ashu-guo
+  &copy; {{new Date().getFullYear()}} ashu-guo
 </div>

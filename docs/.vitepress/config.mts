@@ -29,8 +29,6 @@ import ThreeJs from './sidebars/visual/threejs';
 import Exam from './sidebars/life/exam';
 import Pregnancy from './sidebars/life/pregnancy';
 
-import { customElements } from './customElements';
-
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: 'Blogs',
@@ -77,13 +75,7 @@ export default defineConfig({
     // 支持mathJax
     math: true,
   },
-  vue: {
-    template: {
-      compilerOptions: {
-        isCustomElement: (tag) => customElements.includes(tag),
-      },
-    },
-  },
+  vue: {},
   themeConfig: {
     logo: { dark: '/logo-dark.jpeg', light: '/logo.jpeg' },
     // https://vitepress.dev/reference/default-theme-config
@@ -132,8 +124,6 @@ export default defineConfig({
       ...Pregnancy,
     },
 
-    socialLinks: [
-      { icon: 'github', link: 'https://blog.ashuguo.top/' },
-    ],
+    socialLinks: [{ icon: 'github', link: 'https://blog.ashuguo.top/' }],
   },
 });

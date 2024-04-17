@@ -15,6 +15,47 @@ struct tag{
 
 tag、member_list、variable_name三者至少出现2个才是合法的。
 
+## 声明
+
+1. 分两步，先定义，后声明
+
+```c
+struct InitMember
+{
+    int first；
+    double second；
+    char* third；
+    float four;
+};
+
+struct InitMember test,test1;
+
+```
+
+2. 定义时声明
+
+```c
+struct InitMember
+{
+    int first；
+    double second；
+    char* third；
+    float four;
+} test,test1;
+```
+
+3. 不写名称
+
+```c
+struct
+{
+    int first；
+    double second；
+    char* third；
+    float four;
+} test,test1;
+```
+
 ## 初始化
 
 ```c
@@ -25,12 +66,14 @@ struct InitMember
     char* third；
     float four;
 };
+
 ```
 
 1. 定义时赋值
 
 ```c
 struct InitMember test = {-10, 3.141590,"method one",0.25};
+
 ```
 
 2. `.语法`逐个赋值
@@ -67,3 +110,49 @@ struct InitMember test = { first: 1, second: 1.1, third: "123", four: 1.23};
 为了访问结构的成员，我们使用成**员访问运算符（.）**
 
 ## 指向结构的指针
+
+```c
+struct 结构体类型 *结构体变量名;
+```
+
+### 访问
+
+```c
+struct Student {
+    char name[10];
+    int age;
+};
+
+```
+
+1. 通过取地址对应的结构体变量来访问成员变量
+
+```c
+#include <stdio.h>
+
+int main() {
+    struct Student student = {"xiaoming", 23}, *p = &student;
+    printf("%s\n", (*p).name);
+    printf("%d", (*p).age);
+    return 0;
+}
+```
+
+2. 通过`->`访问成员变量
+
+```c
+#include <stdio.h>
+
+int main() {
+    struct Student student = {"xiaoming", 23}, *p = &student;
+    printf("%s\n", p->name);
+    printf("%d", p->age);
+    return 0;
+}
+```
+
+## 思维导图
+
+![img.png](/imgs/computes-course/c11/chapter1-10.png)
+
+![img.png](/imgs/computes-course/c11/chapter1-11.png)

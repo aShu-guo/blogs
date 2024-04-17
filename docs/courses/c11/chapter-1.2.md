@@ -265,9 +265,9 @@ int main() {
 数组名是指向第一个元素的指针，因此另外一种合法访问数组元素的语法是
 
 ```c
-int arr[10];
+int arr[10], *p = arr;
 
-*(arr + 1);
+*(arr + i) <=> *(p + i) <=> p[i]
 ```
 
 ### 静态数组与动态数组
@@ -295,7 +295,7 @@ int arr[10];
 
 动态数组示例：
 
-```c
+```c {2,6}
 #include <stdlib.h>
 #include <printf.h>
 
@@ -326,3 +326,4 @@ int main() {
 - 最后释放内存
 
 ![img.png](/imgs/computes-course/c11/chapter1-8.png)
+
