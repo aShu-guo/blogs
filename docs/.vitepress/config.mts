@@ -133,7 +133,7 @@ export default defineConfig({
     },
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/aShu-guo/blogs' },
+      { icon: 'github', link: 'https://blog.ashuguo.top/' },
     ],
   },
 });
