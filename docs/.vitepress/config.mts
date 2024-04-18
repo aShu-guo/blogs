@@ -86,9 +86,9 @@ export default defineConfig({
     search: {
       provider: 'algolia',
       options: {
-        appId: 'ODV7UOFLSM',
-        apiKey: '7fa3d227af67d13713ec1637cfb749f7',
-        indexName: 'ashu-guoio',
+        appId: '1NHJHSLIQL',
+        apiKey: 'd7b0f7826136dd1d65e829ac5b48fff0',
+        indexName: 'ashuguo',
       },
     },
     nav: [
