@@ -18,6 +18,7 @@ import Git from './sidebars/base/version-control';
 import Npm from './sidebars/base/npm';
 import ComputerOrganization from './sidebars/courses/computer-organization';
 import C11 from './sidebars/courses/c11';
+import DataStructure from './sidebars/courses/data-structure';
 import Containerization from './sidebars/server/containerization';
 import Database from './sidebars/server/database';
 import Nest from './sidebars/server/nest';
@@ -111,6 +112,7 @@ export default defineConfig({
       ...Npm,
       ...ComputerOrganization,
       ...C11,
+      ...DataStructure,
       ...Containerization,
       ...Network,
       ...Database,

@@ -11,6 +11,10 @@ export default [
         link: '/courses/network/',
       },
       {
+        text: '数据结构',
+        link: '/courses/data-structure/',
+      },
+      {
         text: 'C语言',
         link: '/courses/c11/',
       },
