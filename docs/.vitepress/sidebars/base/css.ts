@@ -50,6 +50,19 @@ export default {
             },
           ],
         },
+        {
+          text: 'Q&A',
+          items: [
+            {
+              text: 'scale与zoom的差异',
+              link: '/base/css/qa/scale-with-zoom',
+            },
+            {
+              text: '大屏自适应方案',
+              link: '/base/css/qa/screen-flexible',
+            },
+          ],
+        },
       ],
     },
   ],
