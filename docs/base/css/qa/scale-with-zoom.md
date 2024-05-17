@@ -6,7 +6,7 @@
 
 ## case
 
-<style>
+<style scoped>
 .zoom-half { zoom: 0.5; }
 .scale-half { transform: scale(0.5); }
 img{ width:10%; }
