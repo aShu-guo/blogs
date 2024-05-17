@@ -20,7 +20,7 @@ body {
         left: 0;
         background-attachment: fixed;
         background-size: revert;
-        background-image: url('pattern.svg');
+        background-image: url('/imgs/pattern.svg');
         z-index: -1;
     }
 }
