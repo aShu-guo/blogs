@@ -1,6 +1,6 @@
 const str =
   'exempt 豁免，免除\n' +
-  'dystopia 烦\n' +
+  'dystopia 反乌托邦的\n' +
   'disparage 贬低地\n' +
   'allegation 指控，无证据的说法\n' +
   'tensions 紧张，绷紧\n' +
@@ -13,9 +13,10 @@ const str =
   'position 位置，姿势，放置\n' +
   'deny 拒绝，否认\n' +
   'prosecutor 检举人，公诉人，控方律师\n' +
-  'testify 出庭作证\n' +
+  'testify 出庭作证，证明\n' +
   'appeal 上诉，呼吁，申诉\n' +
   'convict 定谁的罪，判定有罪\n' +
+  'court 法庭，造成，导致，吸引\n' +
   'motion 行动，动议\n' +
   'dismiss 解雇，释放，discharge\n' +
   'incentive 动机，诱因，原因motivation\n' +
@@ -38,7 +39,7 @@ const str =
   'obligation 义务\n' +
   'justice 正义\n' +
   'discrimination 歧视\n' +
-  'liberty 自由(自己选择生活方式而不受政府及权威限制)；冒犯行为（或言语）\n' +
+  'liberty 自由(自己选择生活方式而不受政府及权威限制)；冒犯行为（或言语）[liberty vs freedom：前者是有限制的自由，后者是绝对的自由，可以自由的做任意的事情]\n' +
   'remedy 挽救，拨正，弥补\n' +
   'comedy 喜剧\n' +
   'cope 处理，应付\n' +
@@ -48,7 +49,8 @@ const str =
   'extraordinary 非凡的\n' +
   'encounter 遭遇，经历\n' +
   'institution 制度\n' +
-  'significant 有重大意义的';
+  'significant 有重大意义的\n' +
+  'force 武力，强迫，强行';
 
 const splitWord = (str) => {
   return str.split('\n').map((item) => item.split(' ')[0]);

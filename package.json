@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "gsap": "^3.12.4",
+    "oh-my-live2d": "^0.19.3",
     "three": "^0.160.0",
     "vitepress": "^1.0.0"
   }
