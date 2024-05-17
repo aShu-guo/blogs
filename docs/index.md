@@ -10,7 +10,7 @@ head:
     - name: keywords
       content: ashu_guo vue rfcs翻译 图形学 3D数学
 hero:
-  name: <img src="https://readme-typing-svg.herokuapp.com?font=Architects+Daughter&color=%2338C2FF&size=50&center=true&vCenter=true&height=60&width=600&lines=Heyyy!+I'm+ashu+guo;TN+is+me!!!;Welcome+to+my+profile!" alt="Title"></img>
+  name: <img src="https://readme-typing-svg.herokuapp.com?font=Architects+Daughter&color=%2338C2FF&size=50&center=true&vCenter=true&height=60&width=600&lines=Heyyy!+I'm+ashu+guo;TN+is+me!!!;Welcome+to+my+website!" alt="Title"></img>
   #  text: '加油更新中'
   #  tagline: 加油更新中
   actions:
