@@ -126,6 +126,6 @@ export default defineConfig({
       ...Pregnancy,
     },
 
-    socialLinks: [{ icon: 'github', link: 'https://blog.ashuguo.top/' }],
+    socialLinks: [{ icon: 'github', link: 'https://github.com/aShu-guo/blogs' }],
   },
 });
