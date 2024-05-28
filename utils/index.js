@@ -1,5 +1,4 @@
-const str =
-  'exempt 豁免，免除\n' +
+const str = 'exempt 豁免，免除\n' +
   'dystopia 反乌托邦的\n' +
   'disparage 贬低地\n' +
   'allegation 指控，无证据的说法\n' +
@@ -50,7 +49,48 @@ const str =
   'encounter 遭遇，经历\n' +
   'institution 制度\n' +
   'significant 有重大意义的\n' +
-  'force 武力，强迫，强行';
+  'force 武力，强迫，强行\n' +
+  '\n' +
+  '—\n' +
+  'furnish 供应，提供，装备\n' +
+  'make an appearance （处于礼节的）短时间到场，露面\n' +
+  'exterior 外部的，外面的\n' +
+  'discipline 纪律，规定，学科，训练\n' +
+  'triumph 胜利，成功\n' +
+  'hostage 人质\n' +
+  'loaf 一条面包，游荡，闲逛\n' +
+  'applicable 能应用（实施）的，合适的\n' +
+  'diploma 文凭，学位证书\n' +
+  'contrast 对比，对照，差异\n' +
+  'by contrast 对比之下\n' +
+  'appendix 附录，附属物\n' +
+  'substantial 实质的，真实的\n' +
+  'hasty 匆忙的，仓促的，草率的\n' +
+  'interpret 解释，说明，了解，认为，口译\n' +
+  'fraction 碎片，小部分\n' +
+  'owl 猫头鹰\n' +
+  'startle 惊吓，使吃惊\n' +
+  'inlet 水湾，小湾\n' +
+  'concede （不情愿的）承认，退让，让步，给予\n' +
+  'jewelry 珠宝\n' +
+  'exhaust 筋疲力尽，排气装置，废气\n' +
+  'dictate 口述，听写，命令，指示\n' +
+  'lame 有缺陷的，无说服力的\n' +
+  'stiff 僵硬的，呆板的\n' +
+  'pinch 紧缺，短缺\n' +
+  'pants 长裤\n' +
+  'remnant 残余，零头布料，遗迹\n' +
+  'projector 放映机，投影仪\n' +
+  'crisp 脆的，易碎的\n' +
+  'incident 事件，政变\n' +
+  'zeal 热心，热忱，热情\n' +
+  'rhythm 节奏，韵律\n' +
+  'overlook 忽略，眺望，宽容，放任\n' +
+  'shear 修剪，剪\n' +
+  'kidnap 绑架，劫持\n' +
+  'propaganda 宣传\n' +
+  'prescribe 指示，规定，开处方药\n' +
+  'cape 斗篷，披肩';
 
 const splitWord = (str) => {
   return str.split('\n').map((item) => item.split(' ')[0]);

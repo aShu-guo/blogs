@@ -5,46 +5,67 @@ export default {
       link: '/courses/c11/',
       items: [
         {
-          text: '类型',
+          text: '词汇',
           link: '/courses/c11/chapter-1',
+        },
+        {
+          text: '类型',
+          link: '/courses/c11/chapter-2',
           items: [
             {
-              text: 'struct',
-              link: '/courses/c11/chapter-1.1',
+              text: '基本类型',
+              link: '/courses/c11/chapter-2.1',
             },
             {
-              text: '数组',
-              link: '/courses/c11/chapter-1.2',
-            },
-            {
-              text: 'union',
-              link: '/courses/c11/chapter-1.3',
-            },
-            {
-              text: 'enum',
-              link: '/courses/c11/chapter-1.4',
+              text: '引用类型',
+              link: '/courses/c11/chapter-2.2',
+              items: [
+                {
+                  text: 'struct',
+                  link: '/courses/c11/chapter-2.2.1',
+                },
+                {
+                  text: '数组',
+                  link: '/courses/c11/chapter-2.2.2',
+                },
+                {
+                  text: 'union',
+                  link: '/courses/c11/chapter-2.2.3',
+                },
+                {
+                  text: 'enum',
+                  link: '/courses/c11/chapter-2.2.4',
+                },
+              ],
             },
             {
               text: '类型转换',
-              link: '/courses/c11/chapter-1.5',
+              link: '/courses/c11/chapter-2.3',
             },
             {
               text: 'void类型',
-              link: '/courses/c11/chapter-1.6',
+              link: '/courses/c11/chapter-2.4',
             },
-            {
-              text: '输入与输出',
-              link: '/courses/c11/chapter-1.7',
-            },
+
           ],
         },
         {
-          text: '分支结构',
-          link: '/courses/c11/chapter-2',
+          text: '输入与输出',
+          link: '/courses/c11/chapter-3',
         },
         {
-          text: '循环结构',
-          link: '/courses/c11/chapter-3',
+          text: '循环与分支',
+          link: '/courses/c11/chapter-4',
+          items:[
+            {
+              text: '分支结构',
+              link: '/courses/c11/chapter-4.1',
+            },
+            {
+              text: '循环结构',
+              link: '/courses/c11/chapter-4.2',
+            },
+          ]
         },
         {
           text: '函数',
