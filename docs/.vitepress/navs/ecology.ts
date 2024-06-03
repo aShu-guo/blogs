@@ -17,6 +17,10 @@ export default [
         text: 'React生态',
         items: [{ text: '入门教程', link: '/ecology/react/rfcs/' }],
       },
+      {
+        text: 'React vs Vue',
+        link: '/ecology/react-vs-vue/'
+      },
     ],
   },
 ];

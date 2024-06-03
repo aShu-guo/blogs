@@ -11,6 +11,8 @@
 // 这里的`类型标识符`表示指针变量指向的物理地址对应变量的数据类型。
 ```
 
+赋值的两种方式：
+
 ![img.png](/imgs/computes-course/c11/chapter5-1.png)
 
 :::warning 注意

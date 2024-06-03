@@ -69,11 +69,11 @@ export default {
         },
         {
           text: '函数',
-          link: '/courses/c11/chapter-4',
+          link: '/courses/c11/chapter-5',
         },
         {
           text: '指针',
-          link: '/courses/c11/chapter-5',
+          link: '/courses/c11/chapter-6',
         },
       ],
     },

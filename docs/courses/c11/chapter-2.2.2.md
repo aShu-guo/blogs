@@ -154,6 +154,15 @@ char c2[] = "hello"; //  sizeof(c1) 输出6
 
 ![img.png](/imgs/computes-course/c11/chapter1-7.png)
 
+:::danger
+不支持这种方式赋值
+
+```c
+char c[10]; //  sizeof(c1) 输出6
+c = "hello";
+```
+:::
+
 #### 输出
 
 1. printf
