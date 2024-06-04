@@ -109,6 +109,26 @@ char *p = "hello";
 - 指针的每一次`递减`，它都会指向`前一个元素`的存储单元。
 - 指针在递增和递减时`跳跃的字节数`取决于指针`所指向变量数据类型长度`，比如 int 就是 4 个字节。
 
+## 拓展
+
+1. 对指针的影响都会作用到变量
+
+```c
+#include <stdio.h>
+
+void add(int *p) {
+    *p = 100;
+    printf("%d", *p);
+}
+
+int main() {
+    int a = 1;
+    add(&a);
+    printf("%d:", a);
+    return 0;
+}
+```
+
 ## 思维导图
 
 ![img.png](/imgs/computes-course/c11/chapter5-3.png)
