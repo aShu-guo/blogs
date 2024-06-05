@@ -11,6 +11,7 @@ import LifeNavs from './navs/life';
 import RfcTranslate from './sidebars/ecology/vue/rfc-translate';
 import Version2 from './sidebars/ecology/vue/version2';
 import Version3 from './sidebars/ecology/vue/version3';
+import Problems from './sidebars/ecology/vue/problems';
 import ReactVsVue from './sidebars/ecology/react-vs-vue';
 import Nuxt from './sidebars/ecology/vue/nuxt';
 import Network from './sidebars/base/network';
@@ -106,6 +107,7 @@ export default defineConfig({
       ...RfcTranslate,
       ...Version2,
       ...Version3,
+      ...Problems,
       ...ReactVsVue,
       ...Nuxt,
       ...Network,

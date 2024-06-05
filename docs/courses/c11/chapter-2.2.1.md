@@ -152,6 +152,36 @@ int main() {
 }
 ```
 
+## 拓展
+
+1. typedef添加别名简化类型声明
+
+```c
+struct NodeList {
+    ElementType value;
+    struct NodeList *next;
+};
+
+// 在没有通过typedef定义别名时，每次声明一个struct NodeList类型的变量，都需要如此声明
+struct NodeList nodeList;
+
+// 添加了别名之后，便可以如此声明
+typedef struct NodeList tag;
+
+tag nodeList;
+```
+
+例如声明链表
+
+```c
+typedef struct LNode {
+    int data;
+    struct LNode *next;
+} LNode, *LinkList;
+```
+
+LNode是等价于LinkList的，为了代码可读性，表示节点时用LNode，表示变量是链表时用LinkList。
+
 ## 思维导图
 
 ![img.png](/imgs/computes-course/c11/chapter1-10.png)
