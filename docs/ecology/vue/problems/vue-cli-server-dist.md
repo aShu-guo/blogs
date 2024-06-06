@@ -48,7 +48,7 @@ npm install -g serve
 serve -s dist
 
 ```
-运行成功后，会提示服务的网址，一般是http://localhost:5000，访问这个网址，即可在本地预览构建后的dist目录内容。
+运行成功后，会提示服务的网址，一般是`http://localhost:5000`，访问这个网址，即可在本地预览构建后的dist目录内容。
 
 ### http-server
 
