@@ -25,12 +25,14 @@ import Containerization from './sidebars/server/containerization';
 import Database from './sidebars/server/database';
 import Nest from './sidebars/server/nest';
 import Math from './sidebars/visual/3d-math';
+import OpenLayers from './sidebars/visual/open-layers';
 import ComputerGraphics from './sidebars/visual/computer-graphics';
 import JavaScript from './sidebars/base/js';
 import TypeScript from './sidebars/base/ts';
 import ThreeJs from './sidebars/visual/threejs';
 import Exam from './sidebars/life/exam';
 import Pregnancy from './sidebars/life/pregnancy';
+
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -123,6 +125,7 @@ export default defineConfig({
       ...ComputerGraphics,
       ...Nest,
       ...Math,
+      ...OpenLayers,
       ...JavaScript,
       ...TypeScript,
       ...ThreeJs,

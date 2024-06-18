@@ -8,12 +8,14 @@
     "@types/three": "^0.160.0",
     "markdown-it-mathjax3": "^4.3.2",
     "medium-zoom": "^1.1.0",
-    "prettier": "^3.2.4"
+    "prettier": "^3.2.4",
+    "ts-node": "^10.9.2"
   },
   "dependencies": {
     "gsap": "^3.12.4",
     "oh-my-live2d": "^0.19.3",
     "three": "^0.160.0",
+    "uninstall": "^0.0.0",
     "vitepress": "^1.1.4",
     "vitepress-plugin-comment-with-giscus": "^1.1.15"
   }

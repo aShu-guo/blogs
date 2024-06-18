@@ -22,8 +22,8 @@ export default [
             link: '/visual/three/',
           },
           {
-            text: 'openlayers',
-            link: '/visual/openlayers-read/',
+            text: 'openLayers',
+            link: '/visual/open-layers/',
           },
         ],
       },
