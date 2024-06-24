@@ -22,8 +22,12 @@ export default [
             link: '/visual/three/',
           },
           {
-            text: 'openLayers',
+            text: 'OpenLayers',
             link: '/visual/open-layers/',
+          },
+          {
+            text: 'WebWorker',
+            link: '/visual/web-worker/',
           },
         ],
       },

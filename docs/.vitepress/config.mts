@@ -26,6 +26,7 @@ import Database from './sidebars/server/database';
 import Nest from './sidebars/server/nest';
 import Math from './sidebars/visual/3d-math';
 import OpenLayers from './sidebars/visual/open-layers';
+import WebWorker from './sidebars/visual/web-worker';
 import ComputerGraphics from './sidebars/visual/computer-graphics';
 import JavaScript from './sidebars/base/js';
 import TypeScript from './sidebars/base/ts';
@@ -126,6 +127,7 @@ export default defineConfig({
       ...Nest,
       ...Math,
       ...OpenLayers,
+      ...WebWorker,
       ...JavaScript,
       ...TypeScript,
       ...ThreeJs,
