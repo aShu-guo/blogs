@@ -26,8 +26,8 @@ export default [
             link: '/visual/open-layers/',
           },
           {
-            text: 'WebWorker',
-            link: '/visual/web-worker/',
+            text: '实时通信技术',
+            link: '/visual/real-time/',
           },
         ],
       },

@@ -1,6 +1,6 @@
 # SharedWorker
 
-SharedWorker有同源限制，接收一个脚本URL以及可选的name，支持多个页面访问同一个worker。
+SharedWorker支持多个页面访问同一个worker，并且有同源限制，它接收一个脚本URL以及可选的name。
 
 ## 初始化
 
@@ -41,7 +41,7 @@ onconnect = function(event) {
 
 点击`inspect`则会自动弹出一个控制台，控制台上输出的是worker中打印的文本
 
-![img.png](/imgs/visual/web-worker/index-1.png)
+![img.png](/imgs/visual/real-time/index-1.png)
 
 :::
 

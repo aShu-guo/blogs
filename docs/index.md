@@ -43,6 +43,8 @@ features:
     details: 从入门到进阶，章节包含3D数学、Three入门到进阶、Blander指南
   - title: 计算机课程知识
     details: 复习计算机组成原理、网络、数据结构、操作系统，并且加入了c语言的入门指南
+  - title: WebGIS
+    details: 介绍webgis发展历程，并着重介绍gis开发中常用的框架OpenLayers以及国内地图提供商（高德、百度）的JSAPI
 ---
 
 ## <div style="display:flex; align-items: center;"><img style="margin-right: 10px;" src="https://raw.githubusercontent.com/ashu-guo/ashu-guo/main/assets/wave.gif" width="50px" height="50px"></img> About Me</div>
