@@ -1,16 +1,20 @@
 export default {
   '/visual/real-time/': [
     {
-      text: '实时通信技术',
+      text: '服务器push技术',
       items: [
         {
           text: '前言',
           link: '/visual/real-time/',
         },
         {
-          text: 'web worker',
-          link: '/visual/real-time/web-worker-1',
+          text: '轮询',
+          link: '/visual/real-time/polling',
           items:[
+            {
+              text: 'Worker',
+              link: '/visual/real-time/web-worker-1',
+            },
             {
               text: 'SharedWorker',
               link: '/visual/real-time/web-worker-2',
@@ -18,12 +22,12 @@ export default {
           ]
         },
         {
-          text: 'websocket',
-          link: '/visual/real-time/web-socket-1',
+          text: 'WebSocket',
+          link: '/visual/real-time/web-socket',
         },
         {
-          text: 'event stream',
-          link: '/visual/real-time/event-steam-1',
+          text: 'SSE',
+          link: '/visual/real-time/event-steam',
         },
       ],
     },
