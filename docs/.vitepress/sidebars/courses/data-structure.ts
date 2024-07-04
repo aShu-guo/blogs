@@ -8,8 +8,18 @@ export default {
           link: '/courses/data-structure/',
         },
         {
-          text: '线性表',
+          text: '绪论',
           link: '/courses/data-structure/chapter-1',
+        },
+        {
+          text: '线性表',
+          link: '/courses/data-structure/chapter-2',
+          items:[
+            {
+              text: '双指针算法',
+              link: '/courses/data-structure/chapter-2.1',
+            },
+          ]
         },
       ],
     },
