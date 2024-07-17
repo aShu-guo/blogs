@@ -10,7 +10,10 @@ import './index.css';
 
 export default {
   ...DefaultTheme,
-  async enhanceApp() {
+  async enhanceApp(ctx) {
+    // extend default theme custom behaviour.
+    DefaultTheme.enhanceApp(ctx)
+
     if (!import.meta.env.SSR) {
       const { loadOml2d } = await import('oh-my-live2d');
 

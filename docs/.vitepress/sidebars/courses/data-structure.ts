@@ -21,6 +21,10 @@ export default {
             },
           ]
         },
+        {
+          text: '栈、队列和数组',
+          link: '/courses/data-structure/chapter-3',
+        },
       ],
     },
     {

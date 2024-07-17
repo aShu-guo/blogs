@@ -14,6 +14,7 @@ import Version3 from './sidebars/ecology/vue/version3';
 import Problems from './sidebars/ecology/vue/problems';
 import ReactVsVue from './sidebars/ecology/react-vs-vue';
 import Nuxt from './sidebars/ecology/vue/nuxt';
+import Interview from './sidebars/ecology/react/interview';
 import Network from './sidebars/base/network';
 import Css from './sidebars/base/css';
 import Git from './sidebars/base/version-control';
@@ -113,6 +114,7 @@ export default defineConfig({
       ...Problems,
       ...ReactVsVue,
       ...Nuxt,
+      ...Interview,
       ...Network,
       ...Css,
       ...Git,

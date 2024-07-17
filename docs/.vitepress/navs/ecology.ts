@@ -15,7 +15,7 @@ export default [
       },
       {
         text: 'React生态',
-        items: [{ text: '入门教程', link: '/ecology/react/rfcs/' }],
+        items: [{ text: '指南', link: '/ecology/react/interview/' }],
       },
       {
         text: 'React vs Vue',
