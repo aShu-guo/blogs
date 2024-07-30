@@ -18,22 +18,31 @@ export default [
             link: '/visual/webgl/',
           },
           {
-            text: 'ThreeJS',
-            link: '/visual/three/',
-          },
-          {
-            text: 'OpenLayers',
-            link: '/visual/open-layers/',
-          },
-          {
             text: '实时通信技术',
             link: '/visual/real-time/',
           },
         ],
       },
       {
+        text: 'WebGIS',
+        items: [
+          {
+            text: 'OpenLayers',
+            link: '/visual/webgis/open-layers/',
+          },
+          {
+            text: 'Cesium',
+            link: '/visual/webgis/cesium/',
+          },
+        ],
+      },
+      {
         text: '进阶',
         items: [
+          {
+            text: 'ThreeJS',
+            link: '/visual/three/',
+          },
           {
             text: 'ThreeJS源码解析',
             link: '/visual/three-read/',

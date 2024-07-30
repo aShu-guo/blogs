@@ -26,7 +26,7 @@ import Containerization from './sidebars/server/containerization';
 import Database from './sidebars/server/database';
 import Nest from './sidebars/server/nest';
 import Math from './sidebars/visual/3d-math';
-import OpenLayers from './sidebars/visual/open-layers';
+import GIS from './sidebars/visual/gis';
 import RealTimeTech from './sidebars/visual/real-time';
 import ComputerGraphics from './sidebars/visual/computer-graphics';
 import JavaScript from './sidebars/base/js';
@@ -128,7 +128,7 @@ export default defineConfig({
       ...ComputerGraphics,
       ...Nest,
       ...Math,
-      ...OpenLayers,
+      ...GIS,
       ...RealTimeTech,
       ...JavaScript,
       ...TypeScript,
