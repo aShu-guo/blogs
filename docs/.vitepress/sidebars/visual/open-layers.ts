@@ -11,6 +11,10 @@ export default {
           text: '坐标系',
           link: '/visual/open-layers/coordinate',
         },
+        {
+          text: '数据类型',
+          link: '/visual/open-layers/data-type',
+        },
       ],
     },
   ],
