@@ -23,6 +23,10 @@ export default {
           text: 'vue-cli预览问题',
           link: '/ecology/vue/problems/vue-cli-server-dist',
         },
+        {
+          text: 'vite-in-vue2',
+          link: '/ecology/vue/problems/vue2-to-vite',
+        },
       ],
     },
   ],
