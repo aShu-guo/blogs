@@ -9,7 +9,11 @@ export default {
         },
         {
           text: '数据类型',
-          link: '/visual/webgis/data-type/',
+          link: '/visual/webgis/data-type',
+        },
+        {
+          text: '投影',
+          link: '/visual/webgis/projection',
         },
       ],
     },
@@ -22,8 +26,8 @@ export default {
         },
 
         {
-          text: '数据类型',
-          link: '/visual/webgis/open-layers/data-type',
+          text: 'StyleFunction',
+          link: '/visual/webgis/open-layers/style-function',
         },
       ],
     },

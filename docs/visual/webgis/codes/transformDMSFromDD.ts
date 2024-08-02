@@ -1,11 +1,4 @@
-type Longitude = number;
-type Latitude = number;
-
-/**
- *
- * @param coordinate
- */
-export const transformDMSFromDD = function(coordinate: [Longitude, Latitude]) {
+const transformDMSFromDD = function(coordinate: [number, number]) {
   return coordinate.map((item, index) => {
     const D = Math.floor(item);
     const M = Math.floor((item - D) * 60);
@@ -23,3 +16,4 @@ export const transformDMSFromDD = function(coordinate: [Longitude, Latitude]) {
   });
 };
 
+export default transformDMSFromDD;

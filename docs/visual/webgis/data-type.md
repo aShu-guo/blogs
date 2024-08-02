@@ -71,7 +71,7 @@ ESRI Shapefile（shp），或简称shapefile
 
 ### 3DTiles
 
-cesium提供的一种高性能加载地图大量数据一种格式
+cesium提供的一种高性能加载地图大量数据一种格式，用于流式传输大规模异构3D地理空间数据集的开放规范。为了扩展Cesium的地形和图像流，3D Tiles将用于流式传输3D内容，包括建筑物，树木，点云和矢量数据。
 
 ### DWG
 
