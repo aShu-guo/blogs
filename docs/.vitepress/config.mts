@@ -15,13 +15,13 @@ import Problems from './sidebars/ecology/vue/problems';
 import ReactVsVue from './sidebars/ecology/react-vs-vue';
 import Nuxt from './sidebars/ecology/vue/nuxt';
 import Interview from './sidebars/ecology/react/interview';
-import Network from './sidebars/base/network';
 import Css from './sidebars/base/css';
 import Git from './sidebars/base/version-control';
 import Npm from './sidebars/base/npm';
 import ComputerOrganization from './sidebars/courses/computer-organization';
 import C11 from './sidebars/courses/c11';
 import DataStructure from './sidebars/courses/data-structure';
+import Network from './sidebars/courses/network';
 import Containerization from './sidebars/server/containerization';
 import Database from './sidebars/server/database';
 import Nest from './sidebars/server/nest';
@@ -115,7 +115,6 @@ export default defineConfig({
       ...ReactVsVue,
       ...Nuxt,
       ...Interview,
-      ...Network,
       ...Css,
       ...Git,
       ...Npm,

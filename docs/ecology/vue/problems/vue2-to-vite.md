@@ -364,3 +364,16 @@ export default ({ mode }) => {
   })
 }
 ```
+
+## 替换css深度作用
+
+在vue2中，使用：
+
+- `/deep/`已废弃
+- 如果项目中使用sass，则通过`::v-deep`作用深度样式；反之则使用`>>>`
+
+在
+
+## 替换client side的包
+
+项目中使用了minio的client侧的包，这在vite环境中是无法使用的。
