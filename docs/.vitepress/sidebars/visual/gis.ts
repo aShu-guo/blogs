@@ -38,6 +38,10 @@ export default {
           text: '前言',
           link: '/visual/webgis/cesium/',
         },
+        {
+          text: '集成three',
+          link: '/visual/webgis/cesium/integration-threejs',
+        },
       ],
     },
   ],
