@@ -33,6 +33,7 @@ import JavaScript from './sidebars/base/js';
 import TypeScript from './sidebars/base/ts';
 import ThreeJs from './sidebars/visual/threejs';
 import Exam from './sidebars/life/exam';
+import Finance from './sidebars/life/finance';
 import Pregnancy from './sidebars/life/pregnancy';
 
 
@@ -133,6 +134,7 @@ export default defineConfig({
       ...TypeScript,
       ...ThreeJs,
       ...Exam,
+      ...Finance,
       ...Pregnancy,
     },
 
