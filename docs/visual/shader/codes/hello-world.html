@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <style>
+      body {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.168.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.168.0/examples/jsm/"
+        }
+      }
+    </script>
+    <script type="x-shader/x-vertex" id="vert-shader">
+      varying vec2 v_uv;
+      varying vec3 v_position;
+      void main() {
+        v_uv = uv;
+        v_position = position;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    </script>
+    <script type="x-shader/x-fragment" id="frag-shader">
+                  uniform vec3 u_color;
+                  uniform vec2 u_resolution;
+                  uniform vec3 u_mouse;
+                  uniform float u_time;
+                  varying vec2 v_uv;
+                  varying vec3 v_position;
+                  void main() {
+                    /*vec3 color = vec3(
+                      u_mouse.x / u_resolution.x,
+                      u_mouse.y / u_resolution.y,
+                      0.0
+                    );*/
+                    //        vec2 v_coord=gl_FragCoord.xy/u_resolution;
+                    //        vec3 color = mix(vec3(1.0,0.0,0.0),vec3(0.0,1.0,0.0),v_coord.y);
+                    //        vec3 color = abs(v_position);
+      //              float inCircle = 1.0 - step(0.5,length(v_position.xy));
+      //              color.r=1.0-step(pow(0.2,2.0)-pow(v_position.y,2.0),pow(v_position.x,2.0));
+      //              color.g=1.0-step(pow(0.2,2.0)-pow(v_position.x,2.0),pow(v_position.y,2.0));
+                    float inCircle=1.0-step(0.5,length(v_position.xy));
+                    vec3 color = vec3(1.0,1.0,0.0)*inCircle;
+
+                    gl_FragColor = vec4(color, 1.0);
+                  }
+    </script>
+    <script type="module">
+      // uv 坐标原点为右下角
+      // position 坐标原点为中心处
+      // 两者都是three内置uniform
+      import * as THREE from 'three';
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      const clock = new THREE.Clock();
+      const uniforms = {
+        u_time: { value: 0.0 },
+        u_mouse: { value: { x: 0.0, y: 0.0 } },
+        u_resolution: {
+          value: { x: window.innerWidth, y: window.innerHeight },
+        },
+        u_color: { value: new THREE.Color(0x00ff00) },
+      };
+      const geometry = new THREE.PlaneGeometry(2, 2);
+      const material = new THREE.ShaderMaterial({
+        uniforms,
+        vertexShader: document.getElementById('vert-shader').innerText,
+        fragmentShader: document.getElementById('frag-shader').innerText,
+      });
+      const plane = new THREE.Mesh(geometry, material);
+      scene.add(plane);
+
+      camera.position.z = 1;
+
+      animate();
+
+      function move(evt) {
+        uniforms.u_mouse.value.x = evt.touches
+          ? evt.touches[0].clientX
+          : evt.clientX;
+        uniforms.u_mouse.value.y = evt.touches
+          ? evt.touches[0].clientY
+          : evt.clientY;
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        uniforms.u_time.value = clock.getElapsedTime();
+        renderer.render(scene, camera);
+      }
+
+      if ('ontouchstart' in window) {
+        document.addEventListener('touchmove', move);
+      } else {
+        window.addEventListener('resize', onWindowResize, false);
+        window.addEventListener('mousemove', move);
+      }
+
+      onWindowResize();
+      function onWindowResize(event) {
+        const aspectRatio = window.innerWidth / window.innerHeight;
+        let width, height;
+        if (aspectRatio >= 1) {
+          width = 1;
+          height = (window.innerHeight / window.innerWidth) * width;
+        } else {
+          width = aspectRatio;
+          height = 1;
+        }
+        camera.left = -width;
+        camera.right = width;
+        camera.top = height;
+        camera.bottom = -height;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        uniforms.u_resolution.value.x = window.innerWidth;
+        uniforms.u_resolution.value.y = window.innerHeight;
+      }
+    </script>
+  </body>
+</html>

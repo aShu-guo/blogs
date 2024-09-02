@@ -15,5 +15,7 @@
   "htmlWhitespaceSensitivity": "css",
   "vueIndentScriptAndStyle": false,
   "endOfLine": "lf",
-  "embeddedLanguageFormatting": "auto"
+  "embeddedLanguageFormatting": "auto",
+  "plugins": ["prettier-plugin-glsl"],
+  "overrides": [{ "files": ["*.frag"], "options": { "parser": "glsl-parser" } }]
 }
