@@ -7,6 +7,7 @@ import ServerNavs from './navs/server';
 import HybridAppNavs from './navs/hybrid-app';
 import VisualNavs from './navs/visual';
 import LifeNavs from './navs/life';
+import Optimization from './navs/optimization';
 // 导出sidebars
 import RfcTranslate from './sidebars/ecology/vue/rfc-translate';
 import Version2 from './sidebars/ecology/vue/version2';
@@ -35,7 +36,7 @@ import ThreeJs from './sidebars/visual/threejs';
 import Exam from './sidebars/life/exam';
 import Finance from './sidebars/life/finance';
 import Pregnancy from './sidebars/life/pregnancy';
-
+import OptimizationIndex from './sidebars/optimization/index'
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -107,6 +108,7 @@ export default defineConfig({
       ...ServerNavs,
       ...HybridAppNavs,
       ...LifeNavs,
+      ...Optimization
     ],
     sidebar: {
       ...RfcTranslate,
@@ -136,8 +138,11 @@ export default defineConfig({
       ...Exam,
       ...Finance,
       ...Pregnancy,
+      ...OptimizationIndex
     },
 
-    socialLinks: [{ icon: 'github', link: 'https://github.com/aShu-guo/blogs' }],
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/aShu-guo/blogs' },
+    ],
   },
 });
