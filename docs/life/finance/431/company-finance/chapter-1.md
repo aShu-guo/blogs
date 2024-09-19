@@ -1,4 +1,4 @@
-# 概论与会计报表
+# 会计报表
 
 ![img.png](/imgs/life/finance/431/chapter-1-2.png)
 
