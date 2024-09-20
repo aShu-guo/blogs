@@ -24,7 +24,11 @@ export default {
                   link: '/life/finance/431/monetary-finance/chapter-1',
                 },
                 {
-                  text: '企业经营能力分析',
+                  text: '信用与金融（补充）',
+                  link: '/life/finance/431/monetary-finance/chapter-1.1',
+                },
+                {
+                  text: '金融体系概述',
                   link: '/life/finance/431/monetary-finance/chapter-2',
                 },
               ],
