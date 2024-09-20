@@ -2,7 +2,7 @@
 
 全书框架
 
-![img.png](/imgs/life/finance/431/chapter-1-1.png)
+![img.png](/imgs/life/finance/431/company-finance/chapter-1-1.png)
 
 ## 题型
 

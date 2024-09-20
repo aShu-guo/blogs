@@ -129,7 +129,7 @@ ROE
 
 2. 内部融资增长率
 
-![img.png](/imgs/life/finance/431/chapter-2-1.png)
+![img.png](/imgs/life/finance/431/company-finance/chapter-2-1.png)
 
 指在没有外部融资的条件下，公司内部可能实现的最大增长率
 
@@ -138,7 +138,7 @@ ROE
 
 3. 可持续增长率
 
-![img.png](/imgs/life/finance/431/chapter-2-2.png)
+![img.png](/imgs/life/finance/431/company-finance/chapter-2-2.png)
 
 - T为总资产对销售额的比率（资产需要率）
 - P为销售净利润率
