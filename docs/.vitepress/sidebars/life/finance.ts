@@ -1,7 +1,7 @@
 export default {
   '/life/finance/': [
     {
-      text: '金融学备考',
+      text: '金融学学习',
       link: '/life/finance/',
       items: [
         {
