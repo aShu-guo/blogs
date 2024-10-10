@@ -31,6 +31,10 @@ export default {
                   text: '金融体系概述',
                   link: '/life/finance/431/monetary-finance/chapter-2',
                 },
+                {
+                  text: '利率',
+                  link: '/life/finance/431/monetary-finance/chapter-3',
+                },
               ],
             },
             {
