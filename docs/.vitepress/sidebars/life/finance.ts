@@ -7,9 +7,7 @@ export default {
         {
           text: '396经济学综合',
           link: '/life/finance/396/',
-          items: [
-            { text: '函数', link: '/life/finance/396/chapter-1' },
-          ],
+          items: [{ text: '函数', link: '/life/finance/396/chapter-1' }],
         },
         {
           text: '431金融学',
@@ -34,6 +32,16 @@ export default {
                 {
                   text: '利率',
                   link: '/life/finance/431/monetary-finance/chapter-3',
+                  items: [
+                    {
+                      text: '经济学学派',
+                      link: '/life/finance/431/monetary-finance/chapter-3.1',
+                    },
+                    {
+                      text: '凯恩斯利率决定理论',
+                      link: '/life/finance/431/monetary-finance/chapter-3.2',
+                    },
+                  ],
                 },
               ],
             },
