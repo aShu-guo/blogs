@@ -28,6 +28,8 @@ import Database from './sidebars/server/database';
 import Nest from './sidebars/server/nest';
 import Math from './sidebars/visual/3d-math';
 import GIS from './sidebars/visual/gis';
+import OpenLayers from './sidebars/visual/openLayers';
+import Cesium from './sidebars/visual/cesium';
 import RealTimeTech from './sidebars/visual/real-time';
 import ComputerGraphics from './sidebars/visual/computer-graphics';
 import JavaScript from './sidebars/base/js';
@@ -36,7 +38,7 @@ import ThreeJs from './sidebars/visual/threejs';
 import Exam from './sidebars/life/exam';
 import Finance from './sidebars/life/finance';
 import Pregnancy from './sidebars/life/pregnancy';
-import OptimizationIndex from './sidebars/optimization/index'
+import OptimizationIndex from './sidebars/optimization/index';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -108,7 +110,7 @@ export default defineConfig({
       ...ServerNavs,
       ...HybridAppNavs,
       ...LifeNavs,
-      ...Optimization
+      ...Optimization,
     ],
     sidebar: {
       ...RfcTranslate,
@@ -131,6 +133,8 @@ export default defineConfig({
       ...Nest,
       ...Math,
       ...GIS,
+      ...OpenLayers,
+      ...Cesium,
       ...RealTimeTech,
       ...JavaScript,
       ...TypeScript,
@@ -138,7 +142,7 @@ export default defineConfig({
       ...Exam,
       ...Finance,
       ...Pregnancy,
-      ...OptimizationIndex
+      ...OptimizationIndex,
     },
 
     socialLinks: [

@@ -27,6 +27,10 @@ export default [
         text: 'WebGIS',
         items: [
           {
+            text: '公共知识',
+            link: '/visual/webgis/common/',
+          },
+          {
             text: 'OpenLayers',
             link: '/visual/webgis/open-layers/',
           },

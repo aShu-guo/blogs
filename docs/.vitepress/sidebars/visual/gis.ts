@@ -1,46 +1,19 @@
 export default {
-  '/visual/webgis/': [
+  '/visual/webgis/common/': [
     {
       text: '基础知识',
       items: [
         {
           text: '坐标系',
-          link: '/visual/webgis/coordinate',
+          link: '/visual/webgis/common/coordinate',
         },
         {
           text: '数据类型',
-          link: '/visual/webgis/data-type',
+          link: '/visual/webgis/common/data-type',
         },
         {
           text: '投影',
-          link: '/visual/webgis/projection',
-        },
-      ],
-    },
-    {
-      text: 'OpenLayers',
-      items: [
-        {
-          text: '前言',
-          link: '/visual/webgis/open-layers/',
-        },
-
-        {
-          text: 'StyleFunction',
-          link: '/visual/webgis/open-layers/style-function',
-        },
-      ],
-    },
-    {
-      text: 'Cesium',
-      items: [
-        {
-          text: '前言',
-          link: '/visual/webgis/cesium/',
-        },
-        {
-          text: '集成three',
-          link: '/visual/webgis/cesium/integration-threejs',
+          link: '/visual/webgis/common/projection',
         },
       ],
     },
