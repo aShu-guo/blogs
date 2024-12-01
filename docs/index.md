@@ -21,14 +21,14 @@ hero:
       text: Vue-RFCs翻译
       link: /ecology/vue/rfcs/
     - theme: brand
+      text: 3D数学
+      link: /visual/3d-math/
+    - theme: brand
       text: Vue2.x源码解析
       link: /ecology/vue/2.x/
     - theme: brand
       text: Vue3.x源码解析
       link: /ecology/vue/3.x/
-    - theme: brand
-      text: 3D数学
-      link: /visual/3d-math/
     - theme: brand
       text: Three
       link: /visual/three/
