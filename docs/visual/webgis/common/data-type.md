@@ -21,7 +21,7 @@ WMTS规定使用瓦片矩阵集（Tile Matrix Set）来表示切割后的地图
 
 ![img.png](/imgs/visual/gis/index-1.png)
 
-#### wms wmts xyz加载对比
+#### 加载对比
 
 - WMS（Web Map Service）
 
@@ -89,55 +89,63 @@ ESRI Shapefile（shp），或简称shapefile
 - 用于描述几何体对象：点、折线与多边形
 - 存储井、河流、湖泊等空间对象的几何位置以及属性，例如河流的名字、城市的温度
 
-### 3DTiles
+### OSGB
 
-cesium提供的一种高性能加载地图大量数据一种格式，用于流式传输大规模异构3D地理空间数据集的开放规范。为了扩展Cesium的地形和图像流，3D
-Tiles将用于流式传输3D内容，包括建筑物，树木，点云和矢量数据。
+OSGB(Open Scene Gragh Binary)，基于倾斜摄影生成的三维模型，尤其Smart3D处理的倾斜摄影三维模型数据的组织方式。
+
+### gltf/glb
+
+GLB 文件格式是一种相对较新的格式，于 2015 年推出，作为表示 GLTF 文件 (.gltf) 的二进制格式，而不是 JSON 格式（`GLTF是基于JSON的`）。
+
+### B3DMS
+
+3DMS（3D Mesh Surface）是一种用于存储三维地表模型数据的格式，特别适用于倾斜摄影的三维模型。3DMS格式将地表模型表示为三角形网格，并且可以包含高程、纹理和颜色等信息。它通常由倾斜摄影软件生成，例如Photoscan、Pix4D等。
+
+但是3DMS格式的灵活性较低，可能无法保存复杂的材质和纹理信息。
+
+### OBJ
+
+OBJ文件是Alias、Wavefront公司为它的一套基于工作站的3D建模和动画软件"AdvancedVisualizer"开发的一种标准3D模型文件格式
 
 ### DWG
 
 AutoCAD导出的专有文件格式
 
+:::info
+
+3DTiles：cesium提供的一种高性能加载地图大量数据的一种`规范`，用于流式传输大规模异构3D地理空间数据集的开放规范。为了扩展Cesium的地形和图像流，3D
+Tiles将用于流式传输3D内容，包括建筑物，树木，点云和矢量数据。
+
+glTF（Graphics Language Transmission Format）：是一种三维计算机图形档案格，其有.gltf（JSON/ASCII）和.glb（二进制）两种副档名。 包含有关3D 模型、场景、模型、灯光、材质、节点层次结构和 动画的信息。
+
+- cesium能直接加载遵循3d tiles规范的任何三维文件类型
+
+<img src="/imgs/visual/gis/index-13.png">
+
+:::
+
+更多gis格式可参考：[山海鲸可视化](https://www.shanhaibi.com/baike/v1/biv52tuo2wxvv14l/)
+
 ## 数据格式转换
 
 ### obj to gltf glb b3dm 3dtiles
 
-1. [obj2gltf](https://github.com/PrincessGod/objTo3d-tiles)
+|      | obj                                                                                                                                  | gltf                                                                             | glb                                                                                                                                            | b3dm                                                                                                                                                                                                           | fbx                                                                                                                                                                                                            |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| obj  |                                                                                                                                      | [obj2gltf](https://github.com/CesiumGS/obj2gltf)                                 | [obj2gltf](https://github.com/CesiumGS/obj2gltf) -> [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline)                                 | [objTo3d-tiles](https://github.com/PrincessGod/objTo3d-tiles)                                                                                                                                                  | [fbx2gltf](https://github.com/facebookincubator/FBX2glTF/tree/main/npm/fbx2gltf) -> [obj2gltf](https://github.com/CesiumGS/obj2gltf)                                                                           |
+| gltf | [obj2gltf](https://github.com/CesiumGS/obj2gltf)                                                                                     |                                                                                  | [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline)                                                                                     | [3d-tiles-tools](https://github.com/CesiumGS/3d-tiles-tools)                                                                                                                                                   | [fbx2gltf](https://github.com/facebookincubator/FBX2glTF/tree/main/npm/fbx2gltf)                                                                                                                               |
+| glb  | [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline) -> [obj2gltf](https://github.com/CesiumGS/obj2gltf)                       | [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline)                       |                                                                                                                                                | [3d-tiles-tools](https://github.com/CesiumGS/3d-tiles-tools)                                                                                                                                                   | [fbx2gltf](https://github.com/facebookincubator/FBX2glTF/tree/main/npm/fbx2gltf) -> [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline)                                                                 |
+| b3dm | [objTo3d-tiles](https://github.com/PrincessGod/objTo3d-tiles)                                                                        | [3d-tiles-tools](https://github.com/CesiumGS/3d-tiles-tools)                     | [3d-tiles-tools](https://github.com/CesiumGS/3d-tiles-tools)                                                                                   |                                                                                                                                                                                                                | [fbx2gltf](https://github.com/facebookincubator/FBX2glTF/tree/main/npm/fbx2gltf) -> [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline) -> [3d-tiles-tools](https://github.com/CesiumGS/3d-tiles-tools) |
+| fbx  | [fbx2gltf](https://github.com/facebookincubator/FBX2glTF/tree/main/npm/fbx2gltf) -> [obj2gltf](https://github.com/CesiumGS/obj2gltf) | [fbx2gltf](https://github.com/facebookincubator/FBX2glTF/tree/main/npm/fbx2gltf) | [fbx2gltf](https://github.com/facebookincubator/FBX2glTF/tree/main/npm/fbx2gltf) -> [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline) | [fbx2gltf](https://github.com/facebookincubator/FBX2glTF/tree/main/npm/fbx2gltf) -> [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline) -> [3d-tiles-tools](https://github.com/CesiumGS/3d-tiles-tools) |                                                                                                                                                                                                                |
 
-- 基于cesium官方的obj2gltf开发
-
-2. cesium官方的工具 [obj--->gltf](https://github.com/CesiumGS/obj2gltf)
-
-3. cesium官方的转换工具：[glb--->b3dm](https://github.com/CesiumGS/3d-tiles-validator/tree/master/tools)
-   （需要自己写tileset.json）
-
-4. [fbx--->gltf](https://github.com/facebookincubator/FBX2glTF/tree/main/npm/fbx2gltf)
-
-- 可以将3dmax导出的fbx格式转为gltf;
-
-5. [gltf--->3dtile](https://github.com/nxddsnc/gltf-to-3dtiles)（c和c++写的，需要vs2015运行）
-
-6. [功能最全的工具](https://github.com/fanvanzh/3dtiles)（程序用C++、C和Rust写的，windows用的时候可能会报c++库缺失的错误）
-
-- Osgb(OpenSceneGraph Binary) 转 3D-Tiles
-- Esri Shapefile 转 3D-Tiles
-- Fbx、gltf 转 3D-Tiles
-
-7. [OSGB、Shp、GDB等格式转为3DTiles](https://github.com/scially/Cesium3DTilesConverter)（基于fanvanzh/3dtiles修改，用C++和Qt重写）
-
-8. cesiumlab工具
-
-西部科技公司的cesiumlab是最全面的转换工具；
-
-9. [模型压缩工具](https://github.com/CesiumGS/gltf-pipeline)：cesium官方工具，具体用法都有；压缩效果不错；
-
-10. 其他验证和查看工具：
-
-[gltf和glb格式验证和查看](https://pissang.github.io/clay-viewer/editor/)
-
-[gltf和glb格式验证](https://github.khronos.org/glTF-Validator/)
-
-[obj, 3ds, stl, ply, gltf, 3dm, fbx格式查看](https://3dviewer.net/)
+- 官方工具合集
+  - [3d-tiles-tools](https://github.com/CesiumGS/3d-tiles-tools)，支持`glbToB3dm`、`glbToI3dm`、`b3dmToGlb`
+  - [obj2gltf](https://github.com/CesiumGS/obj2gltf)
+  - [gltf-pipeline](https://github.com/CesiumGS/gltf-pipeline)，可用于压缩3d资产，并且支持`glTF to glb`、`glb to embedded glTF`、`glTF to Draco glTF`
+- 非官方工具
+  - [gltf和glb格式验证](https://github.khronos.org/glTF-Validator/)
+  - [gltf和glb格式验证和查看](https://pissang.github.io/clay-viewer/editor/)
+  - [obj, 3ds, stl, ply, gltf, 3dm, fbx格式查看](https://3dviewer.net/)
 
 参考：
 
