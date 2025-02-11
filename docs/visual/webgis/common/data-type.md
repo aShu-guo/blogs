@@ -146,6 +146,7 @@ glTF（Graphics Language Transmission Format）：是一种三维计算机图形
   - [gltf和glb格式验证](https://github.khronos.org/glTF-Validator/)
   - [gltf和glb格式验证和查看](https://pissang.github.io/clay-viewer/editor/)
   - [obj, 3ds, stl, ply, gltf, 3dm, fbx格式查看](https://3dviewer.net/)
+  - osgb -> 3dtiles cesiumLab
 
 参考：
 
