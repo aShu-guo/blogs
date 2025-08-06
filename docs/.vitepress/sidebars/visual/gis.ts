@@ -5,7 +5,11 @@ export default {
       items: [
         {
           text: '坐标系',
-          link: '/visual/webgis/common/coordinate',
+          link: '/visual/webgis/common/1-chapter',
+          items: [
+            { text: '常见EPSG', link: '/visual/webgis/common/1.1-chapter' },
+            { text: 'tif文件处理', link: '/visual/webgis/common/1.2-chapter' },
+          ],
         },
         {
           text: '数据类型',

@@ -8,9 +8,11 @@
     "@types/three": "^0.171.0",
     "markdown-it-mathjax3": "^4.3.2",
     "medium-zoom": "^1.1.0",
+    "mermaid": "^11.9.0",
     "prettier": "^3.4.2",
     "prettier-plugin-glsl": "^0.2.0",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "vitepress-plugin-mermaid": "^2.0.17"
   },
   "dependencies": {
     "gsap": "^3.12.5",

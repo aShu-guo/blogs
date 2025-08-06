@@ -39,15 +39,23 @@ import Exam from './sidebars/life/exam';
 import Finance from './sidebars/life/finance';
 import Pregnancy from './sidebars/life/pregnancy';
 import OptimizationIndex from './sidebars/optimization/index';
+import { withMermaid } from 'vitepress-plugin-mermaid';
 
 // https://vitepress.dev/reference/site-config
-export default defineConfig({
+export default withMermaid({
   title: 'Blogs',
   description: 'A VitePress Site',
   // base: '/blogs/',
   lastUpdated: true,
   lang: ' ',
   sitemap: { hostname: 'https://ashu-guo.github.io/blogs/' },
+  mermaid: {
+    // refer https://mermaid.js.org/config/setup/modules/mermaidAPI.html#mermaidapi-configuration-defaults for options
+  },
+  // optionally set additional config for plugin itself with MermaidPluginConfig
+  mermaidPlugin: {
+    class: 'mermaid my-class', // set additional css classes for parent container
+  },
   head: [
     //   google
     [
