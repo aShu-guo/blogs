@@ -12,10 +12,12 @@ on:
   workflow_dispatch:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+# 增加权限设置
 permissions:
-  contents: read
+  contents: write  # 从 read 升级为 write
   pages: write
   id-token: write
+  actions: read    # 新增 actions 读取权限
 
 # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
 # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
@@ -54,6 +56,9 @@ jobs:
 
   # Deployment job
   deploy:
+    # 添加环境变量传递
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
