@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
+  <text x="400" y="250" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#212529">
+    控制机制
+  </text>
+  <text x="400" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#6c757d">
+    Cache映射方式对比
+  </text>
+  <text x="400" y="350" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#868e96">
+    计算机组成原理 - 第三章
+  </text>
+  
+  <!-- Cache映射方式 -->
+  <rect x="100" y="380" width="180" height="100" fill="#e3f2fd" stroke="#1976d2" stroke-width="2"/>
+  <text x="190" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#1976d2">直接映射</text>
+  <text x="190" y="425" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#1976d2">1:1 映射关系</text>
+  <text x="190" y="440" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#1976d2">简单快速</text>
+  <text x="190" y="455" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#1976d2">冲突率高</text>
+  
+  <rect x="310" y="380" width="180" height="100" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="400" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#7b1fa2">全相联映射</text>
+  <text x="400" y="425" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#7b1fa2">任意位置</text>
+  <text x="400" y="440" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#7b1fa2">冲突率低</text>
+  <text x="400" y="455" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#7b1fa2">成本高</text>
+  
+  <rect x="520" y="380" width="180" height="100" fill="#e8f5e8" stroke="#388e3c" stroke-width="2"/>
+  <text x="610" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#388e3c">组相联映射</text>
+  <text x="610" y="425" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#388e3c">折中方案</text>
+  <text x="610" y="440" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#388e3c">性能平衡</text>
+  <text x="610" y="455" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#388e3c">广泛应用</text>
+</svg>

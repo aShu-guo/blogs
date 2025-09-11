@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
+  <text x="400" y="250" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#212529">
+    格式结构
+  </text>
+  <text x="400" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#6c757d">
+    IEEE 754浮点数格式
+  </text>
+  <text x="400" y="350" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#868e96">
+    计算机组成原理 - 第二章
+  </text>
+  
+  <!-- IEEE 754格式 -->
+  <rect x="150" y="400" width="500" height="80" fill="#e3f2fd" stroke="#1976d2" stroke-width="2"/>
+  <text x="200" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#1976d2">符号位</text>
+  <text x="200" y="435" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#1976d2">1位</text>
+  <line x1="250" y1="400" x2="250" y2="480" stroke="#1976d2" stroke-width="1"/>
+  
+  <text x="350" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#1976d2">指数位</text>
+  <text x="350" y="435" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#1976d2">8位</text>
+  <line x1="450" y1="400" x2="450" y2="480" stroke="#1976d2" stroke-width="1"/>
+  
+  <text x="550" y="420" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#1976d2">尾数位</text>
+  <text x="550" y="435" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#1976d2">23位</text>
+  
+  <text x="400" y="460" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#1976d2">32位单精度浮点数格式</text>
+</svg>

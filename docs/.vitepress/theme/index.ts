@@ -1,18 +1,22 @@
-// .vitepress/theme/index.js
 import DefaultTheme from 'vitepress/theme';
-import { onMounted, watch, nextTick } from 'vue';
-import { useData, useRoute } from 'vitepress';
+import { nextTick, onMounted, toRefs, watch } from 'vue';
+import { EnhanceAppContext, Theme, useData, useRoute } from 'vitepress';
 import mediumZoom from 'medium-zoom';
 import giscusTalk from 'vitepress-plugin-comment-with-giscus';
-import { toRefs } from 'vue';
+import 'virtual:group-icons.css';
+import vitepressNprogress from 'vitepress-plugin-nprogress';
+import 'vitepress-plugin-nprogress/lib/css/index.css';
 
-import './index.css';
+import './style/index.css';
 
 export default {
   ...DefaultTheme,
-  async enhanceApp(ctx) {
+  async enhanceApp(ctx: EnhanceAppContext) {
+    const router = ctx.router;
     // extend default theme custom behaviour.
-    DefaultTheme.enhanceApp(ctx)
+    DefaultTheme.enhanceApp(ctx);
+
+    vitepressNprogress(ctx);
 
     if (!import.meta.env.SSR) {
       const { loadOml2d } = await import('oh-my-live2d');
@@ -58,7 +62,8 @@ export default {
 
     const { frontmatter } = toRefs(useData());
     // Obtain configuration from: https://giscus.app/
-    giscusTalk({
+    giscusTalk(
+      {
         repo: 'aShu-guo/giscus-discussions',
         repoId: 'R_kgDOJThJwQ',
         category: 'General', // default: `General`
@@ -73,12 +78,14 @@ export default {
           'zh-Hans': 'zh-CN',
           'en-US': 'en',
         },
-        // homePageShowComment: false, // Whether to display the comment area on the homepage, the default is false
-        // lightTheme: 'light', // default: `light`
-        // darkTheme: 'transparent_dark', // default: `transparent_dark`
+        homePageShowComment: false, // Whether to display the comment area on the homepage, the default is false
+        lightTheme: 'light', // default: `light`
+        darkTheme: 'transparent_dark', // default: `transparent_dark`
         // ...
-      }, {
-        frontmatter, route,
+      },
+      {
+        frontmatter,
+        route,
       },
       // Whether to activate the comment area on all pages.
       // The default is true, which means enabled, this parameter can be ignored;
@@ -87,4 +94,4 @@ export default {
       true,
     );
   },
-};
+} satisfies Theme;

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
+  <text x="400" y="250" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#212529">
+    运算流程
+  </text>
+  <text x="400" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#6c757d">
+    定点数运算流程图
+  </text>
+  <text x="400" y="350" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#868e96">
+    计算机组成原理 - 第二章
+  </text>
+  
+  <!-- 运算流程箭头 -->
+  <rect x="100" y="400" width="120" height="60" fill="#fff3cd" stroke="#ffc107" stroke-width="2" rx="10"/>
+  <text x="160" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#856404">取操作数</text>
+  
+  <path d="M 220 430 L 280 430" stroke="#6c757d" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <rect x="280" y="400" width="120" height="60" fill="#d1ecf1" stroke="#17a2b8" stroke-width="2" rx="10"/>
+  <text x="340" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#0c5460">运算处理</text>
+  
+  <path d="M 400 430 L 460 430" stroke="#6c757d" stroke-width="2" marker-end="url(#arrowhead)"/>
+  
+  <rect x="460" y="400" width="120" height="60" fill="#d4edda" stroke="#28a745" stroke-width="2" rx="10"/>
+  <text x="520" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#155724">存储结果</text>
+  
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#6c757d"/>
+    </marker>
+  </defs>
+</svg>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
+  <text x="400" y="250" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#212529">
+    系统架构
+  </text>
+  <text x="400" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#6c757d">
+    存储器层次结构图
+  </text>
+  <text x="400" y="350" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#868e96">
+    计算机组成原理 - 第三章
+  </text>
+  
+  <!-- 存储器层次结构 -->
+  <rect x="200" y="380" width="400" height="40" fill="#ffebee" stroke="#f44336" stroke-width="2"/>
+  <text x="400" y="405" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#c62828">寄存器 (最快，最小)</text>
+  
+  <rect x="200" y="430" width="400" height="40" fill="#e8f5e8" stroke="#4caf50" stroke-width="2"/>
+  <text x="400" y="455" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#2e7d32">Cache (L1, L2, L3)</text>
+  
+  <rect x="200" y="480" width="400" height="40" fill="#e3f2fd" stroke="#2196f3" stroke-width="2"/>
+  <text x="400" y="505" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#1565c0">主存储器 (RAM)</text>
+  
+  <rect x="200" y="530" width="400" height="40" fill="#fff3e0" stroke="#ff9800" stroke-width="2"/>
+  <text x="400" y="555" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#ef6c00">辅助存储器 (HDD/SSD)</text>
+</svg>

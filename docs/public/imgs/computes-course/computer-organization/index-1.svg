@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
+  <text x="400" y="250" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" fill="#212529">
+    数据表示与运算
+  </text>
+  <text x="400" y="300" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#6c757d">
+    原码、反码、补码对比图
+  </text>
+  <text x="400" y="350" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#868e96">
+    计算机组成原理 - 第二章
+  </text>
+  <rect x="100" y="400" width="150" height="80" fill="#e3f2fd" stroke="#1976d2" stroke-width="2"/>
+  <text x="175" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#1976d2">原码</text>
+  <text x="175" y="450" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#1976d2">+0 = 0000</text>
+  <text x="175" y="465" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#1976d2">-0 = 1000</text>
+  
+  <rect x="325" y="400" width="150" height="80" fill="#f3e5f5" stroke="#7b1fa2" stroke-width="2"/>
+  <text x="400" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#7b1fa2">反码</text>
+  <text x="400" y="450" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#7b1fa2">+0 = 0000</text>
+  <text x="400" y="465" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#7b1fa2">-0 = 1111</text>
+  
+  <rect x="550" y="400" width="150" height="80" fill="#e8f5e8" stroke="#388e3c" stroke-width="2"/>
+  <text x="625" y="430" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#388e3c">补码</text>
+  <text x="625" y="450" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#388e3c">+0 = 0000</text>
+  <text x="625" y="465" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#388e3c">-0 = 0000</text>
+</svg>

@@ -1,4 +1,3 @@
-import { defineConfig } from 'vitepress';
 // 导出navs
 import MvvmNavs from './navs/ecology';
 import BaseNavs from './navs/base';
@@ -28,6 +27,7 @@ import Database from './sidebars/server/database';
 import Nest from './sidebars/server/nest';
 import Math from './sidebars/visual/3d-math';
 import GIS from './sidebars/visual/gis';
+import WebGL from './sidebars/visual/webgl';
 import OpenLayers from './sidebars/visual/openLayers';
 import Cesium from './sidebars/visual/cesium';
 import RealTimeTech from './sidebars/visual/real-time';
@@ -40,6 +40,10 @@ import Finance from './sidebars/life/finance';
 import Pregnancy from './sidebars/life/pregnancy';
 import OptimizationIndex from './sidebars/optimization/index';
 import { withMermaid } from 'vitepress-plugin-mermaid';
+import {
+  groupIconMdPlugin,
+  groupIconVitePlugin,
+} from 'vitepress-plugin-group-icons';
 
 // https://vitepress.dev/reference/site-config
 export default withMermaid({
@@ -48,7 +52,7 @@ export default withMermaid({
   // base: '/blogs/',
   lastUpdated: true,
   lang: ' ',
-  sitemap: { hostname: 'https://ashu-guo.github.io/blogs/' },
+  sitemap: { hostname: 'https://blog.ashuguo.me/' },
   mermaid: {
     // refer https://mermaid.js.org/config/setup/modules/mermaidAPI.html#mermaidapi-configuration-defaults for options
   },
@@ -93,6 +97,12 @@ export default withMermaid({
   markdown: {
     // 支持mathJax
     math: true,
+    config(md) {
+      md.use(groupIconMdPlugin);
+    },
+  },
+  vite: {
+    plugins: [groupIconVitePlugin()],
   },
   vue: {},
   themeConfig: {
@@ -141,6 +151,7 @@ export default withMermaid({
       ...Nest,
       ...Math,
       ...GIS,
+      ...WebGL,
       ...OpenLayers,
       ...Cesium,
       ...RealTimeTech,

@@ -8,12 +8,15 @@ export default {
           link: '/visual/webgis/common/1-chapter',
           items: [
             { text: '常见EPSG', link: '/visual/webgis/common/1.1-chapter' },
-            { text: 'tif文件处理', link: '/visual/webgis/common/1.2-chapter' },
           ],
         },
         {
           text: '数据类型',
-          link: '/visual/webgis/common/data-type',
+          link: '/visual/webgis/common/2-chapter',
+          items: [
+            { text: 'tif文件处理', link: '/visual/webgis/common/2.1-chapter' },
+            { text: 'glb转b3dms', link: '/visual/webgis/common/2.2-chapter' },
+          ],
         },
         {
           text: '投影',
