@@ -274,7 +274,7 @@
 
 **复杂指令例子**：
 
-```assembly
+```text
 MOVSB    ; 移动一个字节（字符串操作）
 REP MOVSB ; 重复移动多个字节
 ```
@@ -310,7 +310,7 @@ REP MOVSB ; 重复移动多个字节
 
 **简单指令例子**：
 
-```assembly
+```text
 ADD $t0, $t1, $t2    ; $t0 = $t1 + $t2
 LW  $t0, 4($t1)      ; $t0 = memory[$t1 + 4]
 SW  $t0, 8($t1)      ; memory[$t1 + 8] = $t0
@@ -356,7 +356,7 @@ SW  $t0, 8($t1)      ; memory[$t1 + 8] = $t0
 
 **例子**：
 
-```assembly
+```text
 MOV R1, R2        ; 寄存器间传送
 LOAD R1, [0x1000] ; 内存到寄存器
 STORE R1, [0x1000]; 寄存器到内存
@@ -368,7 +368,7 @@ STORE R1, [0x1000]; 寄存器到内存
 
 **例子**：
 
-```assembly
+```text
 ADD R1, R2, R3    ; 加法
 SUB R1, R2, R3    ; 减法
 MUL R1, R2, R3    ; 乘法
@@ -381,7 +381,7 @@ DIV R1, R2, R3    ; 除法
 
 **例子**：
 
-```assembly
+```text
 AND R1, R2, R3    ; 逻辑与
 OR  R1, R2, R3    ; 逻辑或
 XOR R1, R2, R3    ; 逻辑异或
@@ -394,7 +394,7 @@ NOT R1, R2        ; 逻辑非
 
 **例子**：
 
-```assembly
+```text
 SHL R1, R2, 2     ; 左移2位
 SHR R1, R2, 2     ; 右移2位
 ROL R1, R2, 1     ; 循环左移1位
@@ -406,7 +406,7 @@ ROL R1, R2, 1     ; 循环左移1位
 
 **例子**：
 
-```assembly
+```text
 CMP R1, R2        ; 比较R1和R2
 TEST R1, R2       ; 测试R1和R2的位
 ```
@@ -417,7 +417,7 @@ TEST R1, R2       ; 测试R1和R2的位
 
 **例子**：
 
-```assembly
+```text
 JMP label         ; 无条件跳转
 JE  label         ; 相等时跳转
 JNE label         ; 不等时跳转
@@ -485,7 +485,7 @@ RET               ; 返回
 
 **例子**：SIMD指令
 
-```assembly
+```text
 VADD V1, V2, V3   ; 向量加法，同时处理多个数据
 ```
 

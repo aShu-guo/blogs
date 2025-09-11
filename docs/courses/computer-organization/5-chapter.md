@@ -177,7 +177,7 @@ CPU主要由以下几个部分组成：
 
 **例子**：
 
-```assembly
+```text
 ADD R1, R2, R3    ; R1 = R2 + R3
 SUB R4, R1, R5    ; R4 = R1 - R5（需要R1的值）
 ```
@@ -194,7 +194,7 @@ SUB R4, R1, R5    ; R4 = R1 - R5（需要R1的值）
 
 **例子**：
 
-```assembly
+```text
 BEQ R1, R2, label ; 如果R1==R2，跳转到label
 ADD R3, R4, R5    ; 这条指令可能不应该执行
 ```
@@ -429,7 +429,7 @@ SIMD方式：
 
 **例子**：
 
-```assembly
+```text
 LOAD R1, [0x1000]  ; 从内存加载数据
 ADD R2, R3, R4     ; 不依赖R1的运算
 MUL R5, R1, R6     ; 依赖R1的运算
@@ -452,7 +452,7 @@ MUL R5, R1, R6     ; 依赖R1的运算
 
 **例子**：
 
-```assembly
+```text
 BEQ R1, R2, label  ; 分支指令
 ADD R3, R4, R5     ; 推测执行的指令
 ```
