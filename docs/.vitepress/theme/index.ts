@@ -1,13 +1,17 @@
 import DefaultTheme from 'vitepress/theme';
-import { nextTick, onMounted, toRefs, watch } from 'vue';
+import { toRefs } from 'vue';
 import { EnhanceAppContext, Theme, useData, useRoute } from 'vitepress';
-import mediumZoom from 'medium-zoom';
 import giscusTalk from 'vitepress-plugin-comment-with-giscus';
-import 'virtual:group-icons.css';
+
 import vitepressNprogress from 'vitepress-plugin-nprogress';
 import 'vitepress-plugin-nprogress/lib/css/index.css';
 
+import 'virtual:uno.css';
 import './style/index.css';
+import 'virtual:group-icons.css';
+
+import imageViewer from 'vitepress-plugin-image-viewer';
+import vImageViewer from 'vitepress-plugin-image-viewer/lib/vImageViewer.vue';
 
 export default {
   ...DefaultTheme,
@@ -17,6 +21,8 @@ export default {
     DefaultTheme.enhanceApp(ctx);
 
     vitepressNprogress(ctx);
+
+    ctx.app.component('vImageViewer', vImageViewer);
 
     if (!import.meta.env.SSR) {
       const { loadOml2d } = await import('oh-my-live2d');
@@ -47,18 +53,7 @@ export default {
   setup() {
     const route = useRoute();
 
-    // 初始化图片查看器
-    const initZoom = () => {
-      // mediumZoom('[data-zoomable]', { background: 'var(--vp-c-bg)' });
-      mediumZoom('.main img', { background: 'var(--vp-c-bg)' });
-    };
-    onMounted(() => {
-      initZoom();
-    });
-    watch(
-      () => route.path,
-      () => nextTick(() => initZoom()),
-    );
+    imageViewer(route);
 
     const { frontmatter } = toRefs(useData());
     // Obtain configuration from: https://giscus.app/

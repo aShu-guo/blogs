@@ -4,6 +4,41 @@ export default {
       text: 'CSS和CSS3',
       items: [
         {
+          text: 'css数据类型',
+          link: '/base/css/chapter-2.1',
+        },
+        {
+          text: '从增强已有的CSS属性开始',
+          link: '/base/css/chapter-3',
+          items: [
+            {
+              text: 'CSS尺寸体系',
+              link: '/base/css/chapter-3.1',
+            },
+            {
+              text: '深入理解CSS逻辑属性',
+              link: '/base/css/chapter-3.2',
+            },
+          ],
+        },
+        {
+          text: '拓展',
+          items: [
+            {
+              text: '插值色彩',
+              link: '/base/css/expand-1',
+            },
+            {
+              text: 'CSS内在尺寸与外在尺寸',
+              link: '/base/css/expand-2',
+            },
+            {
+              text: 'CSS元素分类',
+              link: '/base/css/expand-3',
+            },
+          ],
+        },
+        {
           text: '动画',
           items: [
             {

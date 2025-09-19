@@ -44,6 +44,11 @@ import {
   groupIconMdPlugin,
   groupIconVitePlugin,
 } from 'vitepress-plugin-group-icons';
+import UnoCSS from 'unocss/vite';
+import { presetAttributify, presetIcons, transformerDirectives } from 'unocss';
+import { presetWind3 } from '@unocss/preset-wind3';
+
+const DIRECTION_MAPPIINGS = { t: 'top', r: 'right', b: 'bottom', l: 'left' };
 
 // https://vitepress.dev/reference/site-config
 export default withMermaid({
@@ -102,7 +107,57 @@ export default withMermaid({
     },
   },
   vite: {
-    plugins: [groupIconVitePlugin()],
+    plugins: [
+      groupIconVitePlugin(),
+      UnoCSS({
+        presets: [
+          presetWind3(),
+          presetIcons({
+            extraProperties: {
+              display: 'inline-block',
+              'vertical-align': 'middle',
+            },
+          }),
+          presetAttributify(),
+        ],
+        shortcuts: [
+          [
+            'absolute-center',
+            'top-50% -translate-y-50% left-50% -translate-x-50%',
+          ],
+          ['absolute-x-center', 'left-50% -translate-x-50%'],
+          ['absolute-y-center', 'top-50% -translate-y-50%'],
+        ],
+        transformers: [transformerDirectives()],
+        rules: [
+          [
+            /^b(t|r|b|l|d)-(.*)/,
+            ([, d, c]) => {
+              const direction = DIRECTION_MAPPIINGS[d] || '';
+              const p = direction ? `border-${direction}` : 'border';
+              const attrs = c.split('_');
+              if (
+                // 属性中不包含 border-style 则默认 solid
+                !attrs.some((item) =>
+                  /^(none|hidden|dotted|dashed|solid|double|groove|ridge|inset|outset)$/.test(
+                    item,
+                  ),
+                )
+              ) {
+                attrs.push('solid');
+              }
+              // 属性中不包含 border-width 则默认 1px
+              if (!attrs.some((item) => /^\d/.test(item))) {
+                attrs.push('1px');
+              }
+              return {
+                [p]: attrs.join(' '),
+              };
+            },
+          ],
+        ],
+      }),
+    ],
   },
   vue: {},
   themeConfig: {

@@ -1,3 +1,9 @@
-# CSS和CSS3
+# CSS教程
 
-动画、unit、渐变色
+本系列为《CSS新世界》的阅读笔记
+
+## 参考资料
+
+
+
+- [CSS官方提案](https://drafts.csswg.org/)
