@@ -31,17 +31,17 @@ Sizing”被称为“内在尺寸”，表示元素最终的尺寸表现是由�
 设置了fit-content：
 
 <div>
-<div class="bg-red w-[fit-content]">123</div>
-<div class="bg-red w-[fit-content]">设置了fit-content</div>
-<div class="bg-red w-[fit-content]">hello world</div>
+<div class="bg-#3c3c3c w-[fit-content]">123</div>
+<div class="bg-#3c3c3c w-[fit-content]">设置了fit-content</div>
+<div class="bg-#3c3c3c w-[fit-content]">hello world</div>
 </div>
 
 没有设置fit-content：
 
 <div>
-<div class="bg-red">123</div>
-<div class="bg-red">没有设置fit-content</div>
-<div class="bg-red">hello world</div>
+<div class="bg-#3c3c3c">123</div>
+<div class="bg-#3c3c3c">没有设置fit-content</div>
+<div class="bg-#3c3c3c">hello world</div>
 </div>
 
 ### stretch、fill-available、available
@@ -49,8 +49,8 @@ Sizing”被称为“内在尺寸”，表示元素最终的尺寸表现是由�
 `stretch`使用来替换后两者的，都是尽可能的填充满尺寸
 
 <div>
-<button class="bg-red">12313</button>
-<button style="width: stretch" class="bg-red">123</button>
+<button class="bg-#3c3c3c">12313</button>
+<button style="width: stretch" class="bg-#3c3c3c">123</button>
 </div>
 
 - block水平的元素、弹性布局和网格布局中的子项默认都自带弹性拉伸特性；

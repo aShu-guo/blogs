@@ -126,17 +126,17 @@ BFC 的核心是`创建一个隔离的容器`，其内部的布局规则`不受�
 
 - 未触发BFC
 
-<div class="mb-10px bg-red h-20px"></div>
+<div class="mb-10px bg-#3c3c3c h-20px"></div>
 <div class="mt-20px bg-green h-20px"></div>
 
 - 触发BFC
   - 用一个div包裹
-    <div class="mb-10px bg-red h-20px"></div>
+    <div class="mb-10px bg-#3c3c3c h-20px"></div>
     <div class="bg-green h-20px overflow-hidden">
     <div class="mt-20px"></div>
     </div>
   - 在两个div之间创建一个不可见的元素（通过伪类触发）
-    <div class="mb-10px bg-red h-20px"></div>
+    <div class="mb-10px bg-#3c3c3c h-20px"></div>
     <div class="mt-20px bg-green h-20px div-1"></div>
 
     <style>

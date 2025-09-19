@@ -52,7 +52,7 @@
 ### 代码示例
 
 <!-- 固定尺寸 -->
-<div class="w-75px h-50px bg-red color-#3c3c3c">
+<div class="w-75px h-50px bg-#3c3c3c color-#3c3c3c">
   这段文本可能会溢出，因为容器有固定尺寸
 </div>
 
@@ -77,7 +77,7 @@
 
 ```html
 <!-- 固定尺寸 -->
-<div class="w-75 h-50 overflow-hidden bg-red color-#3c3c3c">
+<div class="w-75 h-50 overflow-hidden bg-#3c3c3c color-#3c3c3c">
   这段文本可能会溢出，因为容器有固定尺寸
 </div>
 
