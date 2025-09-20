@@ -51,6 +51,16 @@
   font-size: 16px;
 }
 
+.custom-block {
+  /* 核心的背景滤镜效果 */
+  backdrop-filter: blur(16px) saturate(180%);
+  /* 玻璃质感边框 */
+  /* 多层阴影营造深度 */
+  box-shadow:
+    0 8px 32px rgba(31, 38, 135, 0.2),
+    inset 0 4px 20px rgba(255, 255, 255, 0.3);
+}
+
 /* info容器:背景色、流体边框 */
 .custom-block.info {
   border-left: none;
