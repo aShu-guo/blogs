@@ -19,6 +19,10 @@ export default {
               text: '深入理解CSS逻辑属性',
               link: '/base/css/chapter-3.2',
             },
+            {
+              text: '在CSS边框上做文章',
+              link: '/base/css/chapter-3.3',
+            },
           ],
         },
         {
