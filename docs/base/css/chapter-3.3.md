@@ -117,7 +117,8 @@ border-image-slice: <number-percentage>{1,4} && fill?
 
 ### border-image-repeat
 
-定义控制九宫格上、右、下、左4个区域（对应的区域序号是5～8，我称这几个区域为平铺区）图形的`平铺规则`（可选，值：stretch, repeat, round, space）
+定义控制九宫格上、右、下、左4个区域（对应的区域序号是5～8，我称这几个区域为平铺区）图形的`平铺规则`（可选，值：stretch, repeat,
+round, space）
 
 - stretch：让源图像拉伸以充满显示区域
 
@@ -146,7 +147,7 @@ border-image-slice: <number-percentage>{1,4} && fill?
 :::warning
 
 - border-image 会替换原始边框（即边框线颜色/样式会被图片替换）。
-- border-radius 对 border-image 没作用——边框图像不会被圆角裁剪（MDN 给出了解决方案，如在 background
+- `border-radius 对 border-image 没作用`——边框图像不会被圆角裁剪（MDN 给出了解决方案，如在 background
   上做两层图）。如果想要圆角效果，最好在图片本身或使用背景/clip 技巧实现。
 - border-image-width 并不会影响border-width，只是影响border-image的宽度，但是在最终渲染出来的效果中看着像是改变了border-width。
 
@@ -155,7 +156,73 @@ border-image-slice: <number-percentage>{1,4} && fill?
 :::danger 注意
 
 - outset、inset：只能对应单向扩展，`仅支持正值`。例如：box-shadow、text-shadow
-- offset：扩展的方向既能向外也能向内，反映在属性值上就是offset`既支持正值也支持负值`。例如：outline-offset、text-underline-offset等CSS属性
+- offset：扩展的方向既能向外也能向内，反映在属性值上就是offset`既支持正值也支持负值`
+  。例如：outline-offset、text-underline-offset等CSS属性
+
+:::
+
+## 妙用
+
+### 自定义虚线框
+
+使用border定义的虚线框在不同的浏览器中展示样式不同，可以通过border-image自定义的虚线框保持样式相同
+
+<div class="border-dashed">1:1的虚线</div>
+
+<style>
+.border-dashed {
+border: 1px dashed deepskyblue;
+border-image: repeating-linear-gradient(135deg, deepskyblue,
+deepskyblue 5px, transparent 5px, transparent 10px) 1;
+}
+</style>
+
+border-image属性最适合模拟宽度为1px的虚线边框。
+
+如果边框宽度比较大，实线的端点就会有明显的斜边，此时建议使用background-image属性和线性渐变语法进行模拟，或者干脆使用SVG元素配合stroke- dasharray实现更灵活的边框效果
+
+### 带圆角的见边框
+
+- 通过父元素的border-radius、overflow: hidden实现（需要在外层包括一层div）
+
+<div class="w-full h-100px rounded-8px overflow-hidden">
+<div class="w-full h-full" style="border-style: solid;
+    border-image: linear-gradient(deepskyblue, deeppink) 20 / 10px;"></div>
+</div>
+
+```html
+<div class="w-full h-100px rounded-8px overflow-hidden">
+  <div
+    class="w-full h-full"
+    style="border-style: solid;
+    border-image: linear-gradient(deepskyblue, deeppink) 20 / 10px;"
+  ></div>
+</div>
+```
+
+- 通过clip-path实现
+
+<div class="w-full h-100px" style="border-style: solid;
+    border-image: linear-gradient(deepskyblue, deeppink) 20 / 10px;clip-path: inset(0 round 10px)"></div>
+
+```text
+<inset()> =
+  inset( <length-percentage>{1,4} [ round <'border-radius'> ]? )
+```
+
+### 模拟轮廓
+
+CSS中有3个属性可以实现`对布局没有任何影响`的轮廓：outline、box-shadow、border-image
+
+| 属性         | 支持渐变 | 支持模糊 | 支持圆角 | 间隙控制 | 方位控制 |
+| ------------ | -------- | -------- | -------- | -------- | -------- |
+| outline      | ❌       | ❌       | ❌       | ✅       | ❌       |
+| box-shadow   | ✅       | ✅       | ✅       | ❌       | ✅       |
+| border-image | ✅       | ❌       | ❌       | ✅       | ✅       |
+
+:::info
+
+border属性不能写在border-image属性的下方。
 
 :::
 
