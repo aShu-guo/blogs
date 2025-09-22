@@ -23,6 +23,10 @@ export default {
               text: '在CSS边框上做文章',
               link: '/base/css/chapter-3.3',
             },
+            {
+              text: '增强position属性',
+              link: '/base/css/chapter-3.4',
+            },
           ],
         },
         {
