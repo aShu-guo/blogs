@@ -27,6 +27,14 @@ export default {
               text: '增强position属性',
               link: '/base/css/chapter-3.4',
             },
+            {
+              text: 'font-family属性和@font-face规则新特性',
+              link: '/base/css/chapter-3.5',
+            },
+            {
+              text: '字符单元的中断与换行',
+              link: '/base/css/chapter-3.6',
+            },
           ],
         },
         {
