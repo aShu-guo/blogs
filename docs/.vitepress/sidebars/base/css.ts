@@ -35,6 +35,10 @@ export default {
               text: '字符单元的中断与换行',
               link: '/base/css/chapter-3.6',
             },
+            {
+              text: 'text-align属性相关的新特性',
+              link: '/base/css/chapter-3.7',
+            },
           ],
         },
         {

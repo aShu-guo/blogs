@@ -107,6 +107,9 @@ export default withMermaid({
     },
   },
   vite: {
+    optimizeDeps: {
+      // include: ['@braintree/sanitize-url']
+    },
     plugins: [
       groupIconVitePlugin(),
       UnoCSS({
