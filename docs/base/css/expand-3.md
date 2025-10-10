@@ -108,39 +108,57 @@ BFC 的核心是`创建一个隔离的容器`，其内部的布局规则`不受�
 }
 ```
 
-1. 父容器高度塌陷问题
+1. float导致父容器高度塌陷问题
 
-- 未触发BFC
+**未触发BFC**
 
 <div class="bd-1px_red">
-<div class="float-left color-red">123</div>
+  <div class="float-left color-red">123</div>
 </div>
 
-- 触发BFC
+**触发BFC**
 
-<div class="bd-1px_red flow-root">
-<div class="float-left color-red">123</div>
+ <div class="bd-1px_red flow-root">
+    <div class="float-left color-red">123</div>
 </div>
 
 2. margin塌陷
 
-- 未触发BFC
+**未触发BFC**
 
 <div class="mb-10px bg-#3c3c3c h-20px"></div>
 <div class="mt-20px bg-green h-20px"></div>
 
-- 触发BFC
-  - 用一个div包裹
-    <div class="mb-10px bg-#3c3c3c h-20px"></div>
-    <div class="bg-green h-20px overflow-hidden">
-    <div class="mt-20px"></div>
-    </div>
-  - 在两个div之间创建一个不可见的元素（通过伪类触发）
-    <div class="mb-10px bg-#3c3c3c h-20px"></div>
-    <div class="mt-20px bg-green h-20px div-1"></div>
+**触发BFC**
 
-    <style>
-    .div-1 {
-        &:before { content: ''; }
-    }
-    </style>
+- 用一个div包裹
+
+<div class="mb-10px bg-#3c3c3c h-20px"></div>
+<div class="overflow-hidden">
+  <div class="mt-20px h-20px bg-green "></div>
+</div>
+
+- 在两个div之间创建一个不可见的元素（通过伪元素触发，本质也是通过overflow:hidden触发）
+
+<div class=" div-1">
+<div class="mb-10px h-20px bg-#3c3c3c"></div>
+</div>
+<div class="mt-20px bg-green h-20px"></div>
+
+<style>
+.div-1::after { content: '';display: block;overflow: hidden;clear: both;    }
+</style>
+
+:::info
+经典触发BFC方式：
+
+```css
+.div-1::after {
+  content: '';
+  display: block;
+  overflow: hidden;
+  clear: both;
+}
+```
+
+:::
