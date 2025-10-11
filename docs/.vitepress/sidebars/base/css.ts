@@ -39,6 +39,10 @@ export default {
               text: 'text-align属性相关的新特性',
               link: '/base/css/chapter-3.7',
             },
+            {
+              text: 'color属性与颜色设置',
+              link: '/base/css/chapter-3.8',
+            },
           ],
         },
         {

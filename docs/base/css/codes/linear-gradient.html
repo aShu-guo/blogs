@@ -1,0 +1,281 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>GLSL linear-gradient (sRGB / linear-sRGB / Oklab)</title>
+    <style>
+      body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+        padding: 12px;
+        background: #111;
+        color: #fff;
+        font-family: system-ui;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas
+      id="gl"
+      width="800"
+      height="240"
+      style="border: 1px solid #333"
+    ></canvas>
+    <div>
+      <label
+        >Angle:
+        <input id="angle" type="range" min="0" max="360" value="90" /></label
+      ><br />
+      <label>Start: <input id="start" type="color" value="#ff0000" /></label
+      ><br />
+      <label>End: <input id="end" type="color" value="#0000ff" /></label><br />
+      <label
+        >Space:
+        <select id="space">
+          <option value="srgb">sRGB (raw)</option>
+          <option value="linear-srgb" selected>linear-sRGB</option>
+          <option value="oklab">Oklab</option>
+        </select>
+      </label>
+    </div>
+
+    <script type="module">
+      const vs = `#version 300 es
+in vec2 a_pos;
+out vec2 v_uv;
+void main(){
+  v_uv = a_pos * 0.5 + 0.5; // a_pos range [-1,1] -> uv [0,1]
+  gl_Position = vec4(a_pos, 0.0, 1.0);
+}
+`;
+
+      const fs = `#version 300 es
+precision highp float;
+in vec2 v_uv;
+out vec4 outColor;
+
+// uniforms
+uniform vec3 u_start; // sRGB 0..1
+uniform vec3 u_end;   // sRGB 0..1
+uniform float u_angle; // degrees
+uniform int u_space; // 0: srgb, 1: linear-srgb, 2: oklab
+
+// -------- sRGB <-> linear helpers --------
+float srgb_to_linear_chan(float c){
+    if(c <= 0.04045) return c / 12.92;
+    return pow((c + 0.055) / 1.055, 2.4);
+}
+float linear_to_srgb_chan(float c){
+    if(c <= 0.0031308) return c * 12.92;
+    return 1.055 * pow(c, 1.0/2.4) - 0.055;
+}
+vec3 srgb_to_linear(vec3 c){ return vec3(srgb_to_linear_chan(c.r), srgb_to_linear_chan(c.g), srgb_to_linear_chan(c.b)); }
+vec3 linear_to_srgb(vec3 c){ return vec3(linear_to_srgb_chan(c.r), linear_to_srgb_chan(c.g), linear_to_srgb_chan(c.b)); }
+
+// -------- Oklab conversion (via linear-sRGB) --------
+// Matrices and formulas from standard Oklab definition
+vec3 linear_srgb_to_lms(vec3 c){
+    // RGB -> LMS (linear)
+    return vec3(
+        0.4122214708*c.r + 0.5363325363*c.g + 0.0514459929*c.b,
+        0.2119034982*c.r + 0.6806995451*c.g + 0.1073969566*c.b,
+        0.0883024619*c.r + 0.2817188376*c.g + 0.6299787005*c.b
+    );
+}
+vec3 lms_to_linear_srgb(vec3 lms){
+    return vec3(
+        +4.0767416621*lms.x -3.3077115903*lms.y +0.2309699292*lms.z,
+        -1.2684380046*lms.x +2.6097574011*lms.y -0.3413193965*lms.z,
+        -0.0041960863*lms.x -0.7034186147*lms.y +1.7076147010*lms.z
+    );
+}
+float cbrt_approx(float v){
+    // GLSL has pow; handle negative values
+    return sign(v) * pow(abs(v), 1.0/3.0);
+}
+vec3 linear_srgb_to_oklab(vec3 c){
+    vec3 lms = linear_srgb_to_lms(c);
+    vec3 lms_cbrt = vec3(cbrt_approx(lms.x), cbrt_approx(lms.y), cbrt_approx(lms.z));
+    float L = 0.2104542553*lms_cbrt.x + 0.7936177850*lms_cbrt.y - 0.0040720468*lms_cbrt.z;
+    float a = 1.9779984951*lms_cbrt.x - 2.4285922050*lms_cbrt.y + 0.4505937099*lms_cbrt.z;
+    float b = 0.0259040371*lms_cbrt.x + 0.7827717662*lms_cbrt.y - 0.8086757660*lms_cbrt.z;
+    return vec3(L,a,b);
+}
+vec3 oklab_to_linear_srgb(vec3 lab){
+    float L = lab.x;
+    float a = lab.y;
+    float b = lab.z;
+    vec3 lms_cbrt = vec3(
+        L + 0.3963377774*a + 0.2158037573*b,
+        L - 0.1055613458*a - 0.0638541728*b,
+        L - 0.0894841775*a - 1.2914855480*b
+    );
+    vec3 lms = vec3(
+        lms_cbrt.x * lms_cbrt.x * lms_cbrt.x,
+        lms_cbrt.y * lms_cbrt.y * lms_cbrt.y,
+        lms_cbrt.z * lms_cbrt.z * lms_cbrt.z
+    );
+    return lms_to_linear_srgb(lms);
+}
+
+// -------- interpolation helpers --------
+vec3 mix_srgb_raw(vec3 a, vec3 b, float t){
+    // naive mix in sRGB channel space (what some old impls do)
+    return mix(a, b, t);
+}
+vec3 mix_linear_srgb(vec3 a_srgb, vec3 b_srgb, float t){
+    // decode -> mix -> encode
+    vec3 la = srgb_to_linear(a_srgb);
+    vec3 lb = srgb_to_linear(b_srgb);
+    vec3 lm = mix(la, lb, t);
+    return linear_to_srgb(lm);
+}
+vec3 mix_oklab(vec3 a_srgb, vec3 b_srgb, float t){
+    vec3 la = srgb_to_linear(a_srgb);
+    vec3 lb = srgb_to_linear(b_srgb);
+    vec3 oka = linear_srgb_to_oklab(la);
+    vec3 okb = linear_srgb_to_oklab(lb);
+    vec3 okm = mix(oka, okb, t);
+    vec3 lm = oklab_to_linear_srgb(okm);
+    return linear_to_srgb(lm);
+}
+
+// -------- main gradient calculation --------
+void main(){
+  // map uv [0,1]
+  vec2 uv = v_uv;
+
+  // compute direction unit vector from angle (CSS: 0deg = pointing up? we'll use 0deg -> to the right like typical)
+  float a = radians(u_angle);
+  vec2 dir = normalize(vec2(cos(a), sin(a)));
+
+  // center-based projection: map uv in [-0.5, 0.5], project onto dir, then remap to [0,1]
+  vec2 p = uv - vec2(0.5);
+  float proj = dot(p, dir); // range approx [-sqrt(2)/2, sqrt(2)/2]
+  // remap: find full span across box corners projected on dir
+  // max projection magnitude for unit square centered at 0 is:
+  float span = 0.5 * (abs(dir.x) + abs(dir.y)); // actually this is correct maximum projection for box corners
+  // but a safe normalization: map from [-span, +span] -> [0,1]
+  float t = (proj / span) * 0.5 + 0.5;
+  t = clamp(t, 0.0, 1.0);
+
+  vec3 color;
+  if(u_space == 0){
+    color = mix_srgb_raw(u_start, u_end, t); // raw sRGB channel mix
+  } else if(u_space == 1){
+    color = mix_linear_srgb(u_start, u_end, t);
+  } else { // oklab
+    color = mix_oklab(u_start, u_end, t);
+  }
+
+  outColor = vec4(color, 1.0);
+}
+`;
+
+      // ---------- WebGL setup (WebGL2) ----------
+      const canvas = document.getElementById('gl');
+      const gl = canvas.getContext('webgl2');
+      if (!gl) {
+        alert('WebGL2 required');
+        throw new Error('no webgl2');
+      }
+
+      function createShader(type, src) {
+        const s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+          console.error(gl.getShaderInfoLog(s));
+          throw new Error('shader compile error');
+        }
+        return s;
+      }
+      function createProgram(vsSrc, fsSrc) {
+        const v = createShader(gl.VERTEX_SHADER, vsSrc);
+        const f = createShader(gl.FRAGMENT_SHADER, fsSrc);
+        const p = gl.createProgram();
+        gl.attachShader(p, v);
+        gl.attachShader(p, f);
+        gl.linkProgram(p);
+        if (!gl.getProgramParameter(p, gl.LINK_STATUS)) {
+          console.error(gl.getProgramInfoLog(p));
+          throw new Error('program link error');
+        }
+        return p;
+      }
+
+      const program = createProgram(vs, fs);
+      gl.useProgram(program);
+
+      // full-screen triangle quad (two triangles)
+      const pos = new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]);
+      const vao = gl.createVertexArray();
+      gl.bindVertexArray(vao);
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, pos, gl.STATIC_DRAW);
+      const loc = gl.getAttribLocation(program, 'a_pos');
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+      // uniforms
+      const u_start = gl.getUniformLocation(program, 'u_start');
+      const u_end = gl.getUniformLocation(program, 'u_end');
+      const u_angle = gl.getUniformLocation(program, 'u_angle');
+      const u_space = gl.getUniformLocation(program, 'u_space');
+
+      function hexToRgb01(hex) {
+        const v = parseInt(hex.slice(1), 16);
+        return [
+          ((v >> 16) & 255) / 255,
+          ((v >> 8) & 255) / 255,
+          (v & 255) / 255,
+        ];
+      }
+
+      function render() {
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.clearColor(0, 0, 0, 0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+      }
+
+      // UI bindings
+      const angleEl = document.getElementById('angle');
+      const startEl = document.getElementById('start');
+      const endEl = document.getElementById('end');
+      const spaceEl = document.getElementById('space');
+
+      function updateUniforms() {
+        const s = hexToRgb01(startEl.value);
+        const e = hexToRgb01(endEl.value);
+        gl.uniform3fv(u_start, new Float32Array(s));
+        gl.uniform3fv(u_end, new Float32Array(e));
+        gl.uniform1f(u_angle, parseFloat(angleEl.value));
+        const spaceMap = { srgb: 0, 'linear-srgb': 1, oklab: 2 };
+        gl.uniform1i(u_space, spaceMap[spaceEl.value] ?? 1);
+        render();
+      }
+
+      angleEl.addEventListener('input', updateUniforms);
+      startEl.addEventListener('input', updateUniforms);
+      endEl.addEventListener('input', updateUniforms);
+      spaceEl.addEventListener('change', updateUniforms);
+
+      // resize canvas to devicePixelRatio
+      function resize() {
+        const dpr = Math.max(1, window.devicePixelRatio || 1);
+        canvas.width = Math.floor(800 * dpr);
+        canvas.height = Math.floor(240 * dpr);
+        canvas.style.width = '800px';
+        canvas.style.height = '240px';
+      }
+      resize();
+      updateUniforms();
+    </script>
+  </body>
+</html>
