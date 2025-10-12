@@ -28,7 +28,7 @@ export default {
       const { loadOml2d } = await import('oh-my-live2d');
 
       loadOml2d({
-        menus: {
+        /*menus: {
           items: [],
         },
         statusBar: { disable: true },
@@ -36,10 +36,10 @@ export default {
           style: {
             top: '-50px',
           },
-        },
+        },*/
         models: [
           {
-            path: 'https://model.oml2d.com/cat-white/model.json',
+            path: 'https://cdn.jsdelivr.net/gh/Eikanya/Live2d-model/Live2D/Senko_Normals/senko.model3.json',
             // scale: 0.15,
             position: [0, 20],
             // stageStyle: {

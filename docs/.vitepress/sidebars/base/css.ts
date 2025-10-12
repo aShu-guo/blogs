@@ -43,6 +43,10 @@ export default {
               text: 'color属性与颜色设置',
               link: '/base/css/chapter-3.8',
             },
+            {
+              text: '必学必会的background属性新特性',
+              link: '/base/css/chapter-3.9',
+            },
           ],
         },
         {
