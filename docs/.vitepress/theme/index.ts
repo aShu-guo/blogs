@@ -25,18 +25,9 @@ export default {
     ctx.app.component('vImageViewer', vImageViewer);
 
     if (!import.meta.env.SSR) {
-      const { loadOml2d } = await import('oh-my-live2d');
+      /*const { loadOml2d } = await import('oh-my-live2d');
 
       loadOml2d({
-        /*menus: {
-          items: [],
-        },
-        statusBar: { disable: true },
-        tips: {
-          style: {
-            top: '-50px',
-          },
-        },*/
         models: [
           {
             path: 'https://cdn.jsdelivr.net/gh/Eikanya/Live2d-model/Live2D/Senko_Normals/senko.model3.json',
@@ -47,7 +38,7 @@ export default {
             // },
           },
         ],
-      });
+      });*/
     }
   },
   setup() {

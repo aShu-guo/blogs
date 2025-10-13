@@ -50,6 +50,16 @@ export default {
           ],
         },
         {
+          text: '更细致的样式表现',
+          link: '/base/css/chapter-4',
+          items: [
+            {
+              text: '透明度控制属性opacity',
+              link: '/base/css/chapter-4.1',
+            },
+          ]
+        },
+        {
           text: '拓展',
           items: [
             {
@@ -63,6 +73,20 @@ export default {
             {
               text: 'CSS元素分类',
               link: '/base/css/expand-3',
+            },
+            {
+              text: 'BFC与FFC',
+              link: '/base/css/expand-4',
+            },
+            {
+              text: '颜色混合算法',
+              link: '/base/css/expand-5',
+              items:[
+                {
+                  text: 'CSS中的混合算法',
+                  link: '/base/css/expand-5.1',
+                },
+              ]
             },
           ],
         },
