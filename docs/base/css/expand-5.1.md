@@ -14,9 +14,9 @@ C_final = C_out / α_out
 ```
 
 :::tip
-CSS中的颜色都是sRGB空间下的，在应用混合算法时，需要首先将它转换为线性空间下，计算后再转换为sRGB空间
+CSS中的颜色都是`sRGB空间`下的，在应用混合算法时，需要首先将它转换为线性空间下，计算后再转换为sRGB空间
 
-计算步骤：sRGB -> linear sRGB -> sRGB
+计算步骤：**sRGB -> linear sRGB -> sRGB**
 :::
 
 ## 半透明前景混合非透明背景
@@ -34,66 +34,57 @@ b = (foreground.b * alpha_f) + (background.b * (1.0 - alpha_f));
 - α_f指前景alpha值
 - α_b指背景alpha值
 
-<div class="w-full h-100px bg-#ffffff">
-   <div class="bg-#ff0000 w-full h-full">
-       <div class="w-full h-full bg-#00ff00 opacity-40 color-#ffffff">
-         三层混合：#ffffff+#ff0000+#00ff00 opacity-0.4
-      </div>
+<div class="bg-#ff0000 w-full h-100px">
+    <div class="w-full h-full bg-#00ff00 opacity-40 color-#ffffff">
+      2层混合：#ff0000、#00ff00 opacity-0.4
    </div>
 </div>
 
 ```html
-<div class="w-full h-100px bg-#ffffff">
-  <div class="bg-#ff0000 w-full h-full">
-    <div class="w-full h-full bg-#00ff00 opacity-40"></div>
-  </div>
+<div class="bg-#ff0000 w-full h-100px">
+  <div class="w-full h-full bg-#00ff00 opacity-40 color-#ffffff"></div>
 </div>
 ```
 
-计算步骤（在sRGB空间中的简化计算）：
+计算步骤：
+
+首先从sRGB转换为linear rgb空间下
 
 - 父层颜色：红色 → #ff0000 = rgb(255, 0, 0)
+  - linear rgb: r-1 g-0 b-0
 - 子层颜色：绿色 → #00ff00 = rgb(0, 255, 0)
+  - linear rgb: r-0 g-1 b-0
 - 子层透明度：opacity = 0.4
 
-使用简化的sRGB空间公式：
+在linear rgb空间中计算：
 
 ```text
-r = (0 × 0.4) + 255 × (1.0 - 0.4) = 153
-g = (255 × 0.4) + 0 × (1.0 - 0.4) = 102
+r = (0 × 0.4) + 1.0 × (1.0 - 0.4) = 0.6
+g = (1.0 × 0.4) + 0 × (1.0 - 0.4) = 0.4
 b = (0 × 0.4) + 0 × (1.0 - 0.4) = 0
 ```
 
-结果：rgb(153, 102, 0) = #996600
+结果：rgb(153, 102, 0)
 
-<div class="w-full h-100px bg-#996600">rgb(153,102,0)</div>
+再转换为sRGB空间下：
+
+```text
+r = 0.78
+g = 0.641
+b = 0
+```
+
+结果：rgb(199, 163, 0)
+
+<div class="w-full h-100px flex">
+   <div class="w-50% h-full bg-[rgb(153,102,0)]">linear rgb空间下：rgb(153, 102, 0)</div>
+   <div class="w-50% h-full bg-[rgb(199,163,0)]">srgb空间下：rgb(199, 163, 0)</div>
+</div>
 
 :::tip
-为什么浏览器最终渲染出的颜色与计算出的背景色不一样，浏览器渲染出的颜色为#A77211，我们计算出的颜色为#996600？
+为什么浏览器最终渲染出的颜色与计算出的背景色不一样，浏览器渲染出的颜色为#A77211，我们计算出的颜色为#C7A300？
 
-**主要原因：**
-
-1. **颜色空间转换**：我们使用的是简化的sRGB空间计算，而浏览器按照CSS Color 4规范在Linear RGB空间中进行alpha合成，然后转换回sRGB显示
-
-2. **伽马校正**：Linear RGB到sRGB的转换涉及伽马校正，这会让结果变亮
-
-3. **渲染引擎差异**：不同浏览器可能使用不同的渲染优化和抗锯齿算法
-
-4. **显示器校准**：最终显示效果还受到显示器色彩配置文件的影响
-
-**正确的Linear RGB计算过程**（见下方"CSS的真实混合过程"部分）
-
-<div class="flex w-full h-100px">
-<div class="flex-basis-33% bg-#A77211">
-#A77211 (浏览器实际渲染)
-</div>
-<div class="flex-basis-33% bg-#996600">
-#996600 (sRGB计算结果)
-</div>
-<div class="flex-basis-33% bg-#cbaa00">
-#cbaa00 (Linear RGB计算结果)
-</div>
-</div>
+这和计算公式本身无关，是`显示/色彩管理链路`的问题
 
 :::
 
@@ -116,6 +107,7 @@ b = (0 × 0.4) + 0 × (1.0 - 0.4) = 0
    ```
 
 3. **最终颜色**：
+
    ```text
    r_final = r_out / alpha_out
    g_final = g_out / alpha_out
@@ -180,20 +172,17 @@ b2 = 1.055 × (0.48^(1/2.4)) - 0.055 ≈ 0.722 → 184
 
 结果：rgb(231, 215, 184) = #E7D7B8
 
-这个结果 `#E7D7B8` 与您观察到的实际渲染结果 `#EFB7AB` 有一定差异，但这是正常的，因为：
+这个结果 `#E7D7B8` 与您观察到的实际渲染结果 `#EFB7AB` 有一定差异，但这是正常的
 
 <div class="w-full h-100px bg-#E7D7B8"></div>
 
-**总结：导致颜色差异的主要原因**
-
-1. **遗漏白色背景**：我们最初的计算没有考虑白色背景，导致结果偏暗
-2. **Linear RGB空间计算**：浏览器按照CSS Color 4规范在Linear RGB空间进行alpha合成
-3. **伽马校正**：Linear RGB到sRGB的转换涉及伽马校正，让结果变亮
-4. **多层混合**：实际渲染涉及三层混合（白色背景 + 红色层 + 绿色层）
-
 ## CSS 的真实混合过程
 
-浏览器中的标准流程（符合 [CSS Color 4](https://drafts.csswg.org/css-color-4/#interpolation)）：
+浏览器中的CSS混合标准流程（符合 [CSS Color 4 规范（color interpolation & compositing）](https://drafts.csswg.org/css-color-4/#interpolation)）：
+
+> "Interpolation and compositing are done in linear-light (unencoded) color space, not gamma-encoded sRGB space."
+
+CSS 所有颜色插值、混合（如 opacity、mix-blend-mode、color-mix() 等）都必须在 linear-light 空间中进行。
 
 1. **取出 RGB 值（0–255）并转为 sRGB 归一化 \[0–1]**
 2. **应用 sRGB → LinearRGB 转换（伽马解码）**
@@ -275,7 +264,7 @@ $$
 - 显示器色彩配置文件
 - 浏览器的优化策略
 
-## 注意事项
+:::warning
 
 1. 内层颜色与外层颜色放置顺序不同，产生的最终效果也不同
 
@@ -300,6 +289,39 @@ $$
 </div>
 ```
 
+:::
+
+## canvas中混合流程
+
+浏览器中canvas的标准混合流程[Canvas 2D 规范](https://drafts.csswg.org/css-color-4/#interpolation)
+
+> "The default color space of the 2D context is 'srgb'."
+> "All drawing operations and compositing are performed in that color space, using 8-bit per channel precision."
+
+也就是说：
+
+- Canvas 默认工作在 sRGB 颜色空间；
+- 混合直接在 gamma 编码的 sRGB 通道 上进行；
+- 不做解码到线性空间的步骤；
+- 结果保存在 sRGB（8-bit）帧缓冲中。
+
+<<< @/base/css/codes/mix-color-canvas.ts
+
+=> canvas pixel (r,g,b,a): 153 102 0 255
+
+=> canvas hex: #996600
+
+### 为什么 Canvas 会这样设计？
+
+历史原因 + 性能考量：
+
+- Canvas API 设计于 2005 年左右，那时没有统一的线性色彩规范；
+- 早期 GPU 合成管线都在 8-bit gamma 空间中操作；
+- 为了性能与兼容性，Canvas 沿用了 sRGB 通道混合；
+- 直到近几年才通过 { colorSpace: 'linear-srgb' } 选项补上线性支持。
+
 参考：
 
-【1】(CSS Color 4)[https://drafts.csswg.org/css-color-4/#interpolation]
+【1】[CSS Color 4](https://drafts.csswg.org/css-color-4/#interpolation)
+
+【2】[canvas](https://drafts.csswg.org/css-color-4/#interpolation)

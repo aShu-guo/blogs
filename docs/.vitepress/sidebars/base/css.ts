@@ -86,6 +86,10 @@ export default {
                   text: 'CSS中的混合算法',
                   link: '/base/css/expand-5.1',
                 },
+                {
+                  text: '常见混合算法',
+                  link: '/base/css/expand-5.2',
+                },
               ]
             },
           ],
