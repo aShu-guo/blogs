@@ -57,6 +57,10 @@ export default {
               text: '透明度控制属性opacity',
               link: '/base/css/chapter-4.1',
             },
+            {
+              text: '深入了解圆角属性border-radius',
+              link: '/base/css/chapter-4.2',
+            },
           ]
         },
         {
