@@ -61,6 +61,10 @@ export default {
               text: '深入了解圆角属性border-radius',
               link: '/base/css/chapter-4.2',
             },
+            {
+              text: 'CSS 2D变换',
+              link: '/base/css/chapter-4.3',
+            },
           ]
         },
         {

@@ -120,6 +120,7 @@ export default withMermaid({
           presetAttributify(),
         ],
         shortcuts: [
+          ['switch-animation', 'transition-property-all duration-300'],
           [
             'absolute-center',
             'top-50% -translate-y-50% left-50% -translate-x-50%',
