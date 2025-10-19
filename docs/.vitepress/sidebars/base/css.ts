@@ -65,6 +65,10 @@ export default {
               text: 'CSS 2D变换',
               link: '/base/css/chapter-4.3',
             },
+            {
+              text: '简单实用的calc()函数',
+              link: '/base/css/chapter-4.4',
+            },
           ]
         },
         {
