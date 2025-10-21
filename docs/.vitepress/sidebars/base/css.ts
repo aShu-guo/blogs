@@ -9,7 +9,6 @@ export default {
         },
         {
           text: '从增强已有的CSS属性开始',
-          link: '/base/css/chapter-3',
           items: [
             {
               text: 'CSS尺寸体系',
@@ -51,7 +50,6 @@ export default {
         },
         {
           text: '更细致的样式表现',
-          link: '/base/css/chapter-4',
           items: [
             {
               text: '透明度控制属性opacity',
@@ -69,7 +67,16 @@ export default {
               text: '简单实用的calc()函数',
               link: '/base/css/chapter-4.4',
             },
-          ]
+          ],
+        },
+        {
+          text: '更强的视觉表现',
+          items: [
+            {
+              text: 'CSS渐变',
+              link: '/base/css/chapter-5.1',
+            },
+          ],
         },
         {
           text: '拓展',
@@ -93,7 +100,7 @@ export default {
             {
               text: '颜色混合算法',
               link: '/base/css/expand-5',
-              items:[
+              items: [
                 {
                   text: 'CSS中的混合算法',
                   link: '/base/css/expand-5.1',
@@ -102,7 +109,25 @@ export default {
                   text: '常见混合算法',
                   link: '/base/css/expand-5.2',
                 },
-              ]
+                {
+                  text: '渐变色实现原理',
+                  link: '/base/css/expand-5.3',
+                },
+              ],
+            },
+            {
+              text: '渐变色实现原理',
+              link: '/base/css/expand-6',
+              items: [
+                {
+                  text: '渐变色实现原理-canvas',
+                  link: '/base/css/expand-6.1',
+                },
+                {
+                  text: '渐变色实现原理-shader',
+                  link: '/base/css/expand-6.2',
+                },
+              ],
             },
           ],
         },
