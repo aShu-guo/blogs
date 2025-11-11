@@ -16,7 +16,6 @@ export default [
           { text: 'CSS', link: '/base/css/' },
           { text: 'JavaScript', link: '/base/js/' },
           { text: 'TypeScript', link: '/base/ts/' },
-          { text: '性能', link: '/base/performance/' },
           { text: 'Webkit原理', link: '/base/webkit/' },
         ],
       },

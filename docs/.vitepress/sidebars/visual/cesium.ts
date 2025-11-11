@@ -21,6 +21,37 @@ export default {
             },
           ],
         },
+        {
+          text: '事件体系',
+          link: '/visual/webgis/cesium/chapter-1',
+          items: [
+            {
+              text: '事件链路概览',
+              link: '/visual/webgis/cesium/chapter-1.1',
+            },
+            {
+              text: 'ScreenSpaceEventHandler',
+              link: '/visual/webgis/cesium/chapter-1.2',
+            },
+            {
+              text: 'CameraEventAggregator',
+              link: '/visual/webgis/cesium/chapter-1.3',
+            },
+            {
+              text: 'ScreenSpaceCameraController',
+              link: '/visual/webgis/cesium/chapter-1.4',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      text: '功能拓展',
+      items: [
+        {
+          text: '获取裁切面',
+          link: '/visual/webgis/cesium/extension/clip-plane',
+        },
       ],
     },
   ],

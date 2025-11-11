@@ -38,7 +38,7 @@ import ThreeJs from './sidebars/visual/threejs';
 import Exam from './sidebars/life/exam';
 import Finance from './sidebars/life/finance';
 import Pregnancy from './sidebars/life/pregnancy';
-import OptimizationIndex from './sidebars/optimization/index';
+import CzmOptimization from './sidebars/optimization/czm'
 import { withMermaid } from 'vitepress-plugin-mermaid';
 import {
   groupIconMdPlugin,
@@ -216,7 +216,7 @@ export default withMermaid({
       ...Exam,
       ...Finance,
       ...Pregnancy,
-      ...OptimizationIndex,
+      ...CzmOptimization,
     },
 
     socialLinks: [
