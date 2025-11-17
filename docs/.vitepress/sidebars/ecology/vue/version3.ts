@@ -31,6 +31,10 @@ export default {
               text: 'slot-flags',
               link: '/ecology/vue/3.x/setup/1-6.3-slot-flags',
             },
+            {
+              text: 'patch-flags',
+              link: '/ecology/vue/3.x/setup/1-6.4-patch-flags',
+            },
             { text: 'block机制', link: '/ecology/vue/3.x/setup/1-6.2-block' },
           ],
         },
@@ -43,7 +47,8 @@ export default {
       ],
     },
     {
-      text: '编译器模块',
+      text: '编译模块',
+      link: '/ecology/vue/3.x/compiler/overview',
       items: [
         {
           text: 'Parser 模板解析模块',
@@ -62,6 +67,20 @@ export default {
         {
           text: 'AST 转换模块',
           link: '/ecology/vue/3.x/compiler/2-2-ast-transform-module',
+          items: [
+            {
+              text: '内置指令及修饰符对照表',
+              link: '/ecology/vue/3.x/compiler/directives',
+            },
+            {
+              text: 'transform-bind',
+              link: '/ecology/vue/3.x/compiler/2-2.1-transform-bind',
+            },
+            {
+              text: 'error-codes',
+              link: '/ecology/vue/3.x/compiler/2-2.2-error-codes',
+            },
+          ],
         },
         {
           text: 'Codegen 代码生成模块',
