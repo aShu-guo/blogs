@@ -53,6 +53,10 @@ export default {
               text: 'node-types',
               link: '/ecology/vue/3.x/compiler/2-1.1-node-types',
             },
+            {
+              text: 'error-codes',
+              link: '/ecology/vue/3.x/compiler/2-1.2-error-codes',
+            },
           ],
         },
         {
