@@ -1,0 +1,39 @@
+body {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(163, 166, 173, 0.3) transparent;
+
+  /* Element UI风格滚动条样式 */
+  /* 整个滚动条 */
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  /* 滚动条轨道 */
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 5px;
+  }
+
+  /* 滚动条滑块 */
+
+  ::-webkit-scrollbar-thumb {
+    background: #c0c4cc;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+  }
+
+  /* 滚动条滑块悬停状态 */
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #909399;
+  }
+
+  /* 滚动条滑块激活状态 */
+
+  ::-webkit-scrollbar-thumb:active {
+    background: #606266;
+  }
+}
