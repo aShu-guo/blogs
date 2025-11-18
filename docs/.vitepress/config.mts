@@ -46,7 +46,7 @@ import {
 } from 'vitepress-plugin-group-icons';
 import UnoCSS from 'unocss/vite';
 import { presetAttributify, presetIcons, transformerDirectives } from 'unocss';
-import { presetWind3 } from '@unocss/preset-wind3';
+import { presetWind4 } from '@unocss/preset-wind4';
 
 const DIRECTION_MAPPIINGS = { t: 'top', r: 'right', b: 'bottom', l: 'left' };
 
@@ -110,7 +110,7 @@ export default withMermaid({
       groupIconVitePlugin(),
       UnoCSS({
         presets: [
-          presetWind3(),
+          presetWind4(),
           presetIcons({
             extraProperties: {
               display: 'inline-block',

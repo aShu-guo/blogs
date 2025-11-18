@@ -207,7 +207,7 @@ transform: skewX (ax) skewY (ay);
 
 <div class="box"></div>
 
-<style>
+<style scoped>
   .box {
     width: 150px;
     height: 100px;

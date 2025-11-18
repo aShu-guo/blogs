@@ -19,7 +19,7 @@
     "vitepress-plugin-nprogress": "^0.1.1"
   },
   "dependencies": {
-    "@unocss/preset-wind3": "^66.5.6",
+    "@unocss/preset-wind4": "^66.5.6",
     "gsap": "^3.13.0",
     "oh-my-live2d": "^0.19.3",
     "three": "^0.181.1",

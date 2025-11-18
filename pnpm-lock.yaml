@@ -8,7 +8,7 @@ importers:
 
   .:
     dependencies:
-      '@unocss/preset-wind3':
+      '@unocss/preset-wind4':
         specifier: ^66.5.6
         version: 66.5.6
       gsap:

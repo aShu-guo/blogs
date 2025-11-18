@@ -643,7 +643,7 @@ Vue 3：
 
 - [Vue 3 官方文档 - 性能优化](https://vuejs.org/guide/best-practices/performance.html)
 - [Vue 3 核心源码](https://github.com/vuejs/core)
-- [编译器章节 - 代码生成](./2-3-codegen-module.md)
+- [编译器章节 - 代码生成](../compiler/2-3-codegen-module.md)
 - [Block 机制详解](./1-6.2-block.md)
 - [PatchFlags 完整说明](./1-6.4-patch-flags.md)
 - [createApp 应用创建](./1-2-createapp.md)

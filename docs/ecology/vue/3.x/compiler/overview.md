@@ -912,7 +912,7 @@ compile(template, {
 
 ### 案例：完整编译过程
 
-```typescript
+```text
 // ========== 输入 ==========
 const template = `
 <template>
