@@ -32,10 +32,15 @@ export default {
               link: '/ecology/vue/3.x/setup/1-6.3-slot-flags',
             },
             {
-              text: 'patch-flags',
-              link: '/ecology/vue/3.x/setup/1-6.4-patch-flags',
+              text: 'block机制',
+              link: '/ecology/vue/3.x/setup/1-6.2-block',
+              items: [
+                {
+                  text: 'patch-flags',
+                  link: '/ecology/vue/3.x/setup/1-6.4-patch-flags',
+                },
+              ],
             },
-            { text: 'block机制', link: '/ecology/vue/3.x/setup/1-6.2-block' },
           ],
         },
       ],
@@ -73,8 +78,22 @@ export default {
               link: '/ecology/vue/3.x/compiler/directives',
             },
             {
-              text: 'transform-bind',
-              link: '/ecology/vue/3.x/compiler/2-2.1-transform-bind',
+              text: '内置transform',
+              link: '/ecology/vue/3.x/compiler/2-2-ast-transform-module',
+              items: [
+                {
+                  text: 'transform-bind',
+                  link: '/ecology/vue/3.x/compiler/2-2.1-transform-bind',
+                },
+                {
+                  text: 'transform-once',
+                  link: '/ecology/vue/3.x/compiler/2-2.1-transform-once',
+                },
+                {
+                  text: 'transform-expression',
+                  link: '/ecology/vue/3.x/compiler/2-2.1-transform-exp',
+                },
+              ],
             },
             {
               text: 'error-codes',
