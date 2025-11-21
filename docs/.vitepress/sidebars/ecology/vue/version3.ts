@@ -92,6 +92,12 @@ export default {
                 {
                   text: 'transform-expression',
                   link: '/ecology/vue/3.x/compiler/2-2.1-transform-exp',
+                  items:[
+                    {
+                      text: 'inline模式',
+                      link: '/ecology/vue/3.x/compiler/2-2.1-transform-exp-inline',
+                    },
+                  ]
                 },
               ],
             },
