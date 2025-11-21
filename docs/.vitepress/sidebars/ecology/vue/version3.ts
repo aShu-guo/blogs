@@ -132,7 +132,10 @@ export default {
     },
     {
       text: '拓展',
-      items: [{ text: 'WeekMap', link: '/ecology/vue/3.x/others/weak-map' }],
+      items: [
+        { text: 'WeekMap', link: '/ecology/vue/3.x/others/weak-map' },
+        { text: '与Vite协同', link: '/ecology/vue/3.x/others/vite-collaboration' },
+      ],
     },
     {
       text: 'API实现解析',
