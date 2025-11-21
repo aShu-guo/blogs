@@ -46,13 +46,13 @@ export default {
       ],
     },
     {
-      text: '响应式模块',
+      text: '响应式模块 reactivity-module',
       items: [
         { text: '响应式api', link: '/ecology/vue/3.x/reactivity/chapter-1' },
       ],
     },
     {
-      text: '编译模块',
+      text: '编译模块 compile-module',
       link: '/ecology/vue/3.x/compiler/overview',
       items: [
         {
@@ -125,7 +125,7 @@ export default {
       ],
     },
     {
-      text: '渲染器模块',
+      text: '渲染器模块 render-module',
       items: [
         { text: '响应式api', link: '/ecology/vue/3.x/renderer/chapter-1' },
       ],
