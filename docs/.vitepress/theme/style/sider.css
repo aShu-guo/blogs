@@ -1,0 +1,17 @@
+.dark {
+  --card-bg-color: rgba(29, 29, 31, 0.7); /* 深黑背景，微透明 */
+  --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+.light {
+  --card-bg-color: rgba(255, 255, 255, 0.7); /* 70% 透明白 */
+  --shadow-color: rgba(0, 0, 0, 0.15);
+}
+
+.aside-container {
+  background-color: var(--card-bg-color);
+  backdrop-filter: blur(20px) saturate(180%);
+  box-shadow:
+    0 8px 30px var(--shadow-color),
+    0 2px 8px rgba(0, 0, 0, 0.05);
+}

@@ -90,6 +90,14 @@ export default {
                   link: '/ecology/vue/3.x/compiler/2-2.1-transform-once',
                 },
                 {
+                  text: 'transform-if',
+                  link: '/ecology/vue/3.x/compiler/2-2.1-transform-if',
+                },
+                {
+                  text: 'transform-memo',
+                  link: '/ecology/vue/3.x/compiler/2-2.1-transform-memo',
+                },
+                {
                   text: 'transform-expression',
                   link: '/ecology/vue/3.x/compiler/2-2.1-transform-exp',
                   items:[
@@ -141,6 +149,12 @@ export default {
       items: [
         { text: 'WeekMap', link: '/ecology/vue/3.x/others/weak-map' },
         { text: '与Vite协同', link: '/ecology/vue/3.x/others/vite-collaboration' },
+      ],
+    },
+    {
+      text: '一些优化技巧',
+      items: [
+        { text: '对象透传', link: '/ecology/vue/3.x/optimize/1-object-compute' },
       ],
     },
     {

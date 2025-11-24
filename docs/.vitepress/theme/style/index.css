@@ -3,6 +3,8 @@
 @import './hidden-divider.css';
 @import './vp-code.css';
 @import './scrollbar.css';
+@import './scrollbar.css';
+@import './sider.css';
 
 .medium-zoom-overlay {
   z-index: 20;
