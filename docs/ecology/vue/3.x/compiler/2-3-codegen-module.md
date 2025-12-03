@@ -1,5 +1,14 @@
 # Codegen - 代码生成模块
 
+### 源代码位置
+
+- **generate 主函数**：`packages/compiler-core/src/codegen.ts:281-404` - 代码生成入口点
+- **CodegenContext**：`packages/compiler-core/src/codegen.ts:122-137` - 代码生成上下文状态对象
+- **createCodegenContext**：`packages/compiler-core/src/codegen.ts:139-279` - 初始化代码生成上下文
+- **genFunctionPreamble**：`packages/compiler-core/src/codegen.ts:406-466` - 函数模式序言生成
+- **genModulePreamble**：`packages/compiler-core/src/codegen.ts:468-533` - 模块模式序言生成
+- **codegen.ts 文件**：`packages/compiler-core/src/codegen.ts` (1116 lines) - 完整代码生成实现
+
 Codegen 是 Vue 3 编译器系统中的**第三道工序**，负责将经过 Transform 处理的 AST 转换为**可执行的 JavaScript render 函数代码**。这是编译流程的最后一步，直接生成最终的编译产物。
 
 ## 核心概念

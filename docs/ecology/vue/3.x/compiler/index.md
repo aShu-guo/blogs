@@ -1,3 +1,16 @@
+### 核心源代码位置
+
+- **Parser 模块**：`packages/compiler-core/src/parser.ts` (1087 lines) - 模板解析入口
+- **Tokenizer**：`packages/compiler-core/src/tokenizer.ts` (1181 lines) - HTML 分词器
+- **Transform 模块**：`packages/compiler-core/src/transform.ts` (517 lines) - AST 转换编排
+- **Codegen 模块**：`packages/compiler-core/src/codegen.ts` (1116 lines) - 代码生成器
+- **Compile 入口**：`packages/compiler-core/src/compile.ts` (125 lines) - 完整编译流程
+- **AST 定义**：`packages/compiler-core/src/ast.ts` (881 lines) - 所有节点类型定义
+- **错误处理**：`packages/compiler-core/src/errors.ts` (191 lines) - 编译器错误定义
+- **各指令转换**：`packages/compiler-core/src/transforms/` - v-if, v-for, v-on, v-bind, v-model 等
+
+---
+
 在 Vue3 的源码体系中，**编译（compiler）模块** 是结构最清晰、分层最严格的部分之一。整体上可以将它拆分为以下 **5 大核心章节**（非常适合作为博客的结构与目录）：
 
 ---
@@ -24,7 +37,7 @@
 ## **2. AST Transform（AST 转换）模块**
 
 **作用：**
-对 AST 进行“语义处理”和“结构优化”，为后续生成代码做准备。
+对 AST 进行"语义处理"和"结构优化"，为后续生成代码做准备。
 
 **主要内容：**
 

@@ -2,7 +2,14 @@
 
 AST Transform 是 Vue 3 编译器系统中的**第二道工序**，负责对 Parser 生成的 AST 进行"语义处理"和"性能优化"。这个阶段的目标是为最终的代码生成做好准备，并提前应用各种编译时优化。
 
-## 核心概念
+### 源代码位置
+
+- **Transform 主函数**：`packages/compiler-core/src/transform.ts:331-353` - `transform()` 核心编排函数
+- **TransformContext 初始化**：`packages/compiler-core/src/transform.ts:126-329` - `createTransformContext()` 创建转换上下文
+- **NodeTransform 类型**：`packages/compiler-core/src/transform.ts:48-51` - 节点转换函数签名定义
+- **DirectiveTransform 类型**：`packages/compiler-core/src/transform.ts:56-63` - 指令转换函数签名定义
+- **AST 遍历**：`packages/compiler-core/src/transform.ts:422-483` - `traverseNode()` 递归遍历函数
+- **Transform 预设**：`packages/compiler-core/src/compile.ts:32-63` - `getBaseTransformPreset()` 获取默认转换集合
 
 ### Transform 在编译流程中的位置
 

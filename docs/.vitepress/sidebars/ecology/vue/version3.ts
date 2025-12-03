@@ -48,7 +48,61 @@ export default {
     {
       text: '响应式模块 reactivity-module',
       items: [
-        { text: '响应式api', link: '/ecology/vue/3.x/reactivity/chapter-1' },
+        { text: '概览', link: '/ecology/vue/3.x/reactivity/index' },
+        {
+          text: 'Proxy详解',
+          items: [
+            {
+              text: '规范',
+              link: '/ecology/vue/3.x/reactivity/1-1.1-proxy-specification',
+            },
+            {
+              text: '应用',
+              link: '/ecology/vue/3.x/reactivity/1-1.2-proxy-utilize',
+            },
+            {
+              text: 'Array',
+              link: '/ecology/vue/3.x/reactivity/1-1.3-proxy-array',
+            },
+          ],
+        },
+        {
+          text: 'Reflect详解',
+          items: [
+            {
+              text: '规范',
+              link: '/ecology/vue/3.x/reactivity/1-2.1-reflect-specification',
+            },
+            {
+              text: '规范',
+              link: '/ecology/vue/3.x/reactivity/1-2.2-reflect-utilize',
+            },
+          ],
+        },
+        {
+          text: 'Effect系统',
+          link: '/ecology/vue/3.x/reactivity/1-3-effect',
+        },
+        {
+          text: 'ref',
+          link: '/ecology/vue/3.x/reactivity/1-4.1-ref',
+        },
+        {
+          text: 'reactive',
+          link: '/ecology/vue/3.x/reactivity/1-4.2-reactive',
+        },
+        {
+          text: 'computed',
+          link: '/ecology/vue/3.x/reactivity/1-4.3-computed',
+        },
+        {
+          text: 'watch',
+          link: '/ecology/vue/3.x/reactivity/1-4.4-watch',
+        },
+        {
+          text: 'watchEffect',
+          link: '/ecology/vue/3.x/reactivity/1-4.5-watch-effect',
+        },
       ],
     },
     {
@@ -100,12 +154,12 @@ export default {
                 {
                   text: 'transform-expression',
                   link: '/ecology/vue/3.x/compiler/2-2.1-transform-exp',
-                  items:[
+                  items: [
                     {
                       text: 'inline模式',
                       link: '/ecology/vue/3.x/compiler/2-2.1-transform-exp-inline',
                     },
-                  ]
+                  ],
                 },
               ],
             },
@@ -148,13 +202,19 @@ export default {
       text: '拓展',
       items: [
         { text: 'WeekMap', link: '/ecology/vue/3.x/others/weak-map' },
-        { text: '与Vite协同', link: '/ecology/vue/3.x/others/vite-collaboration' },
+        {
+          text: '与Vite协同',
+          link: '/ecology/vue/3.x/others/vite-collaboration',
+        },
       ],
     },
     {
       text: '一些优化技巧',
       items: [
-        { text: '对象透传', link: '/ecology/vue/3.x/optimize/1-object-compute' },
+        {
+          text: '对象透传',
+          link: '/ecology/vue/3.x/optimize/1-object-compute',
+        },
       ],
     },
     {

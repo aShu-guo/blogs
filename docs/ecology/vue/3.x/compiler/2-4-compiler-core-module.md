@@ -1,5 +1,11 @@
 # Compiler-core - 编译核心模块
 
+### 源代码位置
+
+- **baseCompile 主函数**：`packages/compiler-core/src/compile.ts:67-124` - 编译流水线主入口
+- **getBaseTransformPreset**：`packages/compiler-core/src/compile.ts:32-63` - 默认转换预设配置
+- **compile.ts 文件**：`packages/compiler-core/src/compile.ts` (125 lines) - 编译流程协调
+
 Compiler-core 是 Vue 3 编译器系统的**核心枢纽**，它整合 Parser、Transform 和 Codegen 三个模块，形成统一的编译流水线。这个模块提供了编译的主入口、配置管理和插件系统。
 
 ## 核心概念

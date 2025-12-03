@@ -1,5 +1,18 @@
 # Vue 3 内置指令、简写及修饰符对照表
 
+### 源代码位置
+
+- **v-if 转换**：`packages/compiler-core/src/transforms/vIf.ts:38` - transformIf
+- **v-for 转换**：`packages/compiler-core/src/transforms/vFor.ts:52` - transformFor
+- **v-on 转换**：`packages/compiler-core/src/transforms/vOn.ts:29` - transformOn
+- **v-bind 转换**：`packages/compiler-core/src/transforms/vBind.ts:15` - transformBind
+- **v-model 转换**：`packages/compiler-core/src/transforms/vModel.ts:23` - transformModel
+- **v-memo 转换**：`packages/compiler-core/src/transforms/vMemo.ts:16` - transformMemo
+- **v-once 转换**：`packages/compiler-core/src/transforms/vOnce.ts:8` - transformOnce
+- **v-slot 转换**：`packages/compiler-core/src/transforms/vSlot.ts` - 插槽相关转换
+- **v-show 运行时**：`packages/runtime-dom/src/directives/vShow.ts` - 运行时显示指令
+- **v-html/v-text 运行时**：`packages/runtime-dom/src/` - 运行时文本/HTML指令
+
 本文档整理了 Vue 3 的所有内置指令、简写规则、可用修饰符及其行为说明，统一团队内部使用规范，便于查阅与培训。
 
 ## 1. Vue3 内置指令一览表

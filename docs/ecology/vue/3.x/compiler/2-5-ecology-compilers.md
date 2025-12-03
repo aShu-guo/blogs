@@ -1,5 +1,12 @@
 # 生态编译器扩展 - 多平台编译适配
 
+### 源代码位置
+
+- **Compiler-DOM**：`packages/compiler-dom/src/` - DOM 特定编译逻辑
+- **Compiler-SSR**：`packages/compiler-ssr/src/` - 服务端渲染编译逻辑
+- **Compiler-SFC**：`packages/compiler-sfc/src/` - 单文件组件编译逻辑
+- **核心编译器**：`packages/compiler-core/src/` - 所有平台的共享核心
+
 Vue 3 的编译器体系采用**分层扩展设计**，在 Compiler-core 的基础上，为不同的运行环境和使用场景提供专门优化的编译器。这些生态编译器复用核心逻辑，并添加环境特定的处理。
 
 ## 架构设计

@@ -2,6 +2,12 @@
 
 Parser 是 Vue 3 编译器系统中的**第一道关卡**，负责将 HTML 模板字符串转换为 **抽象语法树（AST）**。这是一个经典的编译器前端任务，涉及词法分析、语法分析等核心概念。
 
+### 源代码位置
+
+- **Parser 主函数**：`packages/compiler-core/src/parser.ts:1036-1087` - `baseParse()` 函数
+- **Tokenizer**：`packages/compiler-core/src/tokenizer.ts:236+` - `Tokenizer` 类
+- **State 枚举**：`packages/compiler-core/src/tokenizer.ts:87-138` - 状态机所有状态定义
+
 ## 核心概念
 
 ### Parser 在编译流程中的位置

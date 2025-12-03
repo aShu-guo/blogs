@@ -1,5 +1,12 @@
 # Vue 3 编译器模块 - 调用链与时序分析
 
+### 核心源代码位置
+
+- **baseCompile 主入口**：`packages/compiler-core/src/compile.ts:67-124` - 编译流程调度
+- **Parser 调用**：`packages/compiler-core/src/parser.ts:1036-1087` - baseParse() 解析
+- **Transform 调用**：`packages/compiler-core/src/transform.ts:331-353` - transform() 转换
+- **Codegen 调用**：`packages/compiler-core/src/codegen.ts:281-404` - generate() 生成代码
+
 Vue 3 编译器是将模板字符串转换为可执行渲染函数的系统。本文档详细分析编译流程的调用链、时序关系和各模块的交互方式。
 
 ## 第一部分：编译系统架构全景
