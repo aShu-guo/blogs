@@ -74,7 +74,7 @@ export default {
               link: '/ecology/vue/3.x/reactivity/1-2.1-reflect-specification',
             },
             {
-              text: '规范',
+              text: '应用',
               link: '/ecology/vue/3.x/reactivity/1-2.2-reflect-utilize',
             },
           ],
@@ -82,6 +82,40 @@ export default {
         {
           text: 'Effect系统',
           link: '/ecology/vue/3.x/reactivity/1-3-effect',
+          items: [
+            {
+              text: '核心概念',
+              link: '/ecology/vue/3.x/reactivity/1-3.1-effect-concepts',
+            },
+            {
+              text: 'ReactiveEffect',
+              link: '/ecology/vue/3.x/reactivity/1-3.2-effect-reactive-effect',
+            },
+            {
+              text: 'Link 和 Dep 依赖链接机制',
+              link: '/ecology/vue/3.x/reactivity/1-3.3-effect-link-dep',
+            },
+            {
+              text: 'track() 和 trigger()',
+              link: '/ecology/vue/3.x/reactivity/1-3.4-effect-track-trigger',
+            },
+            {
+              text: 'Batch 机制',
+              link: '/ecology/vue/3.x/reactivity/1-3.5-effect-batch',
+            },
+            {
+              text: '清理机制（Dependencies Cleanup）',
+              link: '/ecology/vue/3.x/reactivity/1-3.6-effect-cleanup',
+            },
+            {
+              text: 'Scheduler（调度器）',
+              link: '/ecology/vue/3.x/reactivity/1-3.7-effect-scheduler',
+            },
+            {
+              text: 'EffectScope（作用域管理）',
+              link: '/ecology/vue/3.x/reactivity/1-3.8-effect-scope',
+            },
+          ],
         },
         {
           text: 'ref',
