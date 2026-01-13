@@ -1,53 +1,26 @@
 # createVNode 快速参考
 
-## 核心流程（5 步）
+## 核心流程
 
-### 1️⃣ 类型检查
-```javascript
+```
 _createVNode(type, props, children, ...)
   ↓
-检查 type 是否为 null/VNode/ClassComponent
+1. 类型检查 → 特殊处理（Comment/cloneVNode/解包/兼容性转换）
   ↓
-特殊处理 → Comment / cloneVNode / 解包 / 兼容性转换
-```
-
-### 2️⃣ Props 规范化
-```javascript
-guardReactiveProps(props)
+2. Props 规范化 → guardReactiveProps + normalizeClass/Style
   ↓
-{ class: obj } → normalizeClass() → string
-{ style: obj } → normalizeStyle() → object/string
-```
-
-### 3️⃣ ShapeFlag 编码
-```javascript
-isString(type) → ELEMENT
-isFunction(type) → FUNCTIONAL_COMPONENT
-isObject(type) → STATEFUL_COMPONENT
-isTeleport(type) → TELEPORT
-isSuspense(type) → SUSPENSE
-```
-
-### 4️⃣ 创建 VNode
-```javascript
-createBaseVNode(
-  type, props, children,
-  patchFlag, dynamicProps,
-  shapeFlag, isBlockNode, true
-)
-```
-
-### 5️⃣ 追踪到块树
-```javascript
-if (patchFlag > 0 || isComponent) {
-  currentBlock.push(vnode)
-}
+3. ShapeFlag 编码 → 确定节点类型（ELEMENT/COMPONENT/...）
+  ↓
+4. 创建 VNode → createBaseVNode(...)
+  ↓
+5. 追踪到块树 → 如果有 patchFlag 或是组件，加入 currentBlock
 ```
 
 ---
 
-## 关键决策树
+## 类型决策树
 
+### type 参数
 ```
 type 是什么？
 ├─ null/undefined → Comment VNode
@@ -56,7 +29,10 @@ type 是什么？
 ├─ 字符串 ('div') → ShapeFlags.ELEMENT
 ├─ 函数 → ShapeFlags.FUNCTIONAL_COMPONENT
 └─ 对象 {setup/render} → ShapeFlags.STATEFUL_COMPONENT
+```
 
+### props 参数
+```
 props 是什么？
 ├─ null → 跳过处理
 ├─ 普通对象 → 直接使用
@@ -69,17 +45,19 @@ props 是什么？
    ├─ 字符串 → 保持不变
    ├─ 对象/数组 → normalizeStyle() → 对象/字符串
    └─ 例: {color:'red'} → {color:'red'}
+```
 
+### children 参数
+```
 children 是什么？
 ├─ 字符串 → ShapeFlags.TEXT_CHILDREN
 ├─ 数组 → ShapeFlags.ARRAY_CHILDREN
-├─ 对象 → ShapeFlags.SLOTS_CHILDREN
-└─ 需要规范化...
+└─ 对象 → ShapeFlags.SLOTS_CHILDREN
 ```
 
 ---
 
-## Props 处理细节
+## Props 处理
 
 ### 响应式保护（guardReactiveProps）
 
@@ -91,9 +69,11 @@ const cloned = extend({}, proxy)  // 克隆为普通对象
 // 修改时不触发：SET handler（已是普通对象）
 ```
 
-### class 处理
+**作用：** 避免修改响应式对象时触发 setter，导致意外的响应式副作用。
 
-```
+### class 规范化
+
+```javascript
 { class: 'active' }
   → 'active'（保持）
 
@@ -107,9 +87,11 @@ const cloned = extend({}, proxy)  // 克隆为普通对象
   → 'active disabled'（递归处理）
 ```
 
-### style 处理
+**返回值：** 总是返回字符串
 
-```
+### style 规范化
+
+```javascript
 { style: 'color: red' }
   → 'color: red'（保持）
 
@@ -163,22 +145,28 @@ const cloned = extend({}, proxy)  // 克隆为普通对象
 ## ShapeFlags 位标志
 
 ```javascript
-ELEMENT                 = 1         (001)
-FUNCTIONAL_COMPONENT    = 2         (010)
-STATEFUL_COMPONENT      = 4         (100)
-TEXT_CHILDREN           = 8         (1000)
-ARRAY_CHILDREN          = 16        (10000)
-SLOTS_CHILDREN          = 32        (100000)
-TELEPORT                = 64        (1000000)
-SUSPENSE                = 128       (10000000)
+ELEMENT                        = 1    // 0b1
+FUNCTIONAL_COMPONENT           = 2    // 0b10
+STATEFUL_COMPONENT             = 4    // 0b100
+TEXT_CHILDREN                  = 8    // 0b1000
+ARRAY_CHILDREN                 = 16   // 0b10000
+SLOTS_CHILDREN                 = 32   // 0b100000
+TELEPORT                       = 64   // 0b1000000
+SUSPENSE                       = 128  // 0b10000000
 COMPONENT_SHOULD_KEEP_ALIVE    = 256
 COMPONENT_KEPT_ALIVE           = 512
 ```
 
-**判断方式：**
+**使用方式：**
 ```javascript
+// 判断是否为组件
 if (vnode.shapeFlag & ShapeFlags.COMPONENT) {
   // 是组件（函数或状态组件）
+}
+
+// 判断是否有数组子节点
+if (vnode.shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+  // 有数组子节点
 }
 ```
 
@@ -187,26 +175,26 @@ if (vnode.shapeFlag & ShapeFlags.COMPONENT) {
 ## PatchFlags 优化标记
 
 ```javascript
-TEXT            = 1              // 文本内容变化
-CLASS           = 1 << 1    = 2  // class 变化
-STYLE           = 1 << 2    = 4  // style 变化
-PROPS           = 1 << 3    = 8  // props 变化
-FULL_PROPS      = 1 << 4    = 16 // 完整 props 比对
-HYDRATE_EVENTS  = 1 << 5    = 32 // SSR 事件
-STABLE_FRAGMENT = 1 << 6    = 64 // 稳定 Fragment
-KEYED_FRAGMENT  = 1 << 7    = 128
-UNKEYED_FRAGMENT= 1 << 8    = 256
-NEED_PATCH      = 1 << 9    = 512
-DYNAMIC_SLOTS   = 1 << 10   = 1024
+TEXT             = 1              // 文本内容变化
+CLASS            = 1 << 1    = 2  // class 变化
+STYLE            = 1 << 2    = 4  // style 变化
+PROPS            = 1 << 3    = 8  // props 变化
+FULL_PROPS       = 1 << 4    = 16 // 完整 props 比对
+HYDRATE_EVENTS   = 1 << 5    = 32 // SSR 事件
+STABLE_FRAGMENT  = 1 << 6    = 64 // 稳定 Fragment
+KEYED_FRAGMENT   = 1 << 7    = 128
+UNKEYED_FRAGMENT = 1 << 8    = 256
+NEED_PATCH       = 1 << 9    = 512
+DYNAMIC_SLOTS    = 1 << 10   = 1024
 ```
 
-**意义：** 编译器标记需要更新的内容，patch 算法据此优化比对
+**作用：** 编译器标记需要更新的内容，patch 算法据此优化比对，性能提升约 30-50%。
 
 ---
 
 ## 常见调用模式
 
-### 1. 编译器生成
+### 编译器生成
 
 ```javascript
 // 模板：<div :class="active ? 'active' : ''" @click="handle">
@@ -222,7 +210,7 @@ _createVNode('div',
 )
 ```
 
-### 2. 手写 h() 函数
+### 手写 h() 函数
 
 ```javascript
 h('div', {class: 'container'}, [
@@ -230,14 +218,14 @@ h('div', {class: 'container'}, [
 ])
 ```
 
-### 3. 动态类型
+### 动态类型
 
 ```javascript
 const type = ref(MyComponent)
 h(type.value, props)
 ```
 
-### 4. 多根节点
+### 多根节点
 
 ```javascript
 h(Fragment, null, [
@@ -249,9 +237,35 @@ h(Fragment, null, [
 
 ---
 
-## 性能技巧
+## 函数调用链
 
-### ✓ 最佳实践
+```
+createVNode()
+  ├─→ _createVNode()（PROD）
+  └─→ createVNodeWithArgsTransform()（DEV）
+
+_createVNode()
+  ├─→ guardReactiveProps()
+  ├─→ normalizeClass()
+  ├─→ normalizeStyle()
+  └─→ createBaseVNode()
+
+createBaseVNode()
+  ├─→ normalizeChildren()
+  ├─→ 追踪到块树
+  └─→ 返回 VNode
+
+VNode 后续流程
+  ├─→ patch()（首次挂载或更新）
+  ├─→ mount()（挂载到 DOM）
+  └─→ unmount()（卸载时清理）
+```
+
+---
+
+## 性能优化
+
+### 最佳实践
 
 ```javascript
 // 1. 静态节点提升
@@ -271,7 +285,7 @@ markRaw(SomeComponent)
 h(SomeComponent, props)  // 避免警告
 ```
 
-### ✗ 避免做的事
+### 避免的做法
 
 ```javascript
 // 1. 不要将组件包装为 reactive
@@ -306,32 +320,6 @@ console.log(vnode.props)
 
 // 在开发模式查看警告
 // 控制台会显示关于响应式组件等的警告
-```
-
----
-
-## 关系链
-
-```
-createVNode()
-  ├─→ _createVNode()（PROD）
-  └─→ createVNodeWithArgsTransform()（DEV）
-
-_createVNode()
-  ├─→ guardReactiveProps()
-  ├─→ normalizeClass()
-  ├─→ normalizeStyle()
-  └─→ createBaseVNode()
-
-createBaseVNode()
-  ├─→ normalizeChildren()
-  ├─→ 追踪到块树
-  └─→ 返回 VNode
-
-VNode 后续流程
-  ├─→ patch()（首次挂载或更新）
-  ├─→ mount()（挂载到 DOM）
-  └─→ unmount()（卸载时清理）
 ```
 
 ---

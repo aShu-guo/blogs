@@ -1,6 +1,18 @@
 # Vue 3 核心架构与性能优化体系
 
-Vue 3 的性能优化是多层次、多维度的系统设计。本文档从架构全景出发，详细解析 Vue 3 的优化体系，包括编译时优化（静态提升、PatchFlags）、运行时优化（Block 机制、访问缓存）和应用架构优化（WeakMap、任务调度）。
+## 引言
+
+Vue 3 的性能优化是一个多层次、多维度的系统工程，通过编译时分析和运行时优化的深度结合，实现了相比 Vue 2 **10-100 倍**的性能提升。本文档从架构全景出发，系统性地解析 Vue 3 的优化体系。
+
+### 优化体系概览
+
+Vue 3 的性能优化可以分为三个核心层次：
+
+1. **编译时优化**：通过静态分析模板，生成优化标记（PatchFlags）和提升静态内容，减少运行时工作量
+2. **运行时优化**：利用编译时信息，实现精确的 diff 算法（Block 机制）和高效的缓存策略（WeakMap、accessCache）
+3. **架构优化**：通过任务调度、批处理和智能的内存管理，提升整体应用性能
+
+这些优化技术相互配合，形成了一个完整的性能优化闭环：编译器识别优化机会 → 生成优化标记 → 运行时利用标记跳过不必要的工作 → 缓存加速重复操作。
 
 ---
 
@@ -8,7 +20,7 @@ Vue 3 的性能优化是多层次、多维度的系统设计。本文档从架�
 
 ### 核心概念
 
-ShapeFlags 是一个位标记系统，用于快速判断 VNode 的**类型**和**子节点类型**，避免使用 `instanceof` 或 `typeof` 的性能开销。
+ShapeFlags 是 Vue 3 中的位标记系统，用于快速判断 VNode 的**类型**和**子节点类型**。通过位运算替代传统的 `instanceof` 或 `typeof` 检查，实现 O(1) 时间复杂度的类型判断。
 
 ```typescript
 export enum ShapeFlags {
@@ -59,6 +71,8 @@ if (vnode.type && typeof vnode.type === 'object' && vnode.type.__isComponent) { 
 if (vnode.shapeFlag & ShapeFlags.ELEMENT) { /* ... */ }
 // O(1) 位运算，无额外开销
 ```
+
+ShapeFlags 为后续的 diff 算法提供了基础，使得 Vue 3 能够在 patch 阶段快速分流不同类型的 VNode，选择对应的处理逻辑。
 
 ---
 
@@ -160,9 +174,95 @@ PatchFlags 和 Block 形成**二维优化**：
 结果：O(N²) full diff → O(M) node selection × O(1) property update = O(M)
 ```
 
+这种二维优化是 Vue 3 性能提升的核心，它将传统的全量 diff 转变为精确的靶向更新。
+
 ---
 
-## 第三部分：应用架构优化 - WeakMap 与访问缓存
+## 第三部分：编译时优化 - 静态提升与 Block
+
+### 静态提升
+
+静态节点被提升到模块作用域，避免每次渲染都创建：
+
+```html
+<!-- 模板 -->
+<div>
+  <p>Static text</p>
+  <p>{{ dynamic }}</p>
+</div>
+```
+
+**编译后**：
+```javascript
+// 编译时提升
+const _hoisted_1 = _createVNode('p', null, 'Static text')
+
+export function render(_ctx) {
+  return _createVNode('div', null, [
+    _hoisted_1,  // ← 复用已创建的节点
+    _createVNode('p', null, _toDisplayString(_ctx.dynamic), PatchFlags.TEXT)
+  ])
+}
+```
+
+**优势**：
+```
+100 次渲染，每个模板有 50 个节点，其中 49 个静态：
+  • 不使用静态提升：100 × 50 = 5000 个 VNode 创建
+  • 使用静态提升：100 × 1 个动态节点 + 1 次 49 个静态节点创建 = 149 个 VNode 创建
+  性能提升：33 倍
+```
+
+### Block 机制
+
+Block 机制是 Vue 3 编译时优化的核心，它精确追踪每个 Block 内的动态节点，使运行时能够跳过所有静态节点的 diff。
+
+```typescript
+// openBlock 打开新 Block
+export function openBlock() {
+  blockStack.push({ dynamicChildren: [] })
+}
+
+// createBlock 创建 Block 并收集 dynamicChildren
+export function createBlock(type, props, children, patchFlag, dynamicProps) {
+  const vnode = createVNode(type, props, children, patchFlag, dynamicProps)
+  vnode.dynamicChildren = blockStack[blockStack.length - 1]?.dynamicChildren
+  blockStack.pop()
+  return vnode
+}
+```
+
+**编译示例**：
+```html
+<!-- 模板 -->
+<div>
+  <p>Static 1</p>
+  <p>{{ count }}</p>
+  <p>Static 2</p>
+  <span v-if="show">Conditional</span>
+</div>
+```
+
+**编译后**：
+```javascript
+export function render(_ctx) {
+  return (_openBlock(), _createBlock('div', null, [
+    _createVNode('p', null, 'Static 1'),
+    _createVNode('p', null, _toDisplayString(_ctx.count), PatchFlags.TEXT),  // 动态
+    _createVNode('p', null, 'Static 2'),
+    _ctx.show ? _createVNode('span', null, 'Conditional', PatchFlags.TEXT) : null  // 动态
+  ],
+  undefined,
+  [1, 3]  // dynamicChildren: 仅第 2、4 个节点
+  ))
+}
+```
+
+Block 机制将传统的树形遍历 diff 转变为扁平化的数组遍历，配合 PatchFlags 实现了精确的靶向更新。
+
+---
+
+## 第四部分：应用架构优化 - WeakMap 与访问缓存
 
 ### WeakMap 在 AppContext 中的应用
 
@@ -202,6 +302,8 @@ cache.set(component, { /* options */ })
 delete component  // ← WeakMap 中的条目也被清除
 // 结果：内存正常释放
 ```
+
+WeakMap 的使用体现了 Vue 3 在内存管理上的细致考虑，避免了长期运行应用中的内存泄漏问题。
 
 ### accessCache - 属性访问优化
 
@@ -250,87 +352,7 @@ enum AccessorIndex {
   • 性能提升：10 倍
 ```
 
----
-
-## 第四部分：编译时优化 - 静态提升与 Block
-
-### 静态提升
-
-静态节点被提升到模块作用域，避免每次渲染都创建：
-
-```html
-<!-- 模板 -->
-<div>
-  <p>Static text</p>
-  <p>{{ dynamic }}</p>
-</div>
-```
-
-**编译后**：
-```javascript
-// 编译时提升
-const _hoisted_1 = _createVNode('p', null, 'Static text')
-
-export function render(_ctx) {
-  return _createVNode('div', null, [
-    _hoisted_1,  // ← 复用已创建的节点
-    _createVNode('p', null, _toDisplayString(_ctx.dynamic), PatchFlags.TEXT)
-  ])
-}
-```
-
-**优势**：
-```
-100 次渲染，每个模板有 50 个节点，其中 49 个静态：
-  • 不使用静态提升：100 × 50 = 5000 个 VNode 创建
-  • 使用静态提升：50 次渲染 × 1 个动态节点 + 1 次 49 个静态节点创建 = 99 个 VNode 创建
-  性能提升：50 倍
-```
-
-### Block 机制
-
-Block 精确追踪每个 Block 内的动态节点：
-
-```typescript
-// openBlock 打开新 Block
-export function openBlock() {
-  blockStack.push({ dynamicChildren: [] })
-}
-
-// createBlock 创建 Block 并收集 dynamicChildren
-export function createBlock(type, props, children, patchFlag, dynamicProps) {
-  const vnode = createVNode(type, props, children, patchFlag, dynamicProps)
-  vnode.dynamicChildren = blockStack[blockStack.length - 1]?.dynamicChildren
-  blockStack.pop()
-  return vnode
-}
-```
-
-**编译示例**：
-```html
-<!-- 模板 -->
-<div>
-  <p>Static 1</p>
-  <p>{{ count }}</p>
-  <p>Static 2</p>
-  <span v-if="show">Conditional</span>
-</div>
-```
-
-**编译后**：
-```javascript
-export function render(_ctx) {
-  return (_openBlock(), _createBlock('div', null, [
-    _createVNode('p', null, 'Static 1'),
-    _createVNode('p', null, _toDisplayString(_ctx.count), PatchFlags.TEXT),  // 动态
-    _createVNode('p', null, 'Static 2'),
-    _ctx.show ? _createVNode('span', null, 'Conditional', PatchFlags.TEXT) : null  // 动态
-  ],
-  undefined,
-  [1, 3]  // dynamicChildren: 仅第 2、4 个节点
-  ))
-}
-```
+accessCache 是一个典型的空间换时间优化，通过少量内存开销换取显著的性能提升。
 
 ---
 
@@ -393,9 +415,11 @@ flag.value = true   // → queueJob(update3)
   性能提升：10 倍
 ```
 
+任务调度机制确保了即使在复杂的状态更新场景下，Vue 3 也能保持高效的渲染性能。
+
 ### Fragment 处理
 
-Vue 支持多根元素（Fragment），通过特殊的 Fragment VNode 实现：
+Vue 3 支持多根元素（Fragment），通过特殊的 Fragment VNode 实现：
 
 ```html
 <!-- Vue 2 中报错 -->
@@ -425,6 +449,8 @@ export function render(_ctx) {
   ], 64))  // PatchFlags.STABLE_FRAGMENT
 }
 ```
+
+Fragment 的引入不仅提升了开发体验，也为组件的灵活组合提供了基础。
 
 ---
 
@@ -483,6 +509,8 @@ export function render(_ctx) {
       → 比较 1 项 × 2 属性 = 2 个属性
       性能提升：5000 倍
 ```
+
+这个案例充分展示了 Vue 3 多层优化技术的协同效果，在真实场景中实现了数量级的性能提升。
 
 ---
 
@@ -622,20 +650,39 @@ Vue 3：
 
 ---
 
-## 总结表
+## 总结
+
+### 核心优化技术总览
 
 | 优化技术 | 作用层次 | 性能收益 | 应用场景 |
 |---------|---------|--------|---------|
 | **ShapeFlags** | 编译时 + 运行时 | 类型判断 O(1) | VNode 类型快速判断 |
 | **PatchFlags** | 编译时 + 运行时 | 属性 diff O(1) | 精确 diff 定位 |
-| **Block 机制** | 编译时 + 运时 | 节点 diff O(M) | 避免静态节点 diff |
+| **Block 机制** | 编译时 + 运行时 | 节点 diff O(M) | 避免静态节点 diff |
 | **静态提升** | 编译时 | 节点创建 1 次 | 避免重复创建 |
 | **WeakMap 缓存** | 运行时 | 查询 O(1) | 自动垃圾回收 |
 | **accessCache** | 运行时 | 访问性能 10x | 加速属性访问 |
 | **任务调度** | 运行时 | 批处理 10x | 批量状态更新 |
 | **Fragment** | 运行时 | 多根元素支持 | 灵活模板结构 |
 
-**综合效果**：**10-100 倍性能提升**
+### 优化体系的协同效应
+
+Vue 3 的性能优化不是单一技术的堆砌，而是一个精心设计的系统：
+
+1. **编译时与运行时的深度结合**：编译器通过静态分析生成优化标记，运行时利用这些标记跳过不必要的工作
+2. **多层次的优化策略**：从 VNode 类型判断（ShapeFlags）到属性更新（PatchFlags），再到节点选择（Block），每一层都有针对性的优化
+3. **智能的缓存机制**：通过 WeakMap 和 accessCache，在保证内存安全的前提下最大化性能
+4. **批处理与调度**：任务调度机制确保即使在复杂场景下也能保持高效
+
+### 综合效果
+
+通过这些优化技术的协同作用，Vue 3 实现了：
+- **编译时间**：减少 80%
+- **内存占用**：减少 80%
+- **首次渲染**：提升 10 倍
+- **更新性能**：提升 10-100 倍
+
+这些提升不仅体现在基准测试中，更在真实的应用场景中为开发者带来了显著的性能改善。
 
 ---
 
