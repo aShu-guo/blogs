@@ -547,8 +547,9 @@ SSR 生成的 HTML 需要被客户端 hydrate（重新激活）：
   <p>Message</p>
 </div>
 
-// 客户端 hydrate
-app.mount(document.getElementById('app'), { hydrate: true })
+// 客户端 hydrate：使用 createSSRApp，mount 默认走 hydrate 流程
+import { createSSRApp } from 'vue'
+createSSRApp(App).mount(document.getElementById('app'))
 ```
 
 #### 2. 异步组件处理
@@ -612,18 +613,24 @@ export function ssrRender(..., ssrContext) {
 }
 ```
 
-### Compiler-ssr 特有选项
+### Compiler-ssr 常用选项（在内部会自动开启 `ssr: true` / `inSSR: true`）
 
 ```typescript
 {
-  // SSR 输出目标
-  target?: 'node' | 'browser'
+  // 输出模式：函数或模块
+  mode?: 'function' | 'module'
 
-  // 是否生成 hydration 代码
-  hydrate?: boolean
+  // 作用域 CSS ID（与 SFC 配合）
+  scopeId?: string
 
-  // 是否包含异步组件
-  async?: boolean
+  // 用于内联的 css vars 字符串（SFC 提供）
+  ssrCssVars?: string
+
+  // 自定义元素判断
+  isCustomElement?: (tag: string) => boolean
+
+  // 是否为具名插槽注入 slot 标记
+  slotted?: boolean
 }
 ```
 

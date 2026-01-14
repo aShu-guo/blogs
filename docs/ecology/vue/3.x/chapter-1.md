@@ -766,7 +766,7 @@ const PatchFlags = {
   STYLE: 1 << 2,        // style 变化
   PROPS: 1 << 3,        // props 变化
   FULL_PROPS: 1 << 4,   // 需要完整比对 props
-  HYDRATE_EVENTS: 1 << 5, // SSR 水合时需要绑定事件
+  NEED_HYDRATION: 1 << 5, // SSR 水合时需要 hydration props/事件
   STABLE_FRAGMENT: 1 << 6, // Fragment 稳定
   KEYED_FRAGMENT: 1 << 7,  // Fragment 有 key
   UNKEYED_FRAGMENT: 1 << 8, // Fragment 无 key

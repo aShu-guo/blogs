@@ -1,4 +1,4 @@
-# 编译时优化
+# Vue 3 编译时优化
 
 ## 1. 概念先行：建立心智模型
 
@@ -159,68 +159,68 @@ patchBlock(vnode1, vnode2);
 
 **核心思想**：将完全静态的节点提升到 render 函数外，避免重复创建。
 
-| 优化前                                      | 优化后                                                                     | 效果       |
-|------------------------------------------|-------------------------------------------------------------------------|----------|
-| 每次 render 都创建静态 VNode                    | 静态 VNode 只创建一次                                                          | 减少对象创建开销 |
-| `render() { return h('div', 'static') }` | `const _hoisted = h('div', 'static')`<br>`render() { return _hoisted }` | 内存复用     |
+| 优化前                                   | 优化后                                                                  | 效果             |
+| ---------------------------------------- | ----------------------------------------------------------------------- | ---------------- |
+| 每次 render 都创建静态 VNode             | 静态 VNode 只创建一次                                                   | 减少对象创建开销 |
+| `render() { return h('div', 'static') }` | `const _hoisted = h('div', 'static')`<br>`render() { return _hoisted }` | 内存复用         |
 
 **编译示例**：
 
-| 模板代码                             | 编译输出                                                                                                                  | 优化说明         |
-|----------------------------------|-----------------------------------------------------------------------------------------------------------------------|--------------|
+| 模板代码                         | 编译输出                                                                                                              | 优化说明          |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ----------------- |
 | `<div><p>Static</p></div>`       | `const _hoisted_1 = createVNode('p', null, 'Static')`<br>`render() { return createVNode('div', null, [_hoisted_1]) }` | p 节点被提升      |
-| `<div><p>{{ msg }}</p></div>`    | `render() { return createVNode('div', null, [createVNode('p', null, msg, 1)]) }`                                      | 动态节点不提升      |
+| `<div><p>{{ msg }}</p></div>`    | `render() { return createVNode('div', null, [createVNode('p', null, msg, 1)]) }`                                      | 动态节点不提升    |
 | `<div class="static">text</div>` | `const _hoisted_1 = { class: 'static' }`<br>`render() { return createVNode('div', _hoisted_1, 'text') }`              | 静态 props 也提升 |
 
 **提升条件**：
 
-| 条件      | 是否提升 | 原因      |
-|---------|------|---------|
-| 纯静态文本   | ✅    | 永不改变    |
-| 静态属性    | ✅    | 永不改变    |
-| 包含动态绑定  | ❌    | 可能改变    |
-| 包含 ref  | ❌    | 可能改变    |
-| 包含动态子节点 | ❌    | 子节点可能改变 |
+| 条件           | 是否提升 | 原因           |
+| -------------- | -------- | -------------- |
+| 纯静态文本     | ✅       | 永不改变       |
+| 静态属性       | ✅       | 永不改变       |
+| 包含动态绑定   | ❌       | 可能改变       |
+| 包含 ref       | ❌       | 可能改变       |
+| 包含动态子节点 | ❌       | 子节点可能改变 |
 
 ### 3.2 PatchFlags（补丁标记）
 
 **核心思想**：标记 VNode 中哪些属性是动态的，diff 时只比较标记的属性。
 
-| 标记                   | 值    | 含义            | 编译场景             |
-|----------------------|------|---------------|------------------|
-| **TEXT**             | 1    | 动态文本          | `{{ msg }}`      |
+| 标记                 | 值   | 含义            | 编译场景         |
+| -------------------- | ---- | --------------- | ---------------- |
+| **TEXT**             | 1    | 动态文本        | `{{ msg }}`      |
 | **CLASS**            | 2    | 动态 class      | `:class="cls"`   |
 | **STYLE**            | 4    | 动态 style      | `:style="sty"`   |
 | **PROPS**            | 8    | 动态 props      | `:id="id"`       |
 | **FULL_PROPS**       | 16   | 完整 props diff | `v-bind="obj"`   |
-| **HYDRATE_EVENTS**   | 32   | 事件 hydration  | `@click="fn"`    |
-| **STABLE_FRAGMENT**  | 64   | 稳定片段          | 固定子节点            |
-| **KEYED_FRAGMENT**   | 128  | 有 key 片段      | `v-for` with key |
-| **UNKEYED_FRAGMENT** | 256  | 无 key 片段      | `v-for` 无 key    |
-| **NEED_PATCH**       | 512  | 需要完整 patch    | 组件               |
-| **DYNAMIC_SLOTS**    | 1024 | 动态插槽          | 条件插槽             |
-| **HOISTED**          | -1   | 静态提升          | 完全静态             |
-| **BAIL**             | -2   | 跳过优化          | 复杂场景             |
+| **NEED_HYDRATION**   | 32   | hydration 事件/props | `@click="fn"`    |
+| **STABLE_FRAGMENT**  | 64   | 稳定片段        | 固定子节点       |
+| **KEYED_FRAGMENT**   | 128  | 有 key 片段     | `v-for` with key |
+| **UNKEYED_FRAGMENT** | 256  | 无 key 片段     | `v-for` 无 key   |
+| **NEED_PATCH**       | 512  | 需要完整 patch  | 组件             |
+| **DYNAMIC_SLOTS**    | 1024 | 动态插槽        | 条件插槽         |
+| **CACHED**           | -1   | 缓存的静态 vnode | 完全静态         |
+| **BAIL**             | -2   | 跳过优化        | 复杂场景         |
 
 **编译示例**：
 
-| 模板                                    | 编译输出                                                           | PatchFlag         | 说明          |
-|---------------------------------------|----------------------------------------------------------------|-------------------|-------------|
-| `<div>{{ msg }}</div>`                | `createVNode('div', null, msg, 1)`                             | TEXT = 1          | 只有文本动态      |
+| 模板                                  | 编译输出                                                       | PatchFlag         | 说明            |
+| ------------------------------------- | -------------------------------------------------------------- | ----------------- | --------------- |
+| `<div>{{ msg }}</div>`                | `createVNode('div', null, msg, 1)`                             | TEXT = 1          | 只有文本动态    |
 | `<div :class="cls">text</div>`        | `createVNode('div', { class: cls }, 'text', 2)`                | CLASS = 2         | 只有 class 动态 |
-| `<div :class="cls">{{ msg }}</div>`   | `createVNode('div', { class: cls }, msg, 3)`                   | TEXT \| CLASS = 3 | 两者都动态       |
+| `<div :class="cls">{{ msg }}</div>`   | `createVNode('div', { class: cls }, msg, 3)`                   | TEXT \| CLASS = 3 | 两者都动态      |
 | `<div :id="id" class="static"></div>` | `createVNode('div', { id, class: 'static' }, null, 8, ['id'])` | PROPS = 8         | 只有 id 动态    |
 
 **运行时使用**：
 
-| 源码片段                                  | 逻辑拆解                          |
-|---------------------------------------|-------------------------------|
-| `const { patchFlag } = vnode`         | **提取标记**：从 VNode 获取 patchFlag |
-| `if (patchFlag > 0) {`                | **优化入口**：只有标记 > 0 才进入优化路径     |
+| 源码片段                              | 逻辑拆解                                    |
+| ------------------------------------- | ------------------------------------------- |
+| `const { patchFlag } = vnode`         | **提取标记**：从 VNode 获取 patchFlag       |
+| `if (patchFlag > 0) {`                | **优化入口**：只有标记 > 0 才进入优化路径   |
 | `if (patchFlag & PatchFlags.TEXT) {`  | **按位检查**：用 `&` 检查是否包含 TEXT 标记 |
-| `patchText(el, oldText, newText)`     | **精确更新**：只更新文本，跳过其他属性         |
-| `if (patchFlag & PatchFlags.CLASS) {` | **按位检查**：检查是否包含 CLASS 标记      |
-| `patchClass(el, oldClass, newClass)`  | **精确更新**：只更新 class            |
+| `patchText(el, oldText, newText)`     | **精确更新**：只更新文本，跳过其他属性      |
+| `if (patchFlag & PatchFlags.CLASS) {` | **按位检查**：检查是否包含 CLASS 标记       |
+| `patchClass(el, oldClass, newClass)`  | **精确更新**：只更新 class                  |
 
 ### 3.3 Block Tree（块树）
 
@@ -249,49 +249,49 @@ Block：只遍历 dynamicChildren 中的 1 个节点
 
 **编译示例**：
 
-| 模板                                                          | 编译输出                                                                                                            | dynamicChildren   |
-|-------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|-------------------|
+| 模板                                                        | 编译输出                                                                                                        | dynamicChildren   |
+| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ----------------- |
 | `<div><h1>Static</h1><p>{{ msg }}</p></div>`                | `openBlock()`<br>`createBlock('div', null, [_hoisted_1, createVNode('p', null, msg, 1)])`                       | `[p]`             |
-| `<div><p v-if="show">{{ msg }}</p></div>`                   | `openBlock()`<br>`createBlock('div', null, [show ? createVNode('p', null, msg, 1) : null])`                     | `[p]` (条件渲染)      |
+| `<div><p v-if="show">{{ msg }}</p></div>`                   | `openBlock()`<br>`createBlock('div', null, [show ? createVNode('p', null, msg, 1) : null])`                     | `[p]` (条件渲染)  |
 | `<div v-for="item in list" :key="item.id">{{ item }}</div>` | `openBlock()`<br>`createBlock(Fragment, null, list.map(item => createVNode('div', { key: item.id }, item, 1)))` | `[div, div, ...]` |
 
 **Block 创建流程**：
 
-| 步骤 | 函数调用               | 作用                                                |
-|----|--------------------|---------------------------------------------------|
-| 1  | `openBlock()`      | 创建 currentBlock 数组，准备收集动态节点                       |
-| 2  | `createVNode(...)` | 创建子节点，如果有 patchFlag > 0，自动加入 currentBlock         |
-| 3  | `createBlock(...)` | 创建 Block VNode，将 currentBlock 赋值给 dynamicChildren |
-| 4  | `closeBlock()`     | 清空 currentBlock，恢复父 Block                         |
+| 步骤 | 函数调用           | 作用                                                     |
+| ---- | ------------------ | -------------------------------------------------------- |
+| 1    | `openBlock()`      | 创建 currentBlock 数组，准备收集动态节点                 |
+| 2    | `createVNode(...)` | 创建子节点，如果有 patchFlag > 0，自动加入 currentBlock  |
+| 3    | `createBlock(...)` | 创建 Block VNode，将 currentBlock 赋值给 dynamicChildren |
+| 4    | `closeBlock()`     | 清空 currentBlock，恢复父 Block                          |
 
 ### 3.4 常量折叠（Constant Folding）
 
 **核心思想**：编译时计算常量表达式，减少运行时计算。
 
-| 模板                                | 优化前                           | 优化后                          |
-|-----------------------------------|-------------------------------|------------------------------|
-| `<div :class="'a' + 'b'">`        | `{ class: 'a' + 'b' }`        | `{ class: 'ab' }`            |
+| 模板                              | 优化前                        | 优化后                         |
+| --------------------------------- | ----------------------------- | ------------------------------ |
+| `<div :class="'a' + 'b'">`        | `{ class: 'a' + 'b' }`        | `{ class: 'ab' }`              |
 | `<div :style="{ color: 'red' }">` | `{ style: { color: 'red' } }` | `{ style: _hoisted_1 }` (提升) |
-| `<div v-if="true">`               | `true ? h('div') : null`      | `h('div')` (移除条件)            |
+| `<div v-if="true">`               | `true ? h('div') : null`      | `h('div')` (移除条件)          |
 
 ### 3.5 Tree Shaking（树摇优化）
 
 **核心思想**：按需引入运行时辅助函数，未使用的功能不打包。
 
-| 功能     | Vue 2 | Vue 3        |
-|--------|-------|--------------|
-| 全局 API | 全部打包  | 按需引入         |
-| 内置组件   | 全部打包  | 按需引入         |
-| 指令     | 全部打包  | 按需引入         |
-| 包体积    | ~32KB | ~13KB (gzip) |
+| 功能     | Vue 2    | Vue 3        |
+| -------- | -------- | ------------ |
+| 全局 API | 全部打包 | 按需引入     |
+| 内置组件 | 全部打包 | 按需引入     |
+| 指令     | 全部打包 | 按需引入     |
+| 包体积   | ~32KB    | ~13KB (gzip) |
 
 **编译示例**：
 
-| 模板                                 | 编译输出                                                | 引入的辅助函数         |
-|------------------------------------|-----------------------------------------------------|-----------------|
-| `<div>{{ msg }}</div>`             | `import { createVNode as _createVNode } from 'vue'` | 只引入 createVNode |
+| 模板                               | 编译输出                                            | 引入的辅助函数      |
+| ---------------------------------- | --------------------------------------------------- | ------------------- |
+| `<div>{{ msg }}</div>`             | `import { createVNode as _createVNode } from 'vue'` | 只引入 createVNode  |
 | `<Transition><div /></Transition>` | `import { Transition as _Transition } from 'vue'`   | 额外引入 Transition |
-| `<div v-show="show">`              | `import { vShow as _vShow } from 'vue'`             | 额外引入 vShow 指令   |
+| `<div v-show="show">`              | `import { vShow as _vShow } from 'vue'`             | 额外引入 vShow 指令 |
 
 ## 4. 细节补充：边界与性能优化
 
@@ -299,31 +299,31 @@ Block：只遍历 dynamicChildren 中的 1 个节点
 
 **不会提升的情况**：
 
-| 场景        | 原因     | 示例                              |
-|-----------|--------|---------------------------------|
-| 包含动态绑定    | 内容可能改变 | `<div :id="id">Static</div>`    |
-| 包含 ref    | 需要更新引用 | `<div ref="myRef">Static</div>` |
-| 使用 v-once | 已有其他优化 | `<div v-once>{{ msg }}</div>`   |
-| 嵌套层级过深    | 提升收益不大 | 超过 3 层嵌套                        |
+| 场景         | 原因         | 示例                            |
+| ------------ | ------------ | ------------------------------- |
+| 包含动态绑定 | 内容可能改变 | `<div :id="id">Static</div>`    |
+| 包含 ref     | 需要更新引用 | `<div ref="myRef">Static</div>` |
+| 使用 v-once  | 已有其他优化 | `<div v-once>{{ msg }}</div>`   |
+| 嵌套层级过深 | 提升收益不大 | 超过 3 层嵌套                   |
 
 **提升策略**：
 
-| 配置                  | 默认值   | 说明           |
-|---------------------|-------|--------------|
-| `hoistStatic`       | true  | 是否启用静态提升     |
-| `cacheHandlers`     | false | 是否缓存事件处理器    |
-| `prefixIdentifiers` | false | 是否添加前缀（用于优化） |
+| 配置                | 默认值 | 说明                     |
+| ------------------- | ------ | ------------------------ |
+| `hoistStatic`       | true   | 是否启用静态提升         |
+| `cacheHandlers`     | false  | 是否缓存事件处理器       |
+| `prefixIdentifiers` | false  | 是否添加前缀（用于优化） |
 
 ### 4.2 PatchFlags 的组合使用
 
 **位运算组合**：
 
-| 操作   | 代码                       | 结果                | 说明            |
-|------|--------------------------|-------------------|---------------|
+| 操作     | 代码                     | 结果              | 说明                 |
+| -------- | ------------------------ | ----------------- | -------------------- |
 | 组合标记 | `TEXT \| CLASS`          | `1 \| 2 = 3`      | 同时标记文本和 class |
-| 检查标记 | `3 & TEXT`               | `3 & 1 = 1` (真)   | 包含 TEXT       |
-| 检查标记 | `3 & STYLE`              | `3 & 4 = 0` (假)   | 不包含 STYLE     |
-| 多标记  | `TEXT \| CLASS \| STYLE` | `1 \| 2 \| 4 = 7` | 三个都标记         |
+| 检查标记 | `3 & TEXT`               | `3 & 1 = 1` (真)  | 包含 TEXT            |
+| 检查标记 | `3 & STYLE`              | `3 & 4 = 0` (假)  | 不包含 STYLE         |
+| 多标记   | `TEXT \| CLASS \| STYLE` | `1 \| 2 \| 4 = 7` | 三个都标记           |
 
 **dynamicProps 数组**：
 
@@ -356,11 +356,11 @@ for (const key of dynamicProps) {
 
 **不稳定的结构**：
 
-| 场景                | 问题   | 解决方案                 |
-|-------------------|------|----------------------|
-| `v-if` / `v-else` | 结构改变 | 每个分支创建独立 Block       |
-| `v-for` 无 key     | 无法追踪 | 标记为 UNKEYED_FRAGMENT |
-| 动态组件              | 类型改变 | 标记为 NEED_PATCH       |
+| 场景              | 问题     | 解决方案                |
+| ----------------- | -------- | ----------------------- |
+| `v-if` / `v-else` | 结构改变 | 每个分支创建独立 Block  |
+| `v-for` 无 key    | 无法追踪 | 标记为 UNKEYED_FRAGMENT |
+| 动态组件          | 类型改变 | 标记为 NEED_PATCH       |
 
 **Fragment 的处理**：
 
@@ -380,16 +380,16 @@ createBlock(Fragment, null, [
 
 **场景 1：大量静态内容**
 
-| 指标   | Vue 2 | Vue 3 | 提升    |
-|------|-------|-------|-------|
+| 指标     | Vue 2 | Vue 3 | 提升  |
+| -------- | ----- | ----- | ----- |
 | 首次渲染 | 100ms | 60ms  | 1.67x |
 | 更新渲染 | 50ms  | 5ms   | 10x   |
 | 内存占用 | 10MB  | 6MB   | 1.67x |
 
 **场景 2：大量动态内容**
 
-| 指标   | Vue 2 | Vue 3 | 提升    |
-|------|-------|-------|-------|
+| 指标     | Vue 2 | Vue 3 | 提升  |
+| -------- | ----- | ----- | ----- |
 | 首次渲染 | 100ms | 90ms  | 1.11x |
 | 更新渲染 | 50ms  | 30ms  | 1.67x |
 | 内存占用 | 10MB  | 9MB   | 1.11x |
@@ -398,13 +398,13 @@ createBlock(Fragment, null, [
 
 ### 4.5 编译选项
 
-| 选项                  | 默认值       | 说明      | 影响          |
-|---------------------|-----------|---------|-------------|
-| `hoistStatic`       | true      | 静态提升    | 减少对象创建      |
-| `cacheHandlers`     | false     | 缓存事件处理器 | 减少函数创建      |
-| `prefixIdentifiers` | false     | 添加前缀    | 优化作用域       |
-| `optimizeBindings`  | false     | 优化绑定    | 减少 Proxy 访问 |
-| `isCustomElement`   | undefined | 自定义元素判断 | 避免组件解析      |
+| 选项                | 默认值    | 说明           | 影响            |
+| ------------------- | --------- | -------------- | --------------- |
+| `hoistStatic`       | true      | 静态提升       | 减少对象创建    |
+| `cacheHandlers`     | false     | 缓存事件处理器 | 减少函数创建    |
+| `prefixIdentifiers` | false     | 添加前缀       | 优化作用域      |
+| `optimizeBindings`  | false     | 优化绑定       | 减少 Proxy 访问 |
+| `isCustomElement`   | undefined | 自定义元素判断 | 避免组件解析    |
 
 **开启所有优化**：
 
@@ -457,12 +457,12 @@ export default {
 
 ### 与运行时优化的协作
 
-| 优化类型       | 编译时    | 运行时     | 协作方式   |
-|------------|--------|---------|--------|
-| 静态提升       | 提取静态节点 | 直接复用    | 减少创建开销 |
-| PatchFlags | 标记动态属性 | 精确 diff | 减少比较次数 |
+| 优化类型   | 编译时       | 运行时       | 协作方式     |
+| ---------- | ------------ | ------------ | ------------ |
+| 静态提升   | 提取静态节点 | 直接复用     | 减少创建开销 |
+| PatchFlags | 标记动态属性 | 精确 diff    | 减少比较次数 |
 | Block Tree | 收集动态节点 | 跳过静态树   | 减少遍历次数 |
-| 事件缓存       | 缓存处理器  | 避免重新绑定  | 减少更新开销 |
+| 事件缓存   | 缓存处理器   | 避免重新绑定 | 减少更新开销 |
 
 ### 面试考点
 

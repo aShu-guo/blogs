@@ -378,7 +378,7 @@ enum PatchFlags {
   STYLE = 4,                 // 动态 style
   PROPS = 8,                 // 动态 props（指定列表）
   FULL_PROPS = 16,           // 完整 props
-  HYDRATE_EVENTS = 32,       // 事件
+  NEED_HYDRATION = 32,       // hydration 事件/props
   STABLE_FRAGMENT = 64,      // 稳定 fragment
   KEYED_FRAGMENT = 128,      // 有 key 的 fragment
   UNKEYED_FRAGMENT = 256,    // 无 key 的 fragment

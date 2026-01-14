@@ -43,10 +43,11 @@ export function render(_ctx, _cache) {
         _toDisplayString(_ctx.message),
         4  // PatchFlags.STYLE
       ),
-      _createVNode(_ctx.MyComponent,
+      _createVNode(
+        _ctx.MyComponent,
         {
-          props: _ctx.data,
-          onEvent: _ctx.handler
+          ..._ctx.data,           // 组件 props 应该直接展开到第二个参数
+          onEvent: _ctx.handler,  // 事件监听同样是顶层字段
         },
         null,
         0

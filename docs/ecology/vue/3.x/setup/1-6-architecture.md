@@ -91,13 +91,13 @@ export enum PatchFlags {
   STYLE = 1 << 2,              // 0000000100 - style 动态
   PROPS = 1 << 3,              // 0000001000 - 特定 props 动态
   FULL_PROPS = 1 << 4,         // 0000010000 - 全部 props 动态
-  HYDRATE_EVENTS = 1 << 5,     // 0000100000 - SSR hydration 事件
+  NEED_HYDRATION = 1 << 5,     // 0000100000 - SSR hydration 事件
   STABLE_FRAGMENT = 1 << 6,    // 0001000000 - v-for 节点数固定
   KEYED_FRAGMENT = 1 << 7,     // 0010000000 - v-for 有 key
   UNKEYED_FRAGMENT = 1 << 8,   // 0100000000 - v-for 无 key
   NEED_PATCH = 1 << 9,         // 1000000000 - 组件需要完整 patch
   DYNAMIC_SLOTS = 1 << 10,     // 10000000000 - 动态 slots
-  HOISTED = -1,                // 静态提升标记
+  CACHED = -1,                 // 缓存的静态 vnode
   BAIL = -2                    // 跳过优化
 }
 ```

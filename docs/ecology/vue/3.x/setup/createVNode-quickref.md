@@ -174,7 +174,7 @@ CLASS            = 1 << 1    = 2  // class 变化
 STYLE            = 1 << 2    = 4  // style 变化
 PROPS            = 1 << 3    = 8  // props 变化
 FULL_PROPS       = 1 << 4    = 16 // 完整 props 比对
-HYDRATE_EVENTS   = 1 << 5    = 32 // SSR 事件
+NEED_HYDRATION   = 1 << 5    = 32 // SSR 事件/props hydration
 STABLE_FRAGMENT  = 1 << 6    = 64 // 稳定 Fragment
 KEYED_FRAGMENT   = 1 << 7    = 128
 UNKEYED_FRAGMENT = 1 << 8    = 256

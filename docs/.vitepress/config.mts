@@ -39,6 +39,7 @@ import Exam from './sidebars/life/exam';
 import Finance from './sidebars/life/finance';
 import Pregnancy from './sidebars/life/pregnancy';
 import CzmOptimization from './sidebars/optimization/czm'
+import ProjectOptimization from './sidebars/optimization/project'
 import { withMermaid } from 'vitepress-plugin-mermaid';
 import {
   groupIconMdPlugin,
@@ -217,6 +218,7 @@ export default withMermaid({
       ...Finance,
       ...Pregnancy,
       ...CzmOptimization,
+      ...ProjectOptimization
     },
 
     socialLinks: [

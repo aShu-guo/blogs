@@ -22,9 +22,9 @@ packages/reactivity/src/
 ├── computed.ts          # computed() 函数实现
 ├── watch.ts             # watch() 和 watchEffect() 实现
 ├── effect.ts            # effect() 和 Dep 系统实现
+├── effectScope.ts       # effectScope() 与作用域管理
 ├── baseHandlers.ts      # 普通对象的 Proxy handler
 ├── collectionHandlers.ts # Map/Set 的 Proxy handler
-├── operators.ts         # 响应式操作符（过滤、映射等）
 └── index.ts             # 公共 API 导出
 ```
 
@@ -118,7 +118,7 @@ Vue 3 使用 Proxy 代替原始对象的原因：
 | 数组索引   | 无法追踪                | ✅ 可追踪 |
 | in 操作符 | 无法追踪                | ✅ 可追踪 |
 
-详见 [Proxy 详解](./1-1-proxy.md)。
+详见 [Proxy 规范](./1-1.1-proxy-specification.md) 和 [Proxy 在 Vue3 中的应用](./1-1.2-proxy-utilize.md)。
 
 ## 核心 API
 
@@ -489,7 +489,7 @@ state.dom.textContent = 'hello'  // 不触发响应式更新
 
 ### 初级：理解基础概念
 
-1. **理解 Proxy 的作用** → [Proxy 详解](./1-1-proxy.md)
+1. **理解 Proxy 的作用** → [Proxy 规范](./1-1.1-proxy-specification.md) / [Proxy 在 Vue3 中的应用](./1-1.2-proxy-utilize.md)
     - Proxy 如何拦截属性访问和修改
     - 为什么需要 Proxy（vs Object.defineProperty）
     - WeakMap 缓存原理
@@ -616,7 +616,8 @@ raw.count++  // 修改了，但不响应
 
 ## 相关文件
 
-- [Proxy 详解](./1-1-proxy.md) - 代理机制的完整分析
+- [Proxy 规范](./1-1.1-proxy-specification.md) - 代理机制的完整分析
+- [Proxy 在 Vue3 中的应用](./1-1.2-proxy-utilize.md) - 结合响应式的具体用法
 - [ref 实现](./1-2-ref.md)（待创建）
 - [computed 实现](./1-3-computed.md)（待创建）
 - [watch 实现](./1-4-watch.md)（待创建）

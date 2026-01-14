@@ -7,6 +7,10 @@ export default [
         link: '/optimization/performance/',
       },
       {
+        text: '项目优化',
+        link: '/optimization/project/',
+      },
+      {
         text: 'cesium',
         link: '/optimization/czm/',
       },

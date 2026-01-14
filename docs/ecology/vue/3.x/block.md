@@ -12,6 +12,11 @@
 4. 如果最终集合了子节点的信息`patchFlag > 0`时则会被推入block中
 5. 将block数组放在根VNode的`dynamicChildren`属性上
 
+需要注意的是，运行时的收集条件不仅仅是 `patchFlag > 0`：
+- 组件节点会始终被追踪（即使 patchFlag 为 0），以便正确挂载/卸载
+- 仅带有 `NEED_HYDRATION` 的节点不会被视为动态节点
+- 只有在 `isBlockTreeEnabled > 0` 且存在 `currentBlock` 时才会追踪
+
 ## 如何标记信息位？
 
 ```ts
@@ -27,14 +32,14 @@ export const enum PatchFlags {
   PROPS = 1 << 3,
   // 标记class、style、props都是动态的，所以diff时直接用新节点替换旧节点
   FULL_PROPS = 1 << 4,
-  HYDRATE_EVENTS = 1 << 5,
+  NEED_HYDRATION = 1 << 5,
   STABLE_FRAGMENT = 1 << 6,
   KEYED_FRAGMENT = 1 << 7,
   UNKEYED_FRAGMENT = 1 << 8,
   NEED_PATCH = 1 << 9,
   DYNAMIC_SLOTS = 1 << 10,
   DEV_ROOT_FRAGMENT = 1 << 11,
-  HOISTED = -1,
+  CACHED = -1,
   BAIL = -2,
 }
 ```
@@ -300,7 +305,7 @@ import {
   createElementBlock as _createElementBlock,
 } from 'vue';
 
-const _hoisted_1 = /*#__PURE__*/ _createElementVNode('span', null, 'element node', -1 /* HOISTED */);
+const _hoisted_1 = /*#__PURE__*/ _createElementVNode('span', null, 'element node', -1 /* CACHED */);
 const _hoisted_2 = ['onClick'];
 const _hoisted_3 = ['title'];
 const _hoisted_4 = ['title'];
