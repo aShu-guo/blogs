@@ -1,895 +1,425 @@
 # Vite 与 Vue 协同
 
-介绍 @vitejs/plugin-vue 与 Vue Compiler 的协同
+## 1. 概念先行：建立心智模型
 
-## 核心协同流程
+### 核心问题
+
+Vue 3 的 `.vue` 文件包含 template、script、style 三种不同语法，浏览器无法直接执行。Vite 如何在开发时实现"保存即刷新"，在生产时打包优化？
+
+### 生活化类比
+
+想象一个**翻译工作室**：
+
+- **Vite**：工作室的项目经理，负责接单、分配任务、管理流程
+- **@vitejs/plugin-vue**：翻译协调员，识别 `.vue` 文件并拆分任务
+- **Vue Compiler**：专业翻译团队，将 template 翻译成 render 函数，将 `<script setup>` 翻译成标准 JS
+- **浏览器**：客户，只接受标准的 JavaScript/CSS
+
+当你修改 `.vue` 文件时，协调员会判断：只改了 template？那就只重新翻译 template，script 和 style 复用之前的结果。这就是 **HMR（热模块替换）** 的核心思想。
+
+### 核心流程
 
 ```
-Vite 构建系统
+开发者保存 App.vue
   ↓
-@vitejs/plugin-vue (Vite 插件)
-  ├─ 解析 .vue 文件请求
-  ├─ 调用 vue/compiler-sfc
-  │  ├─ compiler.parse() - 解析 SFC 文件
-  │  ├─ compiler.compileTemplate() - 编译 template
-  │  ├─ compiler.compileStyle() - 编译 style
-  │  └─ compiler.compileScript() - 编译 script
-  └─ 生成可执行的 JavaScript 代码
-     ↓
-浏览器执行
+Vite 拦截请求 /src/App.vue
+  ↓
+plugin-vue 调用 compiler.parse() 解析文件
+  ├─ template → compiler.compileTemplate() → render 函数
+  ├─ script   → compiler.compileScript()   → 标准 JS
+  └─ style    → compiler.compileStyle()    → Scoped CSS
+  ↓
+合并为浏览器可执行的 JS 模块
+  ↓
+浏览器执行并渲染
 ```
 
-## 1. 编译器加载机制
+---
 
-plugin-vue 需要从项目的依赖中加载 Vue 的 compiler-sfc 模块。
+## 2. 最小实现：手写"低配版"
 
-```typescript
-// @vitejs/plugin-vue 的编译器解析逻辑
-function resolveCompiler(root) {
-  const compiler = tryResolveCompiler(root) || tryResolveCompiler();
-  if (!compiler) {
-    throw new Error(
-      `Failed to resolve vue/compiler-sfc.
-@vitejs/plugin-vue requires vue (>=3.2.25) to be present in the dependency tree.`,
-    );
-  }
-  return compiler;
-}
+以下是一个 40 行的简化版 Vite Vue 插件，展示核心协同逻辑：
 
-function tryResolveCompiler(root) {
-  const vueMeta = tryRequire('vue/package.json', root);
-  // 检查 Vue 版本 >= 3
-  if (vueMeta && vueMeta.version.split('.')[0] >= 3) {
-    // 动态加载 vue/compiler-sfc
-    return tryRequire('vue/compiler-sfc', root);
+```javascript
+// mini-vite-vue-plugin.js
+import { parse, compileTemplate, compileScript } from '@vue/compiler-sfc'
+
+export function vuePlugin() {
+  const cache = new Map() // 缓存已解析的文件
+
+  return {
+    name: 'vite-vue',
+
+    // 处理 .vue 文件请求
+    async transform(code, id) {
+      if (!id.endsWith('.vue')) return
+
+      // 1. 解析 .vue 文件
+      const { descriptor } = parse(code, { filename: id })
+      cache.set(id, descriptor)
+
+      // 2. 编译 script
+      const script = compileScript(descriptor, { id })
+
+      // 3. 编译 template
+      const template = compileTemplate({
+        source: descriptor.template.content,
+        id,
+        scoped: descriptor.styles.some(s => s.scoped)
+      })
+
+      // 4. 编译 style
+      const styles = descriptor.styles.map(style =>
+        `const style = document.createElement('style')
+         style.textContent = ${JSON.stringify(style.content)}
+         document.head.appendChild(style)`
+      ).join('\n')
+
+      // 5. 合并输出
+      return `
+        ${script.content}
+        ${template.code}
+        ${styles}
+        _sfc_main.render = render
+        export default _sfc_main
+      `
+    }
   }
 }
 ```
 
-**关键点**：
+**运行效果**：这段代码可以处理简单的 `.vue` 文件，但缺少 HMR、错误处理、缓存优化等生产特性。
 
-- 动态解析 `vue/compiler-sfc` 模块
-- 验证 Vue 版本 \>= 3.2.25
-- 支持自定义编译器版本（通过 options.compiler）
+---
 
-## 2. SFC 解析与缓存
+## 3. 逐行解剖：关键路径分析
 
-当 Vite 请求一个 .vue 文件时，plugin-vue 首先解析该文件。
+### 3.1 编译器加载机制
+
+plugin-vue 需要动态加载项目中的 `vue/compiler-sfc`：
+
+| 源码片段 | 逻辑拆解 |
+|---------|---------|
+| `const compiler = tryResolveCompiler(root)` | **动态解析**：从项目的 node_modules 中查找 Vue 编译器 |
+| `if (vueMeta.version.split('.')[0] >= 3)` | **版本校验**：确保 Vue 版本 >= 3.2.25，避免 API 不兼容 |
+| `return tryRequire('vue/compiler-sfc', root)` | **按需加载**：只在需要时加载编译器，减少启动时间 |
+
+### 3.2 SFC 解析与缓存
+
+当 Vite 请求 `/src/App.vue` 时：
 
 ```typescript
-// 创建 SFC 描述符（Descriptor）
-function createDescriptor(
-  filename,
-  source,
-  { compiler, sourceMap },
-  hmr = false,
-) {
-  // ① 调用 compiler.parse() 解析 .vue 文件
+function createDescriptor(filename, source, { compiler }) {
+  // ① 调用 compiler.parse() 解析
   const { descriptor, errors } = compiler.parse(source, {
     filename,
-    sourceMap,
-    templateParseOptions: template?.compilerOptions,
-  });
+    sourceMap: true
+  })
 
-  // ② 生成组件 ID（唯一标识）
-  descriptor.id = getHash(normalizedPath + (isProduction ? source : ''));
+  // ② 生成唯一 ID（用于 Scoped CSS 和 HMR）
+  descriptor.id = hash(filename + source)
 
   // ③ 缓存 descriptor（避免重复解析）
-  cache.set(filename, descriptor);
+  cache.set(filename, descriptor)
 
-  return { descriptor, errors };
+  return { descriptor, errors }
 }
 ```
-
-**compiler.parse\(\) 的职责**：
-
-- 将 .vue 文件分解为 script、template、style 块
-- 返回 SFCDescriptor 对象（包含所有块的信息）
-- 返回解析错误列表
 
 **SFCDescriptor 结构**：
 
 ```typescript
-interface SFCDescriptor {
-  filename: string; // 文件路径
-  source: string; // 原始源代码
-  script: SFCScriptBlock | null; // <script> 块
-  scriptSetup: SFCScriptBlock | null; // <script setup> 块
-  template: SFCTemplateBlock | null; // <template> 块
-  styles: SFCStyleBlock[]; // <style> 块数组
-  customBlocks: SFCBlock[]; // 自定义块
-  cssVars: string[]; // CSS 变量列表
-  id: string; // 组件唯一 ID
+{
+  filename: '/src/App.vue',
+  script: { content: 'export default { ... }' },
+  scriptSetup: { content: 'const count = ref(0)' },
+  template: { content: '<div>{{ count }}</div>', ast: {...} },
+  styles: [{ content: 'div { color: red }', scoped: true }],
+  id: 'abc123'  // 用于生成 data-v-abc123
 }
 ```
 
-## 3. Template 编译
+### 3.3 请求类型分发
 
-当请求 template 相关资源时，调用 `compiler.compileTemplate()`。
+plugin-vue 通过 URL query 参数区分不同的编译需求：
 
-```typescript
-// plugin-vue 中编译 template 的流程
-function compile(code, descriptor, options, pluginContext, ssr, customElement) {
-  const filename = descriptor.filename;
-
-  // ① 先处理 script
-  resolveScript(descriptor, options, ssr, customElement);
-
-  // ② 调用 compiler.compileTemplate() 编译 template
-  const result = options.compiler.compileTemplate({
-    ...resolveTemplateCompilerOptions(descriptor, options, ssr),
-    source: code,
-  });
-
-  // ③ 处理编译错误和警告
-  if (result.errors.length) {
-    result.errors.forEach((error) =>
-      pluginContext.error(createRollupError(filename, error)),
-    );
-  }
-
-  if (result.tips.length) {
-    result.tips.forEach((tip) =>
-      pluginContext.warn({ id: filename, message: tip }),
-    );
-  }
-
-  return result;
-}
-
-// 准备 template 编译选项
-function resolveTemplateCompilerOptions(descriptor, options, ssr) {
-  return {
-    id: descriptor.id,
-    filename: descriptor.filename,
-    source: descriptor.template.source,
-    ast: descriptor.template.ast,
-
-    // Scoped CSS 相关
-    scoped: descriptor.styles.some((s) => s.scoped),
-    cssVars: descriptor.cssVars,
-
-    // Asset URLs 转换
-    transformAssetUrls: {
-      base: devBase + '/' + path.relative(root, path.dirname(filename)),
-      includeAbsolute: true,
-    },
-
-    // 预处理器选项（如 pug、stylus）
-    preprocessLang: descriptor.template.lang,
-
-    // SSR 模式
-    ssr: ssr,
-
-    // 其他编译器选项
-    ...options.template?.compilerOptions,
-  };
-}
-```
-
-**compiler.compileTemplate() 的职责**：
-
-- 编译 Vue template 为 render 函数
-- 处理指令（v-if、v-for 等）
-- 处理动态内容和表达式
-- 支持 SSR 模式编译
-
-**返回结果**：
+| 请求 URL | 返回内容 | 编译器调用 |
+|---------|---------|-----------|
+| `/App.vue` | 完整组件（主请求） | 所有编译器 API |
+| `/App.vue?type=script` | 编译后的 script | `compileScript()` |
+| `/App.vue?type=template` | render 函数 | `compileTemplate()` |
+| `/App.vue?type=style&index=0` | 第一个 style 块 | `compileStyle()` |
 
 ```typescript
-interface TemplateCompileResult {
-  code: string; // 生成的 JavaScript 代码
-  ast: TemplateAST; // 模板 AST
-  preamble: string; // 前置代码（导入语句等）
-  errors: string[]; // 编译错误列表
-  tips: string[]; // 编译提示列表
-}
-```
-
-## 4. Style 编译与处理
-
-处理 \<style\> 块的编译。
-
-```typescript
-// plugin-vue 中处理 style 的流程
-async function transformStyle(
-  code,
-  descriptor,
-  index,
-  options,
-  filename,
-  devServer,
-) {
-  const blockOptions = descriptor.styles[index];
-
-  // ① 确定是否为 scoped CSS
-  const isScoped = blockOptions.scoped;
-
-  // ② 调用 compiler.compileStyle() 编译 style
-  const result = await options.compiler.compileStyle({
-    source: code,
-    filename: filename + `?vue&type=style&index=${index}`,
-    id: `data-v-${descriptor.id}`,
-    scoped: isScoped,
-    modules: blockOptions.module,
-    preprocessLang: blockOptions.lang,
-    postcssOptions: options.postcssOptions,
-    inMap: blockOptions.map,
-    postcssPlugins: options.postcssPlugins,
-    preprocessCustomRequire: options.preprocessCustomRequire,
-  });
-
-  return result;
-}
-```
-
-**compiler.compileStyle() 的职责**：
-
-- 处理 CSS 预处理器（Less、Sass 等）
-- 生成 Scoped CSS（添加 data-v-xxx 属性）
-- 处理 CSS Modules
-- Source map 生成
-
-## 5. Script 编译
-
-处理 \<script\> 和 \<script setup\> 块。
-
-```typescript
-// plugin-vue 中处理 script 的流程
-function resolveScript(descriptor, options, ssr, customElement) {
-  // 获取 script 或 scriptSetup 块
-  let resolvedScript = descriptor.script;
-
-  // 如果有 <script setup>，调用 compiler.compileScript()
-  if (descriptor.scriptSetup) {
-    resolvedScript = options.compiler.compileScript(descriptor, {
-      inlineTemplate: true,
-      templateOptions: resolveTemplateCompilerOptions(descriptor, options),
-      sourceMap: options.sourceMap,
-      ssr: ssr,
-      customElement: customElement,
-    });
-  }
-
-  return resolvedScript;
-}
-```
-
-**compiler.compileScript() 的职责**：
-
-- 编译 `<script setup>` 语法
-- 处理 `defineProps`、`defineEmits` 等宏
-- 转换为标准 Vue 3 代码
-- 进行模板内联（如果需要）
-
-## 6. 请求类型处理
-
-plugin-vue 通过 query 参数区分不同的编译需求。
-
-```typescript
-// 解析 Vue 请求的 query 参数
 function parseVueRequest(id) {
-  const [filename, rawQuery] = id.split('?', 2);
-  const query = Object.fromEntries(new URLSearchParams(rawQuery));
-  return { filename, query };
-}
+  const [filename, rawQuery] = id.split('?', 2)
+  const query = Object.fromEntries(new URLSearchParams(rawQuery))
 
-// 不同的请求类型
-// ① /App.vue - 主请求，返回完整组件
-// ② /App.vue?vue&type=script - 获取 script 块
-// ③ /App.vue?vue&type=template - 获取 template 块
-// ④ /App.vue?vue&type=style&index=0 - 获取指定 style 块
-// ⑤ /App.vue?vue&type=custom - 获取自定义块
-```
-
-**query 参数说明**：
-
-```typescript
-interface VueQuery {
-  vue?: boolean; // 标记为 Vue 请求
-  type?: 'script' | 'template' | 'style' | 'custom';
-  index?: number; // style 块索引
-  lang?: string; // 语言类型（jsx、ts、less 等）
-  raw?: boolean; // 返回原始源代码
-  url?: boolean; // 返回 URL
-  scoped?: boolean; // 是否为 scoped style
-  id?: string; // 组件 ID
+  // 根据 query.type 决定调用哪个编译器 API
+  if (query.type === 'template') return compileTemplate(...)
+  if (query.type === 'style') return compileStyle(...)
+  // ...
 }
 ```
 
-## 7. 完整编译流程示例
+### 3.4 Template 编译
 
 ```typescript
-// 用户的 .vue 文件
-// App.vue
-<template>
-  <div>{{ message }}</div>
-</template>
+const result = compiler.compileTemplate({
+  source: descriptor.template.content,
+  id: descriptor.id,
 
-<script setup lang="ts">
+  // Scoped CSS 支持
+  scoped: descriptor.styles.some(s => s.scoped),
+
+  // 资源路径转换（如 <img src="./logo.png">）
+  transformAssetUrls: {
+    base: '/src/',
+    includeAbsolute: true
+  },
+
+  // SSR 模式
+  ssr: false
+})
+
+// 返回：{ code: 'function render() { ... }', errors: [] }
+```
+
+| 配置项 | 作用 |
+|-------|------|
+| `scoped: true` | 为模板中的元素添加 `data-v-abc123` 属性 |
+| `transformAssetUrls` | 将相对路径转换为 Vite 可处理的模块导入 |
+| `ssr: true` | 生成服务端渲染代码（返回字符串而非 VNode） |
+
+### 3.5 Script 编译
+
+处理 `<script setup>` 的魔法：
+
+```typescript
+const script = compiler.compileScript(descriptor, {
+  id: descriptor.id,
+
+  // 内联 template（避免额外请求）
+  inlineTemplate: true,
+
+  // 传递 template 的绑定信息（用于类型推断）
+  templateOptions: {
+    ast: descriptor.template.ast,
+    bindingMetadata: {...}
+  }
+})
+```
+
+**编译前后对比**：
+
+```vue
+<!-- 编译前 -->
+<script setup>
 import { ref } from 'vue'
-const message = ref('Hello')
+const count = ref(0)
+defineProps({ msg: String })
 </script>
 
-<style scoped>
+<!-- 编译后 -->
+<script>
+import { ref, defineComponent } from 'vue'
+export default defineComponent({
+  props: { msg: String },
+  setup(__props) {
+    const count = ref(0)
+    return { count }
+  }
+})
+</script>
+```
+
+### 3.6 Style 编译
+
+```typescript
+const result = await compiler.compileStyle({
+  source: descriptor.styles[0].content,
+  filename: '/src/App.vue',
+  id: `data-v-${descriptor.id}`,
+
+  // Scoped CSS：为所有选择器添加属性选择器
+  scoped: true,
+
+  // CSS Modules
+  modules: descriptor.styles[0].module,
+
+  // 预处理器（less/sass/stylus）
+  preprocessLang: 'scss'
+})
+```
+
+**Scoped CSS 转换**：
+
+```css
+/* 编译前 */
 div { color: red; }
-</style>
 
-// ========== 编译流程 ==========
-
-// 步骤 1: 解析文件
-Vite 请求 /src/App.vue
-  ↓
-plugin-vue 拦截请求
-  ↓
-compiler.parse(source)
-  → 提取 template、script、style 块
-  → 生成 SFCDescriptor
-  → 缓存 descriptor
-
-// 步骤 2: 编译 template
-Vite 请求 /src/App.vue?type=template
-  ↓
-plugin-vue 从缓存获取 descriptor
-  ↓
-compiler.compileTemplate({
-  source: '<div>{{ message }}</div>',
-  scoped: true,
-  id: 'data-v-abc123'
-})
-  → 生成 render 函数
-  → 处理响应式绑定
-  → 返回编译代码
-
-// 步骤 3: 编译 script
-compiler.compileScript(descriptor, {
-  inlineTemplate: true
-})
-  → 编译 <script setup>
-  → 处理 defineProps/defineEmits
-  → 返回标准 Vue 代码
-
-// 步骤 4: 编译 style
-compiler.compileStyle({
-  source: 'div { color: red; }',
-  scoped: true,
-  id: 'data-v-abc123'
-})
-  → 生成 Scoped CSS
-  → 处理预处理器
-  → 返回 CSS 代码
-
-// 步骤 5: 合并所有块
-最终代码 =
-  import { defineComponent } from 'vue'
-  import { compileTemplate } from '@vue/compiler-sfc'
-
-  const script = { ... }  // 编译后的 script
-  const render = function() { ... }  // 编译后的 template
-
-  export default {
-    ...script,
-    render,
-    __scopeId: 'data-v-abc123'  // Scoped 标识
-  }
+/* 编译后 */
+div[data-v-abc123] { color: red; }
 ```
 
-## 8. 缓存机制
+---
 
-plugin-vue 使用多层缓存提高性能。
+## 4. 细节补充：边界与性能优化
+
+### 4.1 缓存策略
+
+plugin-vue 使用三层缓存：
 
 ```typescript
-// 缓存策略
-const cache = new Map(); // 主缓存（用于静态构建）
-const hmrCache = new Map(); // HMR 缓存（用于开发时热更新）
-const prevCache = new Map(); // 前一版本缓存（用于对比更新）
-
-// 缓存 descriptor
-function getDescriptor(filename, options, createIfNotFound = true) {
-  if (cache.has(filename)) {
-    return cache.get(filename); // 从缓存返回
-  }
-
-  if (createIfNotFound) {
-    const { descriptor, errors } = createDescriptor(
-      filename,
-      fs.readFileSync(filename, 'utf-8'),
-      options,
-    );
-    return descriptor;
-  }
-}
-
-// 当文件变更时，使缓存失效
-function invalidateDescriptor(filename) {
-  const prev = cache.get(filename);
-  cache.delete(filename);
-  if (prev) {
-    prevCache.set(filename, prev); // 保存前一版本用于 HMR
-  }
-}
+const cache = new Map()      // 主缓存（生产构建）
+const hmrCache = new Map()   // HMR 缓存（开发时）
+const prevCache = new Map()  // 前一版本缓存（用于对比）
 ```
 
-## 9. 热更新（HMR）机制
+| 缓存类型 | 使用场景 | 失效时机 |
+|---------|---------|---------|
+| `cache` | 生产构建时复用 descriptor | 构建完成后清空 |
+| `hmrCache` | 开发时快速获取当前版本 | 文件修改时更新 |
+| `prevCache` | HMR 时对比新旧版本 | 下次 HMR 时覆盖 |
 
-### HMR 的完整流程
+### 4.2 HMR 精确更新
 
-当文件变更时，Vite 会调用 plugin-vue 的 `handleHotUpdate()` 钩子。
+当你修改 `.vue` 文件时，plugin-vue 会对比新旧 descriptor：
 
 ```typescript
-// plugin-vue 的 HMR 处理流程
-async function handleHotUpdate({ file, modules, read }, options) {
-  // ① 获取前一版本的 descriptor（从 HMR 缓存）
-  const prevDescriptor = getDescriptor(file, options, false, true)
-  if (!prevDescriptor) {
-    return  // 第一次加载，无需 HMR
-  }
-
-  // ② 读取新文件内容并创建新 descriptor
+async function handleHotUpdate({ file, read }) {
+  const prevDescriptor = hmrCache.get(file)
   const content = await read()
-  const { descriptor } = createDescriptor(file, content, options, true)
+  const { descriptor } = createDescriptor(file, content)
 
-  // ③ 对比新旧 descriptor 的各个块
-  let needRerender = false
   const affectedModules = new Set()
 
-  // 解析新 script
-  resolveScript(descriptor, options, false)
-
-  // 检测 script 是否变化
-  const scriptChanged = hasScriptChanged(prevDescriptor, descriptor)
-  if (scriptChanged) {
-    affectedModules.add(getScriptModule(modules) || mainModule)
-  }
-
-  // 检测 template 是否变化
-  if (!isEqualBlock(descriptor.template, prevDescriptor.template)) {
-    if (!scriptChanged) {
-      // 仅 template 变化，复用之前的 script 解析结果
-      setResolvedScript(
-        descriptor,
-        getResolvedScript(prevDescriptor, false),
-        false
-      )
-    }
+  // ① 仅 template 变化 → 只重新渲染
+  if (!isEqual(descriptor.template, prevDescriptor.template)) {
     affectedModules.add(templateModule)
-    needRerender = true
+    // 复用之前的 script 解析结果
+    descriptor.script = prevDescriptor.script
   }
 
-  // 检测 style 是否变化
-  let didUpdateStyle = false
-  for (let i = 0; i < nextStyles.length; i++) {
-    const prev = prevStyles[i]
-    const next = nextStyles[i]
-    if (!prev || !isEqualBlock(prev, next)) {
-      didUpdateStyle = true
+  // ② script 变化 → 重新加载整个组件
+  if (!isEqual(descriptor.script, prevDescriptor.script)) {
+    affectedModules.add(mainModule)
+  }
+
+  // ③ style 变化 → 只更新样式
+  descriptor.styles.forEach((style, i) => {
+    if (!isEqual(style, prevDescriptor.styles[i])) {
       affectedModules.add(styleModules[i])
     }
-  }
+  })
 
-  // 返回需要更新的模块
-  return [...affectedModules].filter(Boolean)
+  return [...affectedModules]
 }
 ```
 
-### HMR 缓存策略
-
-plugin-vue 维护三层缓存来支持热更新：
-
-```typescript
-// 三层缓存
-const cache = new Map()           // 主缓存（生产构建）
-const hmrCache = new Map()        // HMR 缓存（开发时）
-const prevCache = new Map()       // 前一版本缓存（用于对比）
-
-// HMR 时的缓存操作流程
-function invalidateDescriptor(filename, hmr = false) {
-  const _cache = hmr ? hmrCache : cache
-
-  // ① 获取当前缓存的 descriptor
-  const prev = _cache.get(filename)
-
-  // ② 删除当前缓存
-  _cache.delete(filename)
-
-  // ③ 保存为前一版本（用于下次 HMR 对比）
-  if (prev) {
-    prevCache.set(filename, prev)
-  }
-}
-
-// HMR 开始时，从 HMR 缓存获取前一版本
-const prevDescriptor = getDescriptor(
-  filename,
-  options,
-  false,  // 不创建新的
-  true    // 使用 HMR 缓存
-)
-
-// 解析新文件后，保存到 HMR 缓存
-const { descriptor } = createDescriptor(
-  filename,
-  content,
-  options,
-  true    // 标记为 HMR 操作
-)
-```
-
-### 对比逻辑
-
-plugin-vue 通过对比 descriptor 的各个块来决定是否需要重新渲染：
-
-```typescript
-// ① 比较两个块是否相等
-function isEqualBlock(a, b) {
-  // 都为空
-  if (!a && !b) return true
-
-  // 一个为空，另一个不为空
-  if (!a || !b) return false
-
-  // 两个都有 src 属性且相同
-  if (a.src && b.src && a.src === b.src) return true
-
-  // 比较内容
-  if (a.content !== b.content) return false
-
-  // 比较属性（lang、scoped 等）
-  const keysA = Object.keys(a.attrs)
-  const keysB = Object.keys(b.attrs)
-  if (keysA.length !== keysB.length) return false
-
-  return keysA.every(key => a.attrs[key] === b.attrs[key])
-}
-
-// ② 比较 script 是否变化
-function hasScriptChanged(prev, next) {
-  const prevScript = getResolvedScript(prev, false)
-  const nextScript = getResolvedScript(next, false)
-
-  // 比较 <script> 块内容
-  if (!isEqualBlock(prev.script, next.script)) {
-    // 进一步比较 AST（忽略位置信息）
-    if (!isEqualAst(prevScript?.scriptAst, nextScript?.scriptAst)) {
-      return true
-    }
-  }
-
-  // 比较 <script setup> 块内容
-  if (!isEqualBlock(prev.scriptSetup, next.scriptSetup)) {
-    if (!isEqualAst(prevScript?.scriptSetupAst, nextScript?.scriptSetupAst)) {
-      return true
-    }
-  }
-
-  return false
-}
-
-// ③ 比较 AST（深度比较，忽略位置信息）
-function isEqualAst(prev, next) {
-  if (typeof prev === 'undefined' || typeof next === 'undefined') {
-    return prev === next
-  }
-
-  if (prev.length !== next.length) return false
-
-  for (let i = 0; i < prev.length; i++) {
-    if (!deepEqual(prev[i], next[i], [
-      'start', 'end', 'loc',        // 位置信息
-      'range', 'leadingComments',   // 注释信息
-      'trailingComments',
-      '_ownerScope',                // TypeScript 内部属性
-      '_resolvedReference'
-    ])) {
-      return false
-    }
-  }
-
-  return true
-}
-```
-
-### 受影响的模块判断
-
-根据哪些块变化，plugin-vue 决定哪些模块需要重新加载：
-
-```typescript
-// ① template 变化
-if (!isEqualBlock(descriptor.template, prevDescriptor.template)) {
-  affectedModules.add(templateModule)  // template 模块需要重新编译
-  needRerender = true
-}
-
-// ② script 变化
-const scriptChanged = hasScriptChanged(prevDescriptor, descriptor)
-if (scriptChanged) {
-  affectedModules.add(getScriptModule(modules) || mainModule)
-  // 如果 script 变化，template 的 binding metadata 也需要更新
-}
-
-// ③ style 变化
-for (let i = 0; i < nextStyles.length; i++) {
-  const prev = prevStyles[i]
-  const next = nextStyles[i]
-  if (!prev || !isEqualBlock(prev, next)) {
-    didUpdateStyle = true
-    // 找到对应的 style 模块并添加
-    const styleModule = modules.find(
-      m => m.url.includes(`type=style&index=${i}`)
-    )
-    if (styleModule) {
-      affectedModules.add(styleModule)
-    }
-  }
-}
-
-// ④ CSS 变量变化（影响主模块）
-if (prevDescriptor.cssVars.join('') !== descriptor.cssVars.join('')) {
-  affectedModules.add(mainModule)
-}
-
-// ⑤ Scoped 属性变化（同时影响 template 和 script）
-if (prevStyles.some(s => s.scoped) !== nextStyles.some(s => s.scoped)) {
-  affectedModules.add(templateModule)
-  affectedModules.add(mainModule)
-}
-```
-
-### HMR 时的代码生成
-
-plugin-vue 在编译代码时会添加 HMR 相关的运行时钩子：
-
-```typescript
-// 在编译 template 时添加 HMR 代码
-let code = result.code  // 编译后的 render 函数
-
-// 如果是开发环境且 HMR 启用，添加 HMR 接收逻辑
-if (devServer && devServer.config.server.hmr !== false && !ssr && !isProduction) {
-  code += `
-import.meta.hot.accept(({ render }) => {
-  __VUE_HMR_RUNTIME__.rerender(${JSON.stringify(descriptor.id)}, render)
-})
-`
-}
-```
-
-### 主模块的 HMR 处理
-
-```typescript
-// 生成的最终组件代码中包含：
-const output = [
-  // ① 组件定义
-  `const _sfc_main = { ... }`,
-
-  // ② 设置 HMR ID
-  `_sfc_main.__hmrId = ${JSON.stringify(descriptor.id)}`,
-
-  // ③ 创建 HMR 记录
-  `typeof __VUE_HMR_RUNTIME__ !== 'undefined' && __VUE_HMR_RUNTIME__.createRecord(_sfc_main.__hmrId, _sfc_main)`,
-
-  // ④ 处理 template 更新
-  `import.meta.hot.on('vite:beforeUpdate', (update) => {
-    if (update.type === 'template') {
-      __VUE_HMR_RUNTIME__.rerender(_sfc_main.__hmrId, updated.render)
-    }
-  })`,
-
-  // ⑤ 处理 script 更新
-  `import.meta.hot.on('vite:beforeUpdate', (update) => {
-    if (update.type === 'script') {
-      __VUE_HMR_RUNTIME__.reload(_sfc_main.__hmrId, updated)
-    }
-  })`
-]
-```
-
-### HMR 流程图
+**HMR 流程图**：
 
 ```
-文件变更
+修改 template
   ↓
-Vite 监听到 .vue 文件变化
+plugin-vue 检测到变化
   ↓
-触发 plugin-vue.handleHotUpdate()
+对比 descriptor.template
   ↓
-① 从 hmrCache 获取 prevDescriptor
-② 读取新文件内容
-③ 创建新 descriptor
+仅重新编译 template
   ↓
-④ 对比各个块（template、script、style）
-  ├─ Template 变化？→ 添加 templateModule
-  ├─ Script 变化？ → 添加 scriptModule
-  └─ Style 变化？ → 添加 styleModules
+浏览器调用 __VUE_HMR_RUNTIME__.rerender()
   ↓
-⑤ 判断是否需要重新渲染
-  ├─ 仅 template 变化 → rerender
-  ├─ Script 变化 → reload 整个组件
-  └─ Style 变化 → 只更新样式
-  ↓
-⑥ 返回受影响的模块列表
-  ↓
-Vite HMR 系统
-  ├─ 发送模块更新消息到浏览器
-  └─ 执行 import.meta.hot.accept() 或 import.meta.hot.invalidate()
-     ↓
-⑦ 浏览器端 HMR Runtime
-  ├─ 调用 __VUE_HMR_RUNTIME__.rerender()（仅 template）
-  └─ 调用 __VUE_HMR_RUNTIME__.reload()（完整重载）
-     ↓
-⑧ 组件热更新完成，保持应用状态
+组件重新渲染（保持状态）
 ```
 
-### HMR 的特殊情况
+### 4.3 AST 复用优化
+
+Vue 3.3+ 支持 AST 复用，避免重复解析：
 
 ```typescript
-// ① 仅 template 变化，且 script 未变化
-if (!isEqualBlock(descriptor.template, prevDescriptor.template)) {
-  if (!scriptChanged) {
-    // 复用前一版本的已解析 script
-    setResolvedScript(
-      descriptor,
-      getResolvedScript(prevDescriptor, false),
-      false
-    )
-    // 这样可以避免重新编译 script，提高更新效率
-  }
-}
-
-// ② Script 中的导入变化，可能影响 template 的类型推断
-const prevImports = prevResolvedScript?.imports
-if (prevImports) {
-  return !next.template || next.shouldForceReload(prevImports)
-}
-
-// ③ 新增 style 块
-if (prevStyles.length < nextStyles.length) {
-  // 新增的 style，需要加载新模块
-  affectedModules.add(mainModule)
-}
-
-// ④ 删除 style 块
-if (prevStyles.length > nextStyles.length) {
-  // 删除的 style，需要更新主模块
-  affectedModules.add(mainModule)
-}
-```
-
-
-## 10. 自定义编译器选项
-
-用户可以通过 plugin-vue 的 options 自定义 compile module 的行为。
-
-```typescript
-// vite.config.ts
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-
-export default defineConfig({
-  plugins: [
-    vue({
-      // 自定义 template 编译选项
-      template: {
-        compilerOptions: {
-          isCustomElement: (tag) => tag.startsWith('ion-'),
-        },
-        transformAssetUrls: {
-          video: ['src', 'poster'],
-          source: 'src',
-          img: 'src',
-        },
-      },
-
-      // 自定义 script 编译选项
-      script: {
-        refTransform: true,
-      },
-
-      // 自定义 style 编译选项
-      style: {
-        postcssPlugins: [require('autoprefixer')],
-      },
-
-      // 使用指定版本的编译器
-      compiler: require('@vue/compiler-sfc'),
-
-      // 特性开关
-      features: {
-        propsDestructure: true,
-        customElement: /\.ce\.vue$/,
-        optionsAPI: true,
-      },
-    }),
-  ],
-});
-```
-
-## 10. 编译器版本兼容性
-
-plugin-vue 与不同版本的 Vue compiler-sfc 的协同。
-
-```typescript
-// 版本检查
-function canReuseAST(compilerVersion) {
-  // 只有 Vue 3.3+ 生成的 AST 才能复用
-  const majorVersion = parseInt(compilerVersion.split('.')[0]);
-  const minorVersion = parseInt(compilerVersion.split('.')[1]);
-
-  return majorVersion > 3 || (majorVersion === 3 && minorVersion >= 3);
-}
-
-// 如果编译器版本支持 AST 复用，传递给下次编译以加速
 const templateOptions = {
-  ...options.template,
-  ast: canReuseAST(options.compiler.version)
-    ? descriptor.template?.ast
-    : undefined,
-};
+  source: descriptor.template.content,
+
+  // 传递上次解析的 AST（如果编译器版本支持）
+  ast: canReuseAST(compiler.version)
+    ? descriptor.template.ast
+    : undefined
+}
 ```
 
-## 11. 错误处理与诊断
+**性能提升**：在 HMR 时，如果 template 内容未变化，直接复用 AST 可节省 30-50% 的编译时间。
 
-plugin-vue 如何与 compiler 协同处理错误。
+### 4.4 错误处理
+
+将 Vue 编译器错误转换为 Vite 可识别的格式：
 
 ```typescript
-// 将 compiler 错误转换为 Rollup 错误
-function createRollupError(id, error) {
-  const { message, name, stack } = error;
-  const rollupError = {
-    id,
+function createRollupError(filename, error) {
+  return {
+    id: filename,
     plugin: 'vue',
-    message,
-    name,
-    stack,
-  };
+    message: error.message,
 
-  // 提取位置信息
-  if ('code' in error && error.loc) {
-    rollupError.loc = {
-      file: id,
+    // 提取错误位置（用于在编辑器中高亮）
+    loc: {
+      file: filename,
       line: error.loc.start.line,
-      column: error.loc.start.column,
-    };
+      column: error.loc.start.column
+    }
   }
-
-  return rollupError;
-}
-
-// 处理编译结果中的错误和警告
-if (result.errors.length) {
-  result.errors.forEach((error) =>
-    pluginContext.error(
-      typeof error === 'string'
-        ? { id: filename, message: error }
-        : createRollupError(filename, error),
-    ),
-  );
-}
-
-if (result.tips.length) {
-  result.tips.forEach((tip) =>
-    pluginContext.warn({ id: filename, message: tip }),
-  );
 }
 ```
 
-## 总结
+**效果**：在浏览器和终端中显示精确的错误位置。
 
-| 环节         | plugin-vue 职责                | compiler 职责                            |
-| ------------ | ------------------------------ | ---------------------------------------- |
-| **加载**     | 动态解析 vue/compiler-sfc 模块 | 提供编译器实例                           |
-| **解析**     | 拦截 .vue 请求，调用 parse()   | 解析 .vue 文件为 descriptor              |
-| **Template** | 缓存 descriptor，传递编译选项  | 编译模板为 render 函数                   |
-| **Script**   | 处理请求路由                   | 编译 <span v-pre>`<script setup>`</span> |
-| **Style**    | 处理 CSS 相关请求              | 处理预处理器和 Scoped CSS                |
-| **缓存**     | 多层缓存策略                   | 支持 AST 复用优化                        |
-| **错误**     | 转换为 Vite 错误格式           | 提供详细错误信息                         |
-| **HMR**      | 对比前后 descriptor，判断更新   | 支持 AST 对比优化                        |
+### 4.5 边界情况
 
-**核心设计理念**：plugin-vue 是一个轻量级的**请求分发器和缓存管理器**，它将具体的编译工作委托给 Vue 的 compile module，自己负责：
+| 场景 | 处理方式 |
+|-----|---------|
+| 没有 template | 只编译 script 和 style |
+| 没有 script | 生成默认的空组件 `export default {}` |
+| 多个 style 块 | 按 index 顺序分别编译并注入 |
+| 自定义块（如 `<docs>`） | 通过 `customBlocks` 暴露给用户自定义处理 |
+| 循环依赖 | 使用 WeakMap 避免内存泄漏 |
 
-- 动态加载 compile module
-- 管理文件缓存（主缓存、HMR 缓存、前版本缓存）
-- 处理请求路由
-- 转换错误格式
-- 实现热更新机制（HMR）
-- 集成 Vite 开发体验
+---
+
+## 5. 总结与延伸
+
+### 一句话总结
+
+**plugin-vue 是 Vite 和 Vue Compiler 之间的"翻译协调员"，负责请求分发、缓存管理和 HMR 优化，而真正的编译工作由 Vue Compiler 完成。**
+
+### 核心设计理念
+
+| 模块 | 职责 |
+|-----|------|
+| **Vite** | 开发服务器、模块热替换、生产构建 |
+| **plugin-vue** | 拦截 `.vue` 请求、管理缓存、实现 HMR |
+| **Vue Compiler** | 解析 SFC、编译 template/script/style |
+
+### 面试考点
+
+1. **Vite 如何处理 `.vue` 文件？**
+   - 通过 `@vitejs/plugin-vue` 拦截请求，调用 `vue/compiler-sfc` 编译
+
+2. **HMR 如何实现精确更新？**
+   - 对比新旧 descriptor 的各个块，只更新变化的部分
+
+3. **为什么 Vite 比 Webpack 快？**
+   - 开发时按需编译（不打包），利用浏览器原生 ESM
+   - 生产时使用 Rollup 打包，tree-shaking 更彻底
+
+4. **Scoped CSS 的原理？**
+   - 编译时为元素添加 `data-v-xxx` 属性，CSS 选择器添加对应的属性选择器
+
+5. **`<script setup>` 如何编译？**
+   - `compiler.compileScript()` 将其转换为标准的 `setup()` 函数，处理 `defineProps` 等宏
+
+### 延伸阅读
+
+- **Vue Compiler 深入**：了解 template 如何编译为 render 函数（transform 流程）
+- **Vite 插件机制**：学习如何编写自定义 Vite 插件
+- **Rollup 打包原理**：理解生产构建的优化策略
+- **浏览器 ESM**：掌握 `import.meta.hot` 和动态导入的原理

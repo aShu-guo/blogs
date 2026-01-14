@@ -9,11 +9,13 @@
 - **genModulePreamble**：`packages/compiler-core/src/codegen.ts:468-533` - 模块模式序言生成
 - **codegen.ts 文件**：`packages/compiler-core/src/codegen.ts` (1116 lines) - 完整代码生成实现
 
-Codegen 是 Vue 3 编译器系统中的**第三道工序**，负责将经过 Transform 处理的 AST 转换为**可执行的 JavaScript render 函数代码**。这是编译流程的最后一步，直接生成最终的编译产物。
+## 概述
+
+Codegen 是 Vue 3 编译器的第三道工序，负责将经过 Transform 处理的 AST 转换为可执行的 JavaScript render 函数代码。
 
 ## 核心概念
 
-### Codegen 在编译流程中的位置
+### 在编译流程中的位置
 
 ```
 优化后的 AST（来自 Transform）
@@ -26,7 +28,7 @@ JavaScript 字符串（render 函数源代码）
 VNode 树
 ```
 
-### Codegen 的核心职责
+### 核心职责
 
 1. **字符串代码生成**：生成可执行的 JavaScript 代码字符串
 2. **VNode 创建调用生成**：生成 `_createVNode()` 等 helper 调用
@@ -34,13 +36,9 @@ VNode 树
 4. **资源导入生成**：生成组件、指令的导入语句
 5. **静态提升处理**：生成提升的 VNode 和常量定义
 
----
-
-## Codegen 的核心架构
+## 源码分析
 
 ### CodegenContext（代码生成上下文）
-
-Codegen 维护一个上下文对象来管理生成状态：
 
 ```typescript
 interface CodegenContext {
@@ -100,13 +98,9 @@ function generate(ast, options) {
 }
 ```
 
----
+## 实现细节
 
-## 关键代码生成详解
-
-### 1. VNode 创建代码生成
-
-将 Element 节点转换为 `_createVNode()` 调用。
+### VNode 创建代码生成
 
 **输入 AST**：
 ```typescript
@@ -130,7 +124,6 @@ _createVNode('div', { class: 'box', id: 'app' }, 'Hello')
 
 **完整 VNode 创建签名**：
 ```typescript
-// _createVNode 的调用形式
 _createVNode(
   type,                  // 'div' 或组件名
   props,                 // { class: 'box', ... }
@@ -143,9 +136,7 @@ _createVNode(
 )
 ```
 
-### 2. Props 代码生成
-
-将 props AST 节点转换为 JavaScript 对象字面量。
+### Props 代码生成
 
 **输入 props**：
 ```typescript
@@ -165,7 +156,7 @@ _createVNode(
 }
 ```
 
-### 3. 条件语句代码生成（v-if）
+### 条件语句代码生成（v-if）
 
 **输入 AST**：
 ```typescript
@@ -187,7 +178,7 @@ _ctx.show
     : _createVNode(...)
 ```
 
-### 4. 循环语句代码生成（v-for）
+### 循环语句代码生成（v-for）
 
 **输入 AST**：
 ```typescript
@@ -206,7 +197,7 @@ _renderList(_ctx.items, (item, index) => {
 })
 ```
 
-### 5. 插值表达式代码生成
+### 插值表达式代码生成
 
 **输入 AST**：
 ```typescript
@@ -220,9 +211,7 @@ InterpolationNode {
 _toDisplayString(_ctx.msg)
 ```
 
----
-
-## 完整编译示例
+## 编译输出示例
 
 ### 输入模板
 
@@ -300,11 +289,9 @@ const render = (_ctx, _cache, $props, $attrs, $slots, $emit, $options) => {
 4. **PatchFlags**：标记动态部分（如 `PatchFlags.TEXT` 表示文本动态）
 5. **事件缓存**：使用 `_cache` 缓存事件处理函数
 
----
+## 高级特性
 
-## 高级代码生成特性
-
-### 1. 静态提升代码
+### 静态提升代码
 
 将完全静态的节点提升到 render 函数外部：
 
@@ -324,7 +311,7 @@ const render = () => {
 }
 ```
 
-### 2. 事件处理缓存
+### 事件处理缓存
 
 事件处理函数在第一次渲染时生成，之后从缓存中获取：
 
@@ -340,7 +327,7 @@ _createVNode('button', {
 })
 ```
 
-### 3. Block 树与 Fragment
+### Block 树与 Fragment
 
 使用 Block 和 Fragment 优化动态节点的 diff：
 
@@ -357,7 +344,7 @@ _createBlock(
 ))
 ```
 
-### 4. 条件注释节点
+### 条件注释节点
 
 v-if 的 else 分支使用注释节点：
 
@@ -367,82 +354,9 @@ _ctx.show
   : _createCommentVNode('', true)  // 占位符，用于保持位置
 ```
 
----
+## 性能优化
 
-## Mode 模式
-
-Codegen 支持两种生成模式：
-
-### 1. Function 模式（默认）
-
-```javascript
-const render = () => {
-  return _createVNode(...)
-}
-
-export { render }
-```
-
-适用于组件内联使用。
-
-### 2. Module 模式
-
-```javascript
-import { ... } from 'vue'
-
-const _hoisted_1 = ...
-
-export function render() {
-  return _createVNode(...)
-}
-
-export const staticRenderFns = []
-```
-
-适用于模块化编译。
-
-### 3. SSR 模式
-
-生成字符串拼接的服务端渲染代码：
-
-```javascript
-export function ssrRender(_ctx, _push, _parent, ...) {
-  _push(`<div id="app">`)
-  _push(escapeHtml(_ctx.message))
-  _push(`</div>`)
-}
-```
-
----
-
-## Helpers 系统
-
-Codegen 使用多个 runtime helpers 来生成高效代码：
-
-```typescript
-// 常用 helpers
-CREATE_VNODE,            // _createVNode
-CREATE_ELEMENT_VNODE,    // _createElementVNode（优化版）
-CREATE_BLOCK,            // _createBlock
-OPEN_BLOCK,              // _openBlock
-CREATE_COMMENT_VNODE,    // _createCommentVNode
-RENDER_LIST,             // _renderList（处理 v-for）
-RENDER_SLOT,             // _renderSlot（处理 slot）
-FRAGMENT,                // _Fragment
-WITH_DIRECTIVES,         // _withDirectives（处理自定义指令）
-NORMALIZE_CLASS,         // _normalizeClass
-NORMALIZE_STYLE,         // _normalizeStyle
-CAMELIZE,                // _camelize
-TO_DISPLAY_STRING,       // _toDisplayString
-RESOLVE_COMPONENT,       // _resolveComponent
-RESOLVE_DIRECTIVE,       // _resolveDirective
-WITH_CTX,                // _withCtx
-CACHE_HANDLERS,          // 缓存处理函数
-```
-
----
-
-## PatchFlags 与优化
+### PatchFlags 与优化
 
 Codegen 为每个动态节点标记 PatchFlags，指导 diff 算法：
 
@@ -459,7 +373,6 @@ enum PatchFlags {
   UNKEYED_FRAGMENT = 256,    // 无 key 的 fragment
   NEED_PATCH = 512,          // 需要完全 patch
   DYNAMIC_SLOTS = 1024,      // 动态 slots
-  // ...
 }
 ```
 
@@ -474,56 +387,28 @@ enum PatchFlags {
 _createVNode('div', {
   class: _normalizeClass(['static', _ctx.dynamicClass])
 }, _toDisplayString(_ctx.text), PatchFlags.CLASS | PatchFlags.TEXT)
-                                           ↑ 标记此节点的动态部分
 ```
 
----
+### Helpers 系统
 
-## 常见 Codegen 场景
-
-### 场景 1: 组件 Props 转发
-
-```html
-<MyComponent v-bind="$attrs" />
+```typescript
+// 常用 helpers
+CREATE_VNODE,            // _createVNode
+CREATE_ELEMENT_VNODE,    // _createElementVNode（优化版）
+CREATE_BLOCK,            // _createBlock
+OPEN_BLOCK,              // _openBlock
+CREATE_COMMENT_VNODE,    // _createCommentVNode
+RENDER_LIST,             // _renderList（处理 v-for）
+RENDER_SLOT,             // _renderSlot（处理 slot）
+FRAGMENT,                // _Fragment
+WITH_DIRECTIVES,         // _withDirectives（处理自定义指令）
+NORMALIZE_CLASS,         // _normalizeClass
+NORMALIZE_STYLE,         // _normalizeStyle
+TO_DISPLAY_STRING,       // _toDisplayString
+RESOLVE_COMPONENT,       // _resolveComponent
+RESOLVE_DIRECTIVE,       // _resolveDirective
+WITH_CTX,                // _withCtx
 ```
-
-**生成代码**：
-```javascript
-_createVNode(MyComponent, _attrs)
-```
-
-### 场景 2: Slot 处理
-
-```html
-<MyComponent>
-  <template #header>Header</template>
-  <template #default>Content</template>
-</MyComponent>
-```
-
-**生成代码**：
-```javascript
-_createVNode(MyComponent, null, {
-  header: () => [_createVNode(...)],
-  default: () => [_createVNode(...)],
-  _: 1  // SlotFlags.STABLE
-})
-```
-
-### 场景 3: 自定义指令
-
-```html
-<div v-mydir="value">Content</div>
-```
-
-**生成代码**：
-```javascript
-_withDirectives(_createVNode('div', null, 'Content'), [
-  [_resolveDirective('mydir'), _ctx.value]
-])
-```
-
----
 
 ## 总结
 
@@ -537,5 +422,3 @@ _withDirectives(_createVNode('div', null, 'Content'), [
 | **Helper 引入** | 收集并生成导入 | `import { ... } from 'vue'` |
 | **PatchFlags** | 标记动态节点 | `PatchFlags.CLASS \| PatchFlags.TEXT` |
 | **Block 树** | 构建优化 diff 树 | openBlock/createBlock 调用 |
-
-**设计哲学**：Codegen 是编译流程的最终阶段，将经过充分优化的 AST 转换为高效的 JavaScript 代码，通过 PatchFlags、Block 树、静态提升等机制，生成的 render 函数在运行时能够实现快速的 diff 和更新。

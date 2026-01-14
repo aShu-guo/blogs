@@ -1,619 +1,243 @@
-# 对象透传
+# 对象计算优化
 
-## 问题描述
+## 1. 概念先行：建立心智模型
 
-在 Vue 3 中，有两种方式向子组件传递包含动态变量的对象：
+### 解决什么问题
 
-**方式 1：直接内联对象**
-```vue
-<MyChild :foo="{ name: dynamicVar }" />
+在 Vue 3 中向子组件传递对象时，每次父组件重新渲染都会创建新的对象引用，即使对象内容完全相同。这会导致子组件不必要的更新，影响性能。
+
+### 核心直觉
+
+**对象计算优化 = 缓存机制 + 依赖追踪 + 引用稳定**
+
+就像图书馆的借书卡系统：
+- **无优化**：每次借书都重新办一张新卡（即使信息相同）
+- **有优化**：只有个人信息变化时才换新卡，否则复用旧卡
+
+### 流程总览
+
+```
+父组件渲染
+    ↓
+检查依赖项是否变化
+    ↓
+├─ 变化 → 重新计算 → 返回新对象 → 子组件更新
+└─ 未变化 → 返回缓存对象 → 子组件不更新
 ```
 
-**方式 2：通过 computed 返回对象**
-```vue
-<script setup>
-const foo = computed(() => ({ name: dynamicVar }))
-</script>
+---
 
-<template>
-  <MyChild :foo />
-</template>
-```
+## 2. 最小实现：手写"低配版"
 
-**问题**：这两种方式在响应式行为上是否完全一致？
-
-## 核心原理分析
-
-### 方式 1：直接内联对象（`:foo="{ name: dynamicVar }"`）
-
-**编译后的代码**：
+以下是一个 40 行的 computed 缓存实现，展示核心优化原理：
 
 ```javascript
-// 原始模板
-<MyChild :foo="{ name: dynamicVar }" />
+// 简化版 computed 实现
+function createComputed(getter) {
+  let cache = null;
+  let dirty = true;
+  const deps = new Set();
 
-// ↓↓↓ 编译为
+  // 依赖收集
+  function track(dep) {
+    deps.add(dep);
+    dep.subscribe(() => {
+      dirty = true; // 依赖变化时标记为脏
+    });
+  }
 
-(_openBlock(), _createBlock(_component_MyChild, {
-  foo: { name: _ctx.dynamicVar }  // ← 每次都创建新对象！
-}))
-```
-
-**关键特点**：
-
-1. **每次都创建新对象**：模板每次重新渲染，都会创建一个新的 `{ name: dynamicVar }` 对象
-2. **引用地址变化**：虽然对象内容相同，但内存引用地址不同
-3. **不稳定的对象标识**：`Object.is()` 比较结果为 `false`
-
-```typescript
-// 伪代码展示
-render() {
-  return <MyChild foo={{ name: dynamicVar }} />
-  // 每次都是：
-  // foo: { name: "value1" } → 新对象 1
-  // foo: { name: "value1" } → 新对象 2（引用不同）
-  // foo: { name: "value1" } → 新对象 3（引用不同）
+  return {
+    get value() {
+      if (dirty) {
+        cache = getter(); // 重新计算
+        dirty = false;
+      }
+      return cache; // 返回缓存
+    }
+  };
 }
+
+// 使用示例
+const name = reactive('Alice');
+const obj = createComputed(() => ({ name: name.value }));
+
+console.log(obj.value); // { name: 'Alice' } - 对象 A
+console.log(obj.value); // 同一个对象 A（缓存）
+console.log(obj.value === obj.value); // true
+
+name.value = 'Bob'; // 依赖变化
+console.log(obj.value); // { name: 'Bob' } - 新对象 B
+console.log(obj.value); // 同一个对象 B（缓存）
 ```
 
-### 方式 2：通过 computed 返回对象（`const foo = computed(...)`）
+**核心机制**：
+1. `dirty` 标记控制是否需要重新计算
+2. 依赖项变化时设置 `dirty = true`
+3. 访问 `value` 时检查 `dirty`，决定返回缓存还是重新计算
 
-**代码**：
+---
 
-```typescript
-const foo = computed(() => ({ name: dynamicVar }))
+## 3. 逐行解剖：关键路径分析
 
-// 使用：
-<MyChild :foo />
-```
+### Vue 3 的 computed 实现
 
-**关键特点**：
+| 源码片段 | 逻辑拆解 |
+|---------|---------|
+| `class ComputedRefImpl` | computed 的核心类，管理缓存和依赖 |
+| `this._dirty = true` | 脏标记：true 表示需要重新计算 |
+| `this._value = undefined` | 缓存值：存储上次计算结果 |
+| `this.effect = new ReactiveEffect(getter)` | 创建响应式副作用，追踪依赖项 |
+| `if (this._dirty)` | 检查是否需要重新计算 |
+| `this._value = this.effect.run()` | 执行计算函数，更新缓存 |
+| `this._dirty = false` | 标记为干净，下次直接返回缓存 |
+| `return this._value` | 返回缓存值（引用稳定） |
 
-1. **缓存机制**：computed 内置了依赖项追踪和结果缓存
-2. **依赖项变化才更新**：只有当 `dynamicVar` 改变时，才会重新执行计算函数
-3. **稳定的对象标识**：在依赖项不变的情况下，返回相同的对象引用
+### 模板编译差异
 
-```typescript
-// computed 的工作原理
-const foo = computed(() => {
-  console.log('重新计算');
-  return { name: dynamicVar };
-});
-
-// 伪代码展示依赖项变化时的行为
-dynamicVar = "value1"
-foo.value  // → { name: "value1" } 对象 A
-foo.value  // → 同样的对象 A（缓存）
-foo.value  // → 同样的对象 A（缓存）
-
-dynamicVar = "value2"  // 依赖项改变
-foo.value  // → { name: "value2" } 对象 B（新计算）
-foo.value  // → 同样的对象 B（缓存）
-```
-
-## 响应式行为差异
-
-### 场景 1：子组件 props 比较
-
-**子组件定义**：
-
-```vue
-<script setup>
-const props = defineProps({
-  foo: Object
-})
-
-// 监听 props 变化
-watch(() => props.foo, (newVal, oldVal) => {
-  console.log('props.foo 变化了')
-  console.log('引用是否相同:', newVal === oldVal)
-}, { deep: true })
-
-// 或使用 watchEffect
-watchEffect(() => {
-  console.log('props.foo:', props.foo)
-})
-</script>
-```
-
-**方式 1 的表现**：
-
+**方式 1：内联对象**
 ```javascript
 // 模板：<MyChild :foo="{ name: dynamicVar }" />
-
-// 父组件渲染 1
-dynamicVar = "Alice"
-// 创建对象 1: { name: "Alice" }
-// 子组件接收到新 props，对象引用改变 ✓
-
-// 父组件渲染 2（仅触发重新渲染，dynamicVar 未改变）
-dynamicVar = "Alice"  // 未改变
-// 创建对象 2: { name: "Alice" }  ← 新对象！
-// 子组件接收到新 props，对象引用改变 ✓
-// watch 触发（虽然内容相同，但引用不同）
-
-// 结论：即使 dynamicVar 未改变，只要父组件重新渲染，子组件也会接收新的对象引用
+// 编译后
+render() {
+  return h(MyChild, {
+    foo: { name: ctx.dynamicVar } // 每次都创建新对象
+  });
+}
 ```
 
-**方式 2 的表现**：
-
+**方式 2：computed**
 ```javascript
-// computed: foo = computed(() => ({ name: dynamicVar }))
+// 模板：<MyChild :foo="foo" />
+// setup
+const foo = computed(() => ({ name: dynamicVar.value }));
 
-// 父组件渲染 1
-dynamicVar = "Alice"
-foo.value  // → { name: "Alice" } 对象 1
-// 子组件接收对象 1，对象引用改变 ✓
-
-// 父组件渲染 2（仅触发重新渲染，dynamicVar 未改变）
-dynamicVar = "Alice"  // 未改变
-foo.value  // → 同样的对象 1（缓存！）
-// 子组件接收相同对象，对象引用不变
-// watch 不触发（引用相同）
-
-// 结论：只要 dynamicVar 未改变，子组件接收的对象引用保持不变
-```
-
-### 场景 2：对比表格
-
-| 维度 | 方式 1（内联对象） | 方式 2（computed） |
-|------|------------------|------------------|
-| **创建时机** | 每次模板渲染 | 仅在依赖项变化时 |
-| **对象引用** | 每次都是新引用 | 依赖项不变时相同引用 |
-| **props 更新触发** | 每次重新渲染都触发 | 仅当对象内容改变时触发 |
-| **watchEffect** | 每次都执行 | 仅依赖项改变时执行 |
-| **性能影响** | 子组件可能不必要地重新渲染 | 更高效，避免不必要的渲染 |
-| **内存占用** | 创建多个相同对象 | 对象复用，内存更优 |
-
-## 完整示例对比
-
-### 完整示例：任务列表
-
-**父组件定义**：
-
-```vue
-<script setup>
-import { ref, computed } from 'vue'
-import MyChild from './MyChild.vue'
-
-const dynamicVar = ref('初始值')
-
-// 方式 2：使用 computed
-const foo = computed(() => ({
-  name: dynamicVar.value
-}))
-
-// 追踪重新渲染次数
-let renderCount = 0
-</script>
-
-<template>
-  <div>
-    <p>渲染次数: {{ renderCount }}</p>
-
-    <!-- 方式 1：直接内联 -->
-    <h3>方式 1：直接内联对象</h3>
-    <MyChild
-      :foo="{ name: dynamicVar }"
-      label="直接内联"
-      @render="() => console.log('方式1渲染')"
-    />
-
-    <!-- 方式 2：computed -->
-    <h3>方式 2：computed</h3>
-    <MyChild
-      :foo="foo"
-      label="computed"
-      @render="() => console.log('方式2渲染')"
-    />
-
-    <button @click="dynamicVar = '新值'">更新 dynamicVar</button>
-    <button @click="renderCount++">手动触发重新渲染</button>
-  </div>
-</template>
-
-<script>
-export default {
-  setup() {
-    return {
-      renderCount: ref(0)
-    }
-  }
+// 编译后
+render() {
+  return h(MyChild, {
+    foo: ctx.foo // 返回缓存的对象引用
+  });
 }
-</script>
 ```
 
-**子组件定义**：
+### 依赖追踪流程
 
-```vue
-<script setup>
-import { watch, watchEffect, defineProps } from 'vue'
-
-const props = defineProps({
-  foo: Object,
-  label: String
-})
-
-// 监听 foo 对象的变化
-watch(() => props.foo, (newVal, oldVal) => {
-  console.log(`[${props.label}] foo 对象引用改变`)
-  console.log('新对象:', newVal)
-  console.log('旧对象:', oldVal)
-  console.log('引用相同?', newVal === oldVal)
-}, { deep: false })  // 注意：deep: false 只比较引用
-
-// 监听 foo.name 的变化
-watch(() => props.foo?.name, (newVal, oldVal) => {
-  console.log(`[${props.label}] foo.name 改变: ${oldVal} → ${newVal}`)
-})
-
-// watchEffect 跟踪所有依赖
-let effectCount = 0
-watchEffect(() => {
-  effectCount++
-  console.log(`[${props.label}] watchEffect 执行次数: ${effectCount}`)
-  console.log('当前 foo.name:', props.foo?.name)
-})
-
-// 组件生命周期
-console.log(`[${props.label}] 组件创建`)
-</script>
-
-<template>
-  <div class="child">
-    <h4>{{ label }}</h4>
-    <p>foo: {{ foo }}</p>
-    <p>foo.name: {{ foo?.name }}</p>
-  </div>
-</template>
-
-<style scoped>
-.child {
-  border: 1px solid #ccc;
-  padding: 10px;
-  margin: 10px 0;
-}
-</style>
-```
-
-**执行流程分析**：
-
-```
-初始化：
-┌─────────────────────────────────────┐
-│ 方式 1（直接内联）                   │
-├─────────────────────────────────────┤
-│ watch foo: 触发一次（初始化）       │
-│ watchEffect: 执行一次（初始化）     │
-└─────────────────────────────────────┘
-
-┌─────────────────────────────────────┐
-│ 方式 2（computed）                   │
-├─────────────────────────────────────┤
-│ watch foo: 触发一次（初始化）       │
-│ watchEffect: 执行一次（初始化）     │
-└─────────────────────────────────────┘
+| 步骤 | 操作 | 说明 |
+|-----|------|------|
+| 1 | 首次访问 `computed.value` | 执行 getter，收集依赖 |
+| 2 | 依赖项（如 `dynamicVar`）变化 | 触发 `trigger()` |
+| 3 | 调用 `computed.effect.scheduler()` | 设置 `_dirty = true` |
+| 4 | 下次访问 `computed.value` | 检测到 `_dirty`，重新计算 |
+| 5 | 返回新值，设置 `_dirty = false` | 缓存新结果 |
 
 ---
 
-点击 "更新 dynamicVar"：
-┌─────────────────────────────────────────────────────┐
-│ 方式 1（直接内联）                                   │
-├─────────────────────────────────────────────────────┤
-│ ① 父组件重新渲染                                    │
-│ ② 创建新对象 { name: '新值' }                       │
-│ ③ 子组件 props.foo 引用改变                         │
-│ ④ watch 触发（新对象 ≠ 旧对象）                    │
-│ ⑤ watchEffect 执行（依赖改变）                      │
-│ ⑥ 子组件必须重新渲染                                │
-└─────────────────────────────────────────────────────┘
+## 4. 细节补充：边界与性能优化
 
-┌─────────────────────────────────────────────────────┐
-│ 方式 2（computed）                                   │
-├─────────────────────────────────────────────────────┤
-│ ① 父组件重新渲染                                    │
-│ ② computed 检测依赖项 dynamicVar 改变               │
-│ ③ computed 重新执行，返回新对象 { name: '新值' }    │
-│ ④ 子组件 props.foo 引用改变                         │
-│ ⑤ watch 触发（新对象 ≠ 旧对象）                    │
-│ ⑥ watchEffect 执行（依赖改变）                      │
-│ ⑦ 子组件必须重新渲染                                │
-│ ✓ 行为与方式 1 相同                                  │
-└─────────────────────────────────────────────────────┘
+### 边界情况处理
 
----
-
-点击 "手动触发重新渲染"（dynamicVar 未改变）：
-┌─────────────────────────────────────────────────────┐
-│ 方式 1（直接内联）                                   │
-├─────────────────────────────────────────────────────┤
-│ ① 父组件重新渲染                                    │
-│ ② 创建新对象 { name: '新值' }                       │
-│ ③ 子组件 props.foo 引用改变 ← 新的对象引用！        │
-│ ④ watch 触发（新对象 ≠ 旧对象）❌ 不必要的触发      │
-│ ⑤ watchEffect 执行 ❌ 不必要的执行                   │
-│ ⑥ 子组件不必要地重新渲染 ❌ 性能浪费                │
-└─────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────┐
-│ 方式 2（computed）                                   │
-├─────────────────────────────────────────────────────┤
-│ ① 父组件重新渲染                                    │
-│ ② computed 检测依赖项 dynamicVar（未改变）          │
-│ ③ computed 返回缓存的对象（相同引用）✓              │
-│ ④ 子组件 props.foo 引用不变                         │
-│ ⑤ watch 不触发（新对象 === 旧对象）                │
-│ ⑥ watchEffect 不执行（依赖未改变）                 │
-│ ⑦ 子组件不重新渲染 ✓ 高效！                         │
-└─────────────────────────────────────────────────────┘
+**1. 循环引用**
+```javascript
+const a = computed(() => ({ b: b.value }));
+const b = computed(() => ({ a: a.value }));
+// Vue 会检测并抛出警告：Maximum recursive updates exceeded
 ```
 
-## 深入技术分析
-
-### Vue 3 的编译优化
-
-**模板编译过程**：
-
-```typescript
-// 原始模板
-<MyChild :foo="{ name: dynamicVar }" />
-
-// 编译后（简化）
-const Parent = {
-  setup() {
-    const dynamicVar = ref('value');
-
-    return () => (
-      _createVNode(
-        MyChild,
-        {
-          foo: { name: dynamicVar.value }  // ← 不稳定的表达式
-        }
-      )
-    );
-  }
-};
-
-// 关键点：{ name: dynamicVar.value } 被标记为不稳定表达式
-// 每次调用都会重新计算
-```
-
-**Patch 过程**：
-
-```typescript
-// Vue 3 的 diff 算法
-
-// 第一次渲染
-const vnode1 = {
-  props: {
-    foo: { name: "value1" }  // 对象 A
-  }
-};
-
-// 第二次渲染（父组件重新渲染，但 dynamicVar 未改变）
-const vnode2 = {
-  props: {
-    foo: { name: "value1" }  // 对象 B（引用不同！）
-  }
-};
-
-// Patch 比较
-if (vnode1.props.foo !== vnode2.props.foo) {  // true（不同对象）
-  // 更新 props
-  child.props.foo = vnode2.props.foo;
-}
-```
-
-### computed 的依赖项追踪
-
-**computed 内部机制**：
-
-```typescript
-const foo = computed(() => {
-  // 这个计算函数在依赖项改变时才会重新执行
-  return { name: dynamicVar.value };
+**2. 异步依赖**
+```javascript
+const data = computed(async () => {
+  return await fetchData(); // ❌ computed 不支持异步
 });
-
-// 内部实现原理（简化）
-class ComputedRefImpl {
-  constructor(getter) {
-    this.getter = getter;
-    this._value = undefined;
-    this._dirty = true;  // 标记是否需要重新计算
-
-    // 创建依赖项追踪
-    effect(() => {
-      this._dirty = true;  // 依赖项改变时标记为脏
-    }, { lazy: true });
-  }
-
-  get value() {
-    if (this._dirty) {
-      this._value = this.getter();  // 重新执行
-      this._dirty = false;
-    }
-    return this._value;  // 返回缓存值
-  }
-}
+// 解决方案：使用 watchEffect + ref
+const data = ref(null);
+watchEffect(async () => {
+  data.value = await fetchData();
+});
 ```
 
-**依赖项变化流程**：
-
-```
-dynamicVar 改变
-    ↓
-computed 依赖项追踪触发
-    ↓
-标记 _dirty = true
-    ↓
-下次访问 foo.value 时
-    ↓
-重新执行计算函数
-    ↓
-生成新对象
-    ↓
-更新缓存
+**3. 深层对象变化**
+```javascript
+const obj = computed(() => ({
+  nested: { value: count.value }
+}));
+// obj.value 引用稳定，但 obj.value.nested 每次都是新对象
+// 如需深层缓存，需手动处理
 ```
 
-## 实际性能对比
+### 性能优化技巧
 
-### 测试场景
+**1. 避免在 computed 中创建大对象**
+```javascript
+// ❌ 不推荐
+const config = computed(() => ({
+  ...heavyComputation(), // 每次依赖变化都重新计算
+  extra: someValue.value
+}));
 
-```vue
-<script setup>
-import { ref, computed, reactive } from 'vue'
-import MyChild from './MyChild.vue'
-
-const dynamicVar = ref('value')
-const foo = computed(() => ({ name: dynamicVar.value }))
-
-// 追踪子组件更新
-let childUpdateCount1 = 0
-let childUpdateCount2 = 0
-
-const handleChildUpdate1 = () => childUpdateCount1++
-const handleChildUpdate2 = () => childUpdateCount2++
-</script>
-
-<template>
-  <div>
-    <p>方式1子组件更新次数: {{ childUpdateCount1 }}</p>
-    <p>方式2子组件更新次数: {{ childUpdateCount2 }}</p>
-
-    <MyChild
-      :foo="{ name: dynamicVar }"
-      @update="handleChildUpdate1"
-    />
-
-    <MyChild
-      :foo="foo"
-      @update="handleChildUpdate2"
-    />
-
-    <button @click="dynamicVar = 'new'">改变值</button>
-    <button @click="forceUpdate">强制更新（值不变）</button>
-  </div>
-</template>
-
-<script>
-import { getCurrentInstance } from 'vue'
-
-export default {
-  setup() {
-    const instance = getCurrentInstance()
-    const forceUpdate = () => {
-      instance?.proxy?.$forceUpdate?.()
-    }
-    return { forceUpdate }
-  }
-}
-</script>
+// ✅ 推荐：拆分 computed
+const base = computed(() => heavyComputation());
+const config = computed(() => ({
+  ...base.value,
+  extra: someValue.value
+}));
 ```
 
-**测试结果**：
-
-| 操作 | 方式 1 子组件更新 | 方式 2 子组件更新 |
-|------|-----------------|-----------------|
-| 初始化 | 1 次 | 1 次 |
-| 改变 dynamicVar | 2 次（总） | 2 次（总） |
-| 强制更新（值不变） | 3 次（总）❌ | 2 次（总）✓ |
-| 强制更新多次 | N 次（总） | 2 次（总） |
-
-## 何时选择哪种方式
-
-### 使用内联对象（方式 1）的场景
-
-```vue
-<!-- ✅ 对象结构简单，不需要复杂逻辑 -->
-<MyChild :foo="{ name: user.name, age: user.age }" />
-
-<!-- ✅ 子组件不会对 props 变化做特殊处理 -->
-<MyChild :foo="{ id: item.id }" />
-
-<!-- ✅ 对象内容经常改变 -->
-<MyChild :foo="{ count: counter.value }" />
+**2. 使用 shallowRef 优化嵌套对象**
+```javascript
+const data = shallowRef({ nested: { value: 1 } });
+// 只追踪第一层，避免深层响应式开销
 ```
 
-### 使用 computed（方式 2）的场景
-
-```vue
-<!-- ✅ 对象需要复杂计算 -->
-<script setup>
-const config = computed(() => {
-  return {
-    theme: isDark.value ? 'dark' : 'light',
-    language: getLang(),
-    format: formatOptions.value
-  }
-})
-</script>
-<MyChild :config="config" />
-
-<!-- ✅ 对象创建开销大，需要缓存 -->
-<script setup>
-const largeData = computed(() => {
-  // 复杂的数据处理
-  return processData(sourceData.value)
-})
-</script>
-<MyChild :data="largeData" />
-
-<!-- ✅ 子组件监听 props 变化，需要避免不必要的触发 -->
-<script setup>
-const options = computed(() => ({
-  mode: mode.value
-}))
-</script>
-<MyChild :options="options" />
-
-<!-- ✅ 多层嵌套，子组件可能再次传给孙组件 -->
-<MyChild :config="config" />
-
-<!-- ✅ 需要在模板中多次使用同一对象 -->
-<template>
-  <MyChild :foo="config" />
-  <MyChild2 :foo="config" />
-  <MyChild3 :foo="config" />
-</template>
+**3. 条件计算**
+```javascript
+const result = computed(() => {
+  if (!enabled.value) return null; // 提前返回
+  return expensiveOperation(); // 仅在需要时计算
+});
 ```
 
-## 总结
+---
 
-### 两种方式的关键差异
+## 5. 总结与延伸：连接知识点
 
-| 特性 | 内联对象 | computed |
-|------|---------|---------|
-| **对象创建** | 每次重新渲染都创建 | 仅依赖项改变时创建 |
-| **引用稳定性** | 不稳定（每次新引用） | 稳定（依赖不变时相同引用） |
-| **子组件更新** | 父重新渲染 → 子必更新 | 仅对象内容改变时子更新 |
-| **适用场景** | 简单、轻量的对象 | 复杂计算、大对象、需要缓存 |
-| **性能影响** | 可能产生不必要的渲染 | 更高效，避免不必要的更新 |
-| **代码可读性** | 简洁直观 | 需要额外的 computed 定义 |
+### 一句话总结
 
-### 最佳实践建议
+**Vue 3 的 computed 通过"脏标记 + 缓存"机制，确保只在依赖项变化时重新计算，返回稳定的对象引用，避免子组件不必要的更新。**
 
-1. **默认使用内联对象**：简单情况下，直接写对象更简洁
-2. **在以下情况使用 computed**：
-   - 对象创建逻辑复杂
-   - 需要在多个地方使用同一对象
-   - 子组件对 props 变化敏感（如监听或计算依赖）
-   - 追求性能优化，避免不必要的更新
+### 面试考点
 
-3. **使用 reactive 的替代方案**：
-   ```typescript
-   // 如果对象需要双向绑定或频繁更新
-   const foo = reactive({ name: dynamicVar.value })
-   // 但需要手动同步 dynamicVar 变化
-   watch(() => dynamicVar.value, (val) => {
-     foo.name = val
-   })
-   ```
+**Q1：为什么 `<MyChild :foo="{ name: x }" />` 会导致性能问题？**
+- 每次父组件渲染都创建新对象，引用地址变化
+- 子组件的 `watch` 和 `watchEffect` 会被触发
+- 即使内容相同，子组件也会重新渲染
 
-4. **对于简单引用类型，优先考虑原始值**：
-   ```typescript
-   // 避免传递对象
-   <MyChild :name="user.name" :age="user.age" />
+**Q2：computed 和 watch 的区别？**
+- `computed`：有缓存，返回值，适合派生状态
+- `watch`：无缓存，执行副作用，适合响应数据变化
 
-   // 而不是
-   <MyChild :user="{ name: user.name, age: user.age }" />
-   ```
+**Q3：如何判断是否需要使用 computed？**
+- 对象创建逻辑复杂
+- 需要在多处使用同一对象
+- 子组件对 props 变化敏感
+- 追求性能优化
+
+**Q4：computed 的缓存失效时机？**
+- 依赖的响应式数据变化
+- 手动触发（通过 `effect.scheduler`）
+- 组件卸载时清理
+
+### 延伸阅读
+
+- **响应式系统**：了解 `track()` 和 `trigger()` 的实现原理
+- **组件更新机制**：Vue 3 的 diff 算法如何比较 props
+- **性能优化**：`shallowRef`、`shallowReactive` 的使用场景
+- **编译优化**：模板编译时的静态提升和缓存策略
+
+### 实战建议
+
+| 场景 | 推荐方案 | 原因 |
+|-----|---------|------|
+| 简单对象 | 内联对象 | 代码简洁，性能影响小 |
+| 复杂计算 | computed | 避免重复计算 |
+| 多处使用 | computed | 引用稳定，便于维护 |
+| 子组件监听 | computed | 避免不必要的触发 |
+| 频繁变化 | 内联对象 | computed 缓存无意义 |

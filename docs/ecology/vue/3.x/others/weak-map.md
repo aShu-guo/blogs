@@ -1,681 +1,417 @@
 # WeakMap
 
-## 规范定义
+## 1. 概念先行：建立心智模型
 
-### 什么是 WeakMap？
+### 生活类比：图书馆的借阅卡系统
 
-WeakMap 是 JavaScript ES6 引入的一种数据结构，用于存储键值对。它与普通 Map 的主要区别在于**键必须是对象**，且这些键是**弱引用**的。
-
-**官方定义**：
-> WeakMap is similar to Map. Keys of WeakMaps are objects. WeakMap does not prevent its keys from being garbage collected.
-
-**关键特性**：
-
-```typescript
-// 创建 WeakMap
-const wm = new WeakMap()
-
-// 键必须是对象
-const obj = { id: 1 }
-wm.set(obj, 'value')  // ✓ 对象作为键
-
-wm.set('string', 'value')  // ✗ TypeError: Invalid value used as weak map key
-wm.set(123, 'value')  // ✗ TypeError: Invalid value used as weak map key
-```
-
-### WeakMap 的 API
-
-```typescript
-// 有限的 API（比普通 Map 少）
-const wm = new WeakMap()
-
-// 添加
-wm.set(key, value)
-
-// 获取
-wm.get(key)
-
-// 检查
-wm.has(key)
-
-// 删除
-wm.delete(key)
-
-// ❌ 不提供以下方法
-wm.size  // undefined
-wm.keys()  // 不存在
-wm.values()  // 不存在
-wm.entries()  // 不存在
-wm.forEach()  // 不存在
-// 原因：键是弱引用，可能被垃圾回收，无法可靠地遍历
-```
-
-### 弱引用 vs 强引用
+想象一个图书馆的借阅卡系统：
 
 **普通 Map（强引用）**：
-
-```typescript
-const map = new Map()
-let obj = { id: 1 }
-
-map.set(obj, 'value')
-
-// obj 被设置为 null
-obj = null
-
-// 但 obj 仍然被 map 强引用，不会被垃圾回收
-console.log(map.size)  // 1
-console.log(map.get({ id: 1 }))  // undefined（新对象）
-
-for (const [key, value] of map) {
-  console.log(key)  // 仍然能访问到原始对象
-}
-```
+- 图书馆为每个读者建立永久档案
+- 即使读者已经搬走、不再来借书，档案仍然保留
+- 档案柜越来越满，永远不会自动清理
 
 **WeakMap（弱引用）**：
+- 图书馆只在读者活跃时保留借阅记录
+- 当读者不再来图书馆（没有其他地方记录这个人），记录自动消失
+- 档案柜自动保持整洁，无需手动清理
+
+### 核心直觉
+
+```
+WeakMap = 对象关联数据 + 自动垃圾回收
+```
+
+当对象不再被使用时，WeakMap 中的相关数据会自动清理，避免内存泄漏。
+
+### 为什么 Vue 3 需要 WeakMap？
+
+Vue 3 需要为原始对象缓存响应式代理：
 
 ```typescript
-const wm = new WeakMap()
-let obj = { id: 1 }
+const obj = { count: 0 }
+const proxy1 = reactive(obj)
+const proxy2 = reactive(obj)  // 应该返回同一个 proxy1
 
-wm.set(obj, 'value')
-
-// obj 被设置为 null
-obj = null
-
-// 没有其他引用指向该对象，垃圾回收器会回收它
-// WeakMap 中的键也会被自动移除
-
-// 无法验证是否被回收（因为无法遍历）
-console.log(wm.has(obj))  // false（obj 现在是 null）
+// 问题：如何缓存 obj → proxy 的映射？
+// 方案 1：使用 Map → 当 obj 不再使用时，Map 仍然持有引用，导致内存泄漏
+// 方案 2：使用 WeakMap → 当 obj 不再使用时，自动清理缓存
 ```
 
-### 原理对比图
+---
 
-```
-普通 Map：
-┌──────────────────┐
-│  Map             │
-├──────────────────┤
-│  ┌────────────┐  │
-│  │ key: obj   │  │ ← 强引用
-│  │ value      │  │
-│  └────────────┘  │
-└──────────────────┘
-     ↓ (强引用)
-   [Object]  ← 对象必须存活（即使没有其他引用）
+## 2. 最小实现：手写"低配版"
 
-WeakMap：
-┌──────────────────┐
-│  WeakMap         │
-├──────────────────┤
-│  ┌────────────┐  │
-│  │ key: obj ~~│  │ ← 弱引用（虚线）
-│  │ value      │  │
-│  └────────────┘  │
-└──────────────────┘
-     ~~~ (弱引用)
-   [Object]  ← 对象可被垃圾回收（如果没有其他引用）
-```
-
-## 与闭包的区别
-
-### 闭包的内存特性
-
-**闭包会保持对变量的强引用**：
+以下是一个 40 行的简化实现，展示 WeakMap 在 Vue 3 响应式系统中的核心作用：
 
 ```typescript
-function createClosure() {
-  const data = { id: 1, size: 1000 }  // 较大的对象
-
-  return function() {
-    return data.id
-  }
-}
-
-const fn = createClosure()
-
-// 即使只需要 data.id，整个 data 对象仍被闭包保持
-// 内存占用：1000（对象大小）+ 额外开销
-// 直到 fn 被垃圾回收，data 才会被释放
-```
-
-**问题**：
-
-```typescript
-// 场景：缓存 DOM 元素的相关信息
-const elementCache = []
-
-function trackElement(el) {
-  const closure = () => {
-    // 访问 el
-    return el.id
-  }
-  elementCache.push(closure)
-}
-
-trackElement(document.getElementById('app'))
-trackElement(document.getElementById('user'))
-
-// 如果这些元素被从 DOM 中移除：
-// - 闭包仍然强引用这些元素
-// - 元素无法被垃圾回收（内存泄漏）
-
-// 结果：即使元素不在 DOM 中，仍占用内存
-```
-
-### WeakMap 的优势
-
-**WeakMap 不阻止对象被垃圾回收**：
-
-```typescript
-const elementCache = new WeakMap()
-
-function trackElement(el) {
-  elementCache.set(el, {
-    id: el.id,
-    metadata: {}
-  })
-}
-
-trackElement(document.getElementById('app'))
-trackElement(document.getElementById('user'))
-
-// 如果元素被从 DOM 中移除：
-// - WeakMap 不强引用该元素
-// - 垃圾回收器可以回收该元素
-// - WeakMap 中的相关数据也会自动清理
-
-// 结果：无内存泄漏，自动清理
-```
-
-### 对比表
-
-| 特性 | 闭包 | WeakMap |
-|------|------|---------|
-| **引用类型** | 强引用 | 弱引用 |
-| **内存管理** | 手动管理 | 自动垃圾回收 |
-| **键的类型** | 任意（通过作用域） | 仅对象 |
-| **访问方式** | 作用域访问 | 通过 get/has/delete |
-| **可遍历** | 不可遍历 | 不可遍历 |
-| **内存安全** | 需注意泄漏风险 | 自动防止泄漏 |
-| **适用场景** | 数据隐私、封装 | 对象关联、缓存 |
-
-## Vue 3 中的使用场景
-
-### 场景 1：DOM 元素和组件实例的关联
-
-**问题**：
-
-```typescript
-// ❌ 使用普通 Map 会导致内存泄漏
-const domToComponent = new Map()
-
-function registerComponent(el, component) {
-  domToComponent.set(el, component)
-}
-
-// 元素被移除时
-el.remove()
-
-// 但 Map 仍然强引用该元素，无法被垃圾回收
-// 结论：内存泄漏
-```
-
-**解决方案**：
-
-```typescript
-// ✓ 使用 WeakMap
-const domToComponent = new WeakMap()
-
-function registerComponent(el, component) {
-  domToComponent.set(el, component)
-}
-
-// 元素被移除时
-el.remove()
-
-// WeakMap 不强引用，元素可被垃圾回收
-// 相关数据也自动清理
-// 结论：无内存泄漏
-```
-
-### 场景 2：响应式对象和原始数据的映射
-
-Vue 3 内部使用 WeakMap 来缓存响应式代理：
-
-```typescript
-// Vue 3 的实现（简化）
-const reactiveMap = new WeakMap()  // 原始对象 → 响应式代理
+// 缓存：原始对象 → 响应式代理
+const reactiveMap = new WeakMap()
 
 function reactive(target) {
-  // 检查是否已创建过代理
-  if (reactiveMap.has(target)) {
-    return reactiveMap.get(target)
+  // 1. 检查缓存，避免重复创建代理
+  const existingProxy = reactiveMap.get(target)
+  if (existingProxy) {
+    return existingProxy
   }
 
-  // 创建代理
-  const proxy = new Proxy(target, handler)
+  // 2. 创建响应式代理
+  const proxy = new Proxy(target, {
+    get(target, key) {
+      console.log(`访问 ${String(key)}`)
+      return target[key]
+    },
+    set(target, key, value) {
+      console.log(`设置 ${String(key)} = ${value}`)
+      target[key] = value
+      return true
+    }
+  })
 
-  // 缓存映射
+  // 3. 缓存映射关系
   reactiveMap.set(target, proxy)
 
   return proxy
 }
 
-let data = { id: 1 }
-const reactiveData = reactive(data)
+// 测试
+let obj = { count: 0 }
+const proxy1 = reactive(obj)
+const proxy2 = reactive(obj)
 
-// 当 data 被垃圾回收时
-data = null
+console.log(proxy1 === proxy2)  // true，返回同一个代理
 
-// WeakMap 也会自动清理相关缓存
-// 优势：避免因代理缓存导致的内存泄漏
+proxy1.count++  // 设置 count = 1
+
+// 当 obj 不再使用时
+obj = null
+// WeakMap 会自动清理 obj → proxy 的映射
+// 如果使用普通 Map，obj 永远不会被垃圾回收
 ```
 
-### 场景 3：私有属性的存储
+**核心要点**：
+- WeakMap 的键必须是对象（这里是 `target`）
+- 当 `target` 不再被引用时，WeakMap 自动清理
+- 这避免了因缓存导致的内存泄漏
+
+---
+
+## 3. 逐行解剖：Vue 3 的 WeakMap 使用
+
+### Vue 3 源码中的 WeakMap
+
+Vue 3 在 `reactivity` 模块中使用了多个 WeakMap：
+
+| WeakMap 名称 | 键 | 值 | 作用 |
+|-------------|----|----|------|
+| `reactiveMap` | 原始对象 | 响应式代理 | 缓存 `reactive()` 创建的代理 |
+| `readonlyMap` | 原始对象 | 只读代理 | 缓存 `readonly()` 创建的代理 |
+| `shallowReactiveMap` | 原始对象 | 浅层响应式代理 | 缓存 `shallowReactive()` 创建的代理 |
+| `targetMap` | 响应式对象 | 依赖映射表 | 存储对象的依赖关系 |
+
+### 关键代码分析
 
 ```typescript
-// ❌ 使用闭包或 Symbol（容易泄漏或污染）
-const privateData = new Map()
-let idCounter = 0
+// packages/reactivity/src/reactive.ts
 
-class Component {
-  constructor() {
-    const id = idCounter++
-    privateData.set(id, {
-      state: {},
-      watchers: []
-    })
+export const reactiveMap = new WeakMap<Target, any>()
+
+export function reactive(target: object) {
+  // 如果已经是只读代理，直接返回
+  if (isReadonly(target)) {
+    return target
   }
+
+  return createReactiveObject(
+    target,
+    false,
+    mutableHandlers,
+    reactiveMap
+  )
 }
 
-// 问题：手动清理很复杂，容易忘记
-
-// ✓ 使用 WeakMap（自动清理）
-const privateData = new WeakMap()
-
-class Component {
-  constructor() {
-    privateData.set(this, {
-      state: {},
-      watchers: []
-    })
-  }
-
-  getPrivate() {
-    return privateData.get(this)
-  }
-}
-
-// 当 Component 实例被垃圾回收时
-// privateData 中的相关数据也自动清理
-```
-
-### 场景 4：缓存计算结果
-
-```typescript
-// 使用 WeakMap 缓存基于对象的计算结果
-
-const computeCache = new WeakMap()
-
-function getComputedValue(obj) {
+function createReactiveObject(
+  target: Target,
+  isReadonly: boolean,
+  baseHandlers: ProxyHandler<any>,
+  proxyMap: WeakMap<Target, any>
+) {
   // 检查缓存
-  if (computeCache.has(obj)) {
-    console.log('from cache')
-    return computeCache.get(obj)
+  const existingProxy = proxyMap.get(target)
+  if (existingProxy) {
+    return existingProxy
   }
 
-  // 执行昂贵的计算
-  console.log('computing...')
-  const result = expensiveCompute(obj)
+  // 创建代理
+  const proxy = new Proxy(target, baseHandlers)
 
-  // 存储缓存
-  computeCache.set(obj, result)
+  // 缓存映射
+  proxyMap.set(target, proxy)
 
-  return result
-}
-
-let data = { items: Array(1000) }
-getComputedValue(data)  // 'computing...'
-getComputedValue(data)  // 'from cache'
-
-data = null  // 删除引用
-
-// WeakMap 自动清理，无内存泄漏
-```
-
-## 实际应用示例
-
-### 示例 1：Vue 组件的内部状态管理
-
-```typescript
-// 为组件实例存储内部状态，避免污染组件本身
-const componentStates = new WeakMap()
-
-function createComponentState(component) {
-  const state = {
-    mounted: false,
-    observers: new Set(),
-    computedCache: new Map()
-  }
-
-  componentStates.set(component, state)
-
-  return state
-}
-
-function getComponentState(component) {
-  return componentStates.get(component)
-}
-
-class Component {
-  constructor() {
-    createComponentState(this)
-  }
-
-  onMount() {
-    const state = getComponentState(this)
-    state.mounted = true
-  }
-
-  compute(key, fn) {
-    const state = getComponentState(this)
-
-    if (state.computedCache.has(key)) {
-      return state.computedCache.get(key)
-    }
-
-    const result = fn()
-    state.computedCache.set(key, result)
-    return result
-  }
-}
-
-// 使用
-const comp = new Component()
-comp.onMount()
-const result = comp.compute('myKey', () => 'value')
-
-// 当 comp 被垃圾回收时，componentStates 中的相关数据也自动清理
-```
-
-### 示例 2：DOM 元素和指令数据的关联
-
-```typescript
-// 为 DOM 元素关联指令的私有数据
-const directiveState = new WeakMap()
-
-const MyDirective = {
-  mounted(el, binding) {
-    // 为这个特定的元素存储指令状态
-    directiveState.set(el, {
-      value: binding.value,
-      listeners: [],
-      subscriptions: []
-    })
-
-    // 设置监听器等
-    const state = directiveState.get(el)
-    state.listeners.push(/* ... */)
-  },
-
-  updated(el, binding) {
-    const state = directiveState.get(el)
-    if (state) {
-      state.value = binding.value
-    }
-  },
-
-  unmounted(el) {
-    // 不需要手动清理，WeakMap 会自动处理
-    // 当元素被移除时，WeakMap 中的数据也自动清理
-  }
+  return proxy
 }
 ```
 
-### 示例 3：对象到元数据的映射
+| 源码片段 | 逻辑拆解 |
+|---------|---------|
+| `const reactiveMap = new WeakMap<Target, any>()` | **全局缓存**：使用 WeakMap 存储所有响应式代理，键是原始对象 |
+| `const existingProxy = proxyMap.get(target)` | **缓存查询**：检查是否已为该对象创建过代理 |
+| `if (existingProxy) return existingProxy` | **避免重复**：同一对象多次调用 `reactive()` 返回同一代理 |
+| `proxyMap.set(target, proxy)` | **缓存存储**：将新创建的代理存入 WeakMap |
+| 使用 WeakMap 而非 Map | **自动清理**：当 `target` 不再被引用时，缓存自动清理，防止内存泄漏 |
+
+### 依赖收集中的 WeakMap
 
 ```typescript
-// 为任意对象关联元数据，不污染对象本身
-const metadata = new WeakMap()
+// packages/reactivity/src/effect.ts
 
-function setMetadata(obj, key, value) {
-  if (!metadata.has(obj)) {
-    metadata.set(obj, new Map())
-  }
-  metadata.get(obj).set(key, value)
-}
+type Dep = Set<ReactiveEffect>
+type KeyToDepMap = Map<any, Dep>
+const targetMap = new WeakMap<any, KeyToDepMap>()
 
-function getMetadata(obj, key) {
-  return metadata.get(obj)?.get(key)
-}
+export function track(target: object, key: unknown) {
+  if (!activeEffect) return
 
-// 使用
-const user = { name: 'Alice' }
-setMetadata(user, 'role', 'admin')
-setMetadata(user, 'lastLogin', Date.now())
-
-console.log(getMetadata(user, 'role'))  // 'admin'
-console.log(user)  // { name: 'Alice' }（未被污染）
-
-// 当 user 被垃圾回收时，元数据也自动清理
-```
-
-## WeakMap vs WeakSet
-
-### WeakSet 简介
-
-WeakSet 类似于 WeakMap，但只存储值（没有键值对）：
-
-```typescript
-const ws = new WeakSet()
-
-// 只能添加对象
-const obj1 = { id: 1 }
-const obj2 = { id: 2 }
-
-ws.add(obj1)
-ws.add(obj2)
-
-// API
-ws.has(obj1)     // true
-ws.delete(obj1)  // true
-ws.has(obj1)     // false
-
-// 不支持
-ws.size      // undefined
-ws.keys()    // 不存在
-ws.values()  // 不存在
-ws.forEach() // 不存在
-```
-
-### 使用场景
-
-```typescript
-// WeakSet：跟踪对象集合（如已处理的对象）
-const processedObjects = new WeakSet()
-
-function process(obj) {
-  if (processedObjects.has(obj)) {
-    return  // 已处理过，跳过
+  // 获取对象的依赖映射表
+  let depsMap = targetMap.get(target)
+  if (!depsMap) {
+    targetMap.set(target, (depsMap = new Map()))
   }
 
-  // 处理对象
-  doSomething(obj)
+  // 获取属性的依赖集合
+  let dep = depsMap.get(key)
+  if (!dep) {
+    depsMap.set(key, (dep = new Set()))
+  }
 
-  // 标记为已处理
-  processedObjects.add(obj)
+  // 添加依赖
+  dep.add(activeEffect)
 }
-
-// 好处：当对象被垃圾回收时，自动从集合中移除
 ```
 
-## 性能考虑
+| 源码片段 | 逻辑拆解 |
+|---------|---------|
+| `const targetMap = new WeakMap<any, KeyToDepMap>()` | **依赖存储**：为每个响应式对象存储其依赖关系 |
+| `let depsMap = targetMap.get(target)` | **查找依赖表**：获取该对象的所有属性依赖 |
+| `targetMap.set(target, (depsMap = new Map()))` | **初始化**：首次访问时创建依赖映射表 |
+| 使用 WeakMap 作为外层容器 | **自动清理**：当响应式对象被销毁时，其依赖关系自动清理 |
 
-### 优势
+---
+
+## 4. 细节补充：边界与性能优化
+
+### WeakMap vs Map 的内存对比
 
 ```typescript
-// 1. 自动内存管理
-// 不需要手动追踪和清理，减少内存泄漏的风险
+// 场景：缓存 10000 个对象的计算结果
 
-// 2. 哈希表性能
-// WeakMap 使用对象引用作为键，比字符串键更快
+// 使用 Map（强引用）
+const mapCache = new Map()
+for (let i = 0; i < 10000; i++) {
+  const obj = { id: i, data: new Array(1000).fill(i) }
+  mapCache.set(obj, computeResult(obj))
+}
+// 问题：即使这些对象不再使用，Map 仍然持有引用
+// 内存占用：~80MB（对象 + 计算结果）
 
-// 3. 隐私保护
-// 用于存储私有数据，对象本身不被污染
+// 使用 WeakMap（弱引用）
+const weakMapCache = new WeakMap()
+for (let i = 0; i < 10000; i++) {
+  let obj = { id: i, data: new Array(1000).fill(i) }
+  weakMapCache.set(obj, computeResult(obj))
+  obj = null  // 释放引用
+}
+// 优势：对象不再使用时，自动被垃圾回收
+// 内存占用：~0MB（已被回收）
 ```
 
-### 劣势
+### 边界情况处理
+
+#### 1. 键必须是对象
 
 ```typescript
-// 1. 不可遍历
-// 无法获取所有键，限制了某些用途
+const wm = new WeakMap()
 
-// 2. 不可检测垃圾回收
-// 无法确定何时对象被回收，给 debug 增加难度
+// ✓ 正确
+wm.set({}, 'value')
+wm.set([], 'value')
+wm.set(function() {}, 'value')
 
-// 3. 只支持对象键
-// 基本类型无法使用
+// ✗ 错误
+wm.set('string', 'value')  // TypeError
+wm.set(123, 'value')       // TypeError
+wm.set(Symbol(), 'value')  // TypeError
+wm.set(null, 'value')      // TypeError
 ```
 
-## 常见错误
-
-### 错误 1：期望可遍历
+#### 2. 不可遍历
 
 ```typescript
-// ❌ 错误
+const wm = new WeakMap()
+wm.set({}, 'value')
+
+// ✗ 不支持
+wm.size           // undefined
+wm.keys()         // TypeError
+wm.values()       // TypeError
+wm.entries()      // TypeError
+wm.forEach()      // TypeError
+for (const [k, v] of wm) {}  // TypeError
+
+// 原因：键是弱引用，可能随时被垃圾回收，无法可靠遍历
+```
+
+#### 3. Vue 3 中的防御性检查
+
+```typescript
+function createReactiveObject(
+  target: Target,
+  isReadonly: boolean,
+  baseHandlers: ProxyHandler<any>,
+  proxyMap: WeakMap<Target, any>
+) {
+  // 边界 1：非对象类型直接返回
+  if (!isObject(target)) {
+    return target
+  }
+
+  // 边界 2：已经是代理对象，直接返回
+  if (target[ReactiveFlags.RAW]) {
+    return target
+  }
+
+  // 边界 3：检查缓存
+  const existingProxy = proxyMap.get(target)
+  if (existingProxy) {
+    return existingProxy
+  }
+
+  // 边界 4：不可扩展的对象不代理
+  if (!Object.isExtensible(target)) {
+    return target
+  }
+
+  const proxy = new Proxy(target, baseHandlers)
+  proxyMap.set(target, proxy)
+  return proxy
+}
+```
+
+### 性能优化
+
+#### 1. 哈希查找性能
+
+```typescript
+// WeakMap 使用对象引用作为键，查找时间复杂度 O(1)
 const wm = new WeakMap()
 const obj = { id: 1 }
+
 wm.set(obj, 'value')
+wm.get(obj)  // O(1) 直接通过对象引用查找
 
-for (const [key, value] of wm) {  // TypeError: wm is not iterable
-  console.log(key, value)
-}
-
-// ✓ 正确
-const map = new Map()
-map.set(obj, 'value')
-for (const [key, value] of map) {
-  console.log(key, value)
-}
+// 对比：使用对象属性存储
+obj.__reactiveProxy = proxy  // 污染对象
 ```
 
-### 错误 2：使用基本类型作为键
+#### 2. Vue 3 的多层缓存策略
 
 ```typescript
-// ❌ 错误
-const wm = new WeakMap()
-wm.set('string', 'value')  // TypeError
-wm.set(123, 'value')  // TypeError
-wm.set(Symbol('key'), 'value')  // TypeError
+// 第一层：WeakMap 缓存代理对象
+const reactiveMap = new WeakMap()
 
-// ✓ 正确
-wm.set({}, 'value')  // 对象
-wm.set([], 'value')  // 数组（也是对象）
-wm.set(function() {}, 'value')  // 函数（也是对象）
+// 第二层：WeakMap 缓存依赖关系
+const targetMap = new WeakMap()
+
+// 第三层：Map 缓存属性依赖
+type KeyToDepMap = Map<any, Dep>
+
+// 优势：
+// - WeakMap 自动清理不再使用的对象
+// - Map 提供高效的属性查找
+// - 分层设计平衡了性能和内存管理
 ```
 
-### 错误 3：依赖 WeakMap 的 size 属性
+---
 
+## 5. 总结与延伸
+
+### 一句话总结
+
+WeakMap 是 Vue 3 响应式系统的"自动清洁工"，它为对象缓存代理和依赖关系，并在对象不再使用时自动清理，防止内存泄漏。
+
+### 面试考点
+
+#### Q1: WeakMap 和 Map 的区别是什么？
+
+**答案**：
+- **键的类型**：WeakMap 只接受对象作为键，Map 接受任意类型
+- **引用强度**：WeakMap 是弱引用，Map 是强引用
+- **垃圾回收**：WeakMap 的键可被垃圾回收，Map 的键不会
+- **可遍历性**：WeakMap 不可遍历（无 `size`、`keys()`、`forEach()` 等），Map 可遍历
+- **使用场景**：WeakMap 用于对象元数据、缓存，Map 用于通用键值存储
+
+#### Q2: Vue 3 为什么使用 WeakMap 而不是 Map？
+
+**答案**：
+1. **防止内存泄漏**：当组件销毁时，原始对象不再被引用，WeakMap 自动清理缓存的代理对象
+2. **自动垃圾回收**：不需要手动清理缓存，减少内存管理负担
+3. **对象关联**：响应式系统需要为对象关联代理和依赖，WeakMap 是天然的对象→数据映射工具
+
+#### Q3: 如果用 Map 代替 WeakMap 会有什么问题？
+
+**答案**：
 ```typescript
-// ❌ 错误
-const wm = new WeakMap()
-console.log(wm.size)  // undefined
+// 使用 Map
+const reactiveMap = new Map()
 
-// ✓ 正确做法（如果需要追踪数量）
-const wm = new WeakMap()
-const tracker = new Map()  // 使用普通 Map 追踪
-
-wm.set(obj, data)
-tracker.set(obj, true)
-
-console.log(tracker.size)  // 可以获取数量
-```
-
-## 最佳实践
-
-### 1. 用于对象元数据存储
-
-```typescript
-// ✓ 好的做法
-const objectMetadata = new WeakMap()
-
-function addMetadata(obj, meta) {
-  objectMetadata.set(obj, meta)
-}
-```
-
-### 2. 用于缓存关联的计算结果
-
-```typescript
-// ✓ 好的做法
-const resultCache = new WeakMap()
-
-function cachedCompute(input) {
-  if (resultCache.has(input)) {
-    return resultCache.get(input)
+function reactive(target) {
+  let proxy = reactiveMap.get(target)
+  if (!proxy) {
+    proxy = new Proxy(target, handlers)
+    reactiveMap.set(target, proxy)
   }
-  const result = expensiveOperation(input)
-  resultCache.set(input, result)
-  return result
+  return proxy
 }
+
+// 问题：
+let obj = { count: 0 }
+const proxy = reactive(obj)
+
+obj = null  // 尝试释放 obj
+
+// Map 仍然持有 obj 的强引用
+// obj 和 proxy 都无法被垃圾回收
+// 导致内存泄漏
+
+// 解决方案：必须手动清理
+reactiveMap.delete(obj)  // 但如何知道何时清理？
 ```
 
-### 3. 用于私有属性实现
+#### Q4: WeakMap 的实际应用场景有哪些？
 
-```typescript
-// ✓ 好的做法
-const private = new WeakMap()
+**答案**：
+1. **对象元数据存储**：为对象关联额外信息而不污染对象本身
+2. **缓存计算结果**：缓存基于对象的计算结果，对象销毁时自动清理
+3. **私有属性实现**：存储类的私有数据
+4. **DOM 元素关联**：为 DOM 元素关联数据，元素移除时自动清理
 
-class MyClass {
-  constructor() {
-    private.set(this, {
-      internalState: {}
-    })
-  }
+### 延伸阅读
 
-  getInternal() {
-    return private.get(this)
-  }
-}
-```
+- **下一章节**：[Vue 3 响应式系统 - Proxy 与 Reflect](/ecology/vue/3.x/reactivity/proxy-reflect)
+- **相关主题**：
+  - [依赖收集与触发](/ecology/vue/3.x/reactivity/effect)
+  - [响应式 API 设计](/ecology/vue/3.x/reactivity/api-design)
+  - [内存管理与性能优化](/ecology/vue/3.x/performance/memory)
 
-### 4. 避免过度设计
+### 实践建议
 
-```typescript
-// ❌ 过度使用
-const everything = new WeakMap()
-everything.set(obj1, data1)
-everything.set(obj2, data2)
-// 不如直接定义属性清晰
+1. **何时使用 WeakMap**：
+   - 需要为对象关联数据且不想污染对象
+   - 需要自动清理不再使用的对象相关数据
+   - 实现对象级别的缓存
 
-// ✓ 适度使用
-// 只在需要避免污染对象或自动清理时使用
-```
-
-## 总结
-
-| 特性 | Map | WeakMap |
-|------|-----|---------|
-| **键** | 任意 | 仅对象 |
-| **引用强度** | 强 | 弱 |
-| **可遍历** | 是 | 否 |
-| **大小属性** | 有 | 无 |
-| **用途** | 通用存储 | 对象关联、缓存、隐私 |
-| **内存管理** | 手动 | 自动 |
-
-**何时使用 WeakMap**：
-
-- 需要为对象关联元数据
-- 需要缓存基于对象的计算结果
-- 需要存储私有数据而不污染对象
-- 需要避免内存泄漏的缓存机制
-- 需要自动清理不再使用的对象相关数据
-
-**何时不使用 WeakMap**：
-
-- 需要遍历所有键值
-- 需要检查集合大小
-- 键可能是基本类型
-- 需要手动控制何时清理数据
+2. **何时不使用 WeakMap**：
+   - 需要遍历所有键值对
+   - 需要获取集合大小
+   - 键可能是基本类型
+   - 需要手动控制清理时机

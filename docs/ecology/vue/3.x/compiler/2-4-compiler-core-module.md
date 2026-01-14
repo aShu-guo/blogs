@@ -6,11 +6,13 @@
 - **getBaseTransformPreset**：`packages/compiler-core/src/compile.ts:32-63` - 默认转换预设配置
 - **compile.ts 文件**：`packages/compiler-core/src/compile.ts` (125 lines) - 编译流程协调
 
-Compiler-core 是 Vue 3 编译器系统的**核心枢纽**，它整合 Parser、Transform 和 Codegen 三个模块，形成统一的编译流水线。这个模块提供了编译的主入口、配置管理和插件系统。
+## 概述
+
+Compiler-core 是 Vue 3 编译器系统的核心枢纽，整合 Parser、Transform 和 Codegen 三个模块，形成统一的编译流水线。
 
 ## 核心概念
 
-### Compiler-core 的角色
+### 在编译流程中的角色
 
 ```
 模板字符串
@@ -22,18 +24,17 @@ Compiler-core 是 Vue 3 编译器系统的**核心枢纽**，它整合 Parser、
 render 函数代码
 ```
 
-**Compiler-core 的职责**：
+### 核心职责
+
 1. **编译流程协调**：管理 Parse → Transform → Codegen 的完整流程
 2. **配置管理**：接收和处理编译选项
 3. **插件系统**：提供 Transform 插件的注册和管理机制
 4. **预设配置**：提供默认的 Transform 预设
 5. **错误处理**：统一的错误收集和报告
 
----
+## 源码分析
 
-## baseCompile 编译函数
-
-这是最核心的函数，管理整个编译流水线：
+### baseCompile 编译函数
 
 ```typescript
 export function baseCompile(
@@ -96,6 +97,8 @@ export function baseCompile(
   return generate(ast, resolvedOptions)
 }
 ```
+
+## 实现细节
 
 ### 编译流程分解
 
@@ -190,8 +193,6 @@ return generate(ast, resolvedOptions)
 // }
 ```
 
----
-
 ## Transform 预设系统
 
 ### getBaseTransformPreset
@@ -272,8 +273,6 @@ const result = baseCompile(template, {
 })
 ```
 
----
-
 ## 编译选项（CompilerOptions）
 
 完整的编译选项配置：
@@ -316,15 +315,10 @@ export interface CompilerOptions {
   // 错误处理
   onError?: (error: CompilerError) => void
   onWarn?: (message: CompilerWarning) => void
-
-  // 兼容性选项
-  // ... v2 兼容配置
 }
 ```
 
----
-
-## 完整编译示例
+## 编译输出示例
 
 ### 输入
 
@@ -416,9 +410,9 @@ export function render(_ctx, _cache, $props, $attrs, $slots, $emit, $options) {
 }
 ```
 
----
+## 性能优化
 
-## 错误处理
+### 错误处理
 
 Compiler-core 提供了完善的错误处理机制：
 
@@ -428,18 +422,15 @@ export enum ErrorCodes {
   X_INVALID_END_TAG,
   X_MISSING_END_TAG,
   X_MISSING_INTERPOLATION_END,
-  // ...
 
   // Transform 错误
   X_V_IF_NO_EXPRESSION,
   X_V_FOR_NO_EXPRESSION,
   X_V_MODEL_NO_EXPRESSION,
-  // ...
 
   // Codegen 错误
   X_PREFIX_ID_NOT_SUPPORTED,
   X_MODULE_MODE_NOT_SUPPORTED,
-  // ...
 }
 
 interface CompilerError {
@@ -457,9 +448,7 @@ baseCompile(template, {
 })
 ```
 
----
-
-## 源码映射支持
+### 源码映射支持
 
 Codegen 可以生成源码映射，用于调试：
 
@@ -477,59 +466,6 @@ Codegen 可以生成源码映射，用于调试：
   }
 }
 ```
-
-浏览器开发者工具可以使用这个映射，将压缩后的代码映射回原始的模板代码。
-
----
-
-## 常见使用场景
-
-### 场景 1: 基础编译
-
-```typescript
-import { baseCompile } from '@vue/compiler-core'
-
-const template = '<div>{{ message }}</div>'
-const result = baseCompile(template)
-console.log(result.code)  // render 函数代码
-```
-
-### 场景 2: 模块化编译
-
-```typescript
-const result = baseCompile(template, {
-  mode: 'module',
-  filename: 'Component.vue'
-})
-// 输出包含 import/export 语句的模块代码
-```
-
-### 场景 3: SSR 编译
-
-```typescript
-const result = baseCompile(template, {
-  mode: 'ssr'
-})
-// 输出字符串拼接形式的 SSR 代码
-```
-
-### 场景 4: 自定义优化
-
-```typescript
-const result = baseCompile(template, {
-  nodeTransforms: [
-    // 自定义 transform
-    (node, context) => {
-      // 添加自定义优化逻辑
-    }
-  ],
-  onError: (error) => {
-    // 自定义错误处理
-  }
-})
-```
-
----
 
 ## 与其他编译器的关系
 
@@ -553,8 +489,6 @@ Compiler-core
       └─ Hydration 支持
 ```
 
----
-
 ## 总结
 
 | 概念 | 说明 |
@@ -568,5 +502,3 @@ Compiler-core
 | **配置选项** | `CompilerOptions` 接口定义所有配置 |
 | **错误处理** | `onError` 和 `onWarn` 回调 |
 | **源码映射** | 支持调试用的源码位置映射 |
-
-**设计哲学**：Compiler-core 是编译器系统的协调中心，通过整合 Parser、Transform 和 Codegen 三个模块，提供统一的编译接口，同时支持灵活的配置和插件扩展机制，让高层编译器（DOM、SFC、SSR）可以方便地在其基础上进行定制。
