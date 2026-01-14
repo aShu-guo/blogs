@@ -38,8 +38,6 @@ sequenceDiagram
     Create->>Render: 渲染组件
 ```
 
----
-
 ## 2. 最小实现：手写"低配版"
 
 下面是一个 40 行的简化版 setup 执行器，展示核心逻辑：
@@ -109,16 +107,14 @@ executeSetup(component, { count: 5 });
 console.log(component.setupState.doubled); // 10（自动解包）
 ```
 
----
-
 ## 3. 逐行解剖：关键路径分析
 
 ### 3.1 setup() 的参数
 
-| 参数 | 类型 | 说明 | 注意事项 |
-|------|------|------|----------|
-| `props` | `Readonly<Props>` | 父组件传入的属性 | 只读代理，修改会警告 |
-| `context` | `SetupContext` | 上下文对象 | 仅当 `setup.length > 1` 时创建 |
+| 参数        | 类型                | 说明       | 注意事项                      |
+|-----------|-------------------|----------|---------------------------|
+| `props`   | `Readonly<Props>` | 父组件传入的属性 | 只读代理，修改会警告                |
+| `context` | `SetupContext`    | 上下文对象    | 仅当 `setup.length > 1` 时创建 |
 
 #### Props 的处理流程
 
@@ -177,11 +173,11 @@ interface SetupContext {
 
 ### 3.2 依赖收集的暂停与恢复
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `pauseTracking()` | **暂停收集**：setup 中访问 ref 不应建立依赖关系，因为 setup 只执行一次 |
-| `const setupResult = setup(...)` | **执行用户代码**：此时访问 `count.value` 不会触发依赖收集 |
-| `resetTracking()` | **恢复收集**：后续 render 函数中的访问才需要收集依赖 |
+| 源码片段                             | 逻辑拆解                                           |
+|----------------------------------|------------------------------------------------|
+| `pauseTracking()`                | **暂停收集**：setup 中访问 ref 不应建立依赖关系，因为 setup 只执行一次 |
+| `const setupResult = setup(...)` | **执行用户代码**：此时访问 `count.value` 不会触发依赖收集         |
+| `resetTracking()`                | **恢复收集**：后续 render 函数中的访问才需要收集依赖               |
 
 **为什么要暂停？**
 
@@ -218,13 +214,11 @@ function handleSetupResult(instance, setupResult) {
 
 #### 形态对比表
 
-| 返回类型 | 用途 | 处理方式 | 示例 |
-|---------|------|---------|------|
-| `Object` | 暴露数据和方法给模板 | `proxyRefs()` 自动解包 | `return { count, increment }` |
+| 返回类型       | 用途             | 处理方式                  | 示例                                   |
+|------------|----------------|-----------------------|--------------------------------------|
+| `Object`   | 暴露数据和方法给模板     | `proxyRefs()` 自动解包    | `return { count, increment }`        |
 | `Function` | 直接作为 render 函数 | 赋值给 `instance.render` | `return () => h('div', count.value)` |
-| `Promise` | 异步数据加载 | 配合 `<Suspense>` 使用 | `return fetch('/api').then(...)` |
-
----
+| `Promise`  | 异步数据加载         | 配合 `<Suspense>` 使用    | `return fetch('/api').then(...)`     |
 
 ## 4. 细节补充：边界与性能优化
 
@@ -238,6 +232,7 @@ setup(props) {
 ```
 
 **原因**：
+
 1. **单向数据流**：子组件不应直接修改 props，应通过 `emit` 通知父组件
 2. **调试友好**：违反规则时立即报错，而非静默失败
 
@@ -249,6 +244,7 @@ const setupContext = setup.length > 1 ? createSetupContext(instance) : null;
 ```
 
 **测试**：
+
 ```javascript
 // 场景 1：不创建 context（节省内存）
 setup(props) {
@@ -327,33 +323,34 @@ setup() {
 {{ count }}  // 自动解包，等价于 count.value
 ```
 
----
-
 ## 5. 总结与延伸
 
 ### 一句话总结
 
-> `setup()` 是 Vue 3 组件的"准备车间"，在渲染前执行一次，接收 props 和 context，返回模板所需的响应式状态和方法，通过暂停依赖收集和自动解包 ref 来优化性能和开发体验。
+> `setup()` 是 Vue 3 组件的"准备车间"，在渲染前执行一次，接收 props 和 context，返回模板所需的响应式状态和方法，通过暂停依赖收集和自动解包
+> ref 来优化性能和开发体验。
 
 ### 与 Options API 的对比
 
-| 特性 | Options API | Composition API (setup) |
-|------|------------|------------------------|
-| **代码组织** | 按选项类型分散（data/methods/computed） | 按逻辑功能聚合 |
-| **类型推导** | TypeScript 支持较弱 | 完美支持类型推导 |
-| **代码复用** | Mixins（命名冲突） | Composables（清晰来源） |
-| **this 指向** | 需要理解 this 绑定 | 无 this，使用闭包 |
-| **Tree-shaking** | 无法按需引入 | 按需引入（如 `ref`、`computed`） |
+| 特性               | Options API                    | Composition API (setup)  |
+|------------------|--------------------------------|--------------------------|
+| **代码组织**         | 按选项类型分散（data/methods/computed） | 按逻辑功能聚合                  |
+| **类型推导**         | TypeScript 支持较弱                | 完美支持类型推导                 |
+| **代码复用**         | Mixins（命名冲突）                   | Composables（清晰来源）        |
+| **this 指向**      | 需要理解 this 绑定                   | 无 this，使用闭包              |
+| **Tree-shaking** | 无法按需引入                         | 按需引入（如 `ref`、`computed`） |
 
 ### 面试高频考点
 
 **Q1: setup 中为什么不能使用 this？**
 
-A: setup 执行时组件实例尚未完全创建，且 Composition API 设计理念是通过闭包而非 this 来访问状态。需要实例时使用 `getCurrentInstance()`。
+A: setup 执行时组件实例尚未完全创建，且 Composition API 设计理念是通过闭包而非 this 来访问状态。需要实例时使用
+`getCurrentInstance()`。
 
 **Q2: setup 的执行时机是什么？**
 
 A: 在 `beforeCreate` 和 `created` 之间，具体流程是：
+
 1. 创建组件实例
 2. 初始化 props
 3. 初始化 slots

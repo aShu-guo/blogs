@@ -47,8 +47,6 @@ template 部分
 JavaScript 代码
 ```
 
----
-
 ## Compiler-dom：浏览器优化编译器
 
 ### 职责
@@ -56,6 +54,7 @@ JavaScript 代码
 Compiler-dom 为浏览器环境优化 Vue 模板编译，处理 DOM 特有的属性和行为。
 
 **核心特性**：
+
 1. **class 属性特殊处理**：智能合并静态和动态 class
 2. **style 属性特殊处理**：解析和优化内联样式
 3. **HTML 特性识别**：识别原生 HTML 属性和 Vue 属性的区别
@@ -191,6 +190,7 @@ Compiler-dom 为不同表单元素提供特殊的 v-model 处理：
 ### 完整编译示例
 
 **输入模板**：
+
 ```html
 <template>
   <div class="wrapper" :class="{ active: isActive }">
@@ -208,6 +208,7 @@ Compiler-dom 为不同表单元素提供特殊的 v-model 处理：
 ```
 
 **生成的代码**：
+
 ```javascript
 import { openBlock as _openBlock, createBlock as _createBlock, createVNode as _createVNode, normalizeClass as _normalizeClass, normalizeStyle as _normalizeStyle, toDisplayString as _toDisplayString } from 'vue'
 
@@ -232,8 +233,6 @@ export function render(_ctx, _cache, $props, $attrs, $slots, $emit, $options) {
   ], 2)
 }
 ```
-
----
 
 ## Compiler-sfc：单文件组件编译器
 
@@ -375,6 +374,7 @@ export function compileStyle(
 ### 完整编译示例
 
 **输入 .vue 文件**：
+
 ```vue
 <template>
   <div class="container">
@@ -409,6 +409,7 @@ const update = () => {
 5. **合并结果**：生成最终的 JavaScript 模块
 
 **生成的代码**：
+
 ```javascript
 import { openBlock, createBlock, createVNode, toDisplayString, ref } from 'vue'
 
@@ -445,13 +446,12 @@ export default _sfc_main
 ```
 
 **生成的样式**：
+
 ```css
 .container[data-v-abc123] {
   padding: 20px;
 }
 ```
-
----
 
 ## Compiler-ssr：服务端渲染编译器
 
@@ -501,6 +501,7 @@ const render = (ctx, push) => {
 ### SSR 编译示例
 
 **输入模板**：
+
 ```html
 <template>
   <div class="app">
@@ -515,6 +516,7 @@ const render = (ctx, push) => {
 ```
 
 **生成的 SSR 代码**：
+
 ```javascript
 import { escapeHtml as _escapeHtml, renderList as _renderList } from 'vue'
 
@@ -576,8 +578,6 @@ export function ssrRender(..., ssrContext) {
 }
 ```
 
----
-
 ## 编译选项总结
 
 ### Compiler-dom 特有选项
@@ -627,8 +627,6 @@ export function ssrRender(..., ssrContext) {
 }
 ```
 
----
-
 ## 常见使用场景
 
 ### 场景 1: 浏览器直接编译
@@ -670,15 +668,14 @@ const render = new Function('ctx', 'push', code)
 const html = render({ message: 'Hello' }, chunks)
 ```
 
----
-
 ## 总结
 
-| 编译器 | 职责 | 优化重点 | 输出形式 |
-|-------|------|--------|--------|
-| **Compiler-core** | 核心编译逻辑 | 通用优化 | AST + 代码 |
-| **Compiler-dom** | 浏览器特定处理 | class、style、events | VNode 代码 |
-| **Compiler-sfc** | .vue 文件处理 | 组件集成 | 组件模块 |
-| **Compiler-ssr** | 服务端渲染 | HTML 字符串生成 | 字符串代码 |
+| 编译器               | 职责        | 优化重点               | 输出形式     |
+|-------------------|-----------|--------------------|----------|
+| **Compiler-core** | 核心编译逻辑    | 通用优化               | AST + 代码 |
+| **Compiler-dom**  | 浏览器特定处理   | class、style、events | VNode 代码 |
+| **Compiler-sfc**  | .vue 文件处理 | 组件集成               | 组件模块     |
+| **Compiler-ssr**  | 服务端渲染     | HTML 字符串生成         | 字符串代码    |
 
-**设计哲学**：Vue 采用分层编译器设计，Compiler-core 提供通用的编译基础，各个生态编译器在其上进行针对性的扩展和优化，既保证了代码复用，又实现了高度的定制化。这种设计使得 Vue 能够灵活适应浏览器、SSR、IDE 插件等多种使用场景。
+**设计哲学**：Vue 采用分层编译器设计，Compiler-core 提供通用的编译基础，各个生态编译器在其上进行针对性的扩展和优化，既保证了代码复用，又实现了高度的定制化。这种设计使得
+Vue 能够灵活适应浏览器、SSR、IDE 插件等多种使用场景。

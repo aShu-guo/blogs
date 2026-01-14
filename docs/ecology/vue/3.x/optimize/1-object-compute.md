@@ -11,6 +11,7 @@
 **对象计算优化 = 缓存机制 + 依赖追踪 + 引用稳定**
 
 就像图书馆的借书卡系统：
+
 - **无优化**：每次借书都重新办一张新卡（即使信息相同）
 - **有优化**：只有个人信息变化时才换新卡，否则复用旧卡
 
@@ -24,8 +25,6 @@
 ├─ 变化 → 重新计算 → 返回新对象 → 子组件更新
 └─ 未变化 → 返回缓存对象 → 子组件不更新
 ```
-
----
 
 ## 2. 最小实现：手写"低配版"
 
@@ -71,30 +70,30 @@ console.log(obj.value); // 同一个对象 B（缓存）
 ```
 
 **核心机制**：
+
 1. `dirty` 标记控制是否需要重新计算
 2. 依赖项变化时设置 `dirty = true`
 3. 访问 `value` 时检查 `dirty`，决定返回缓存还是重新计算
-
----
 
 ## 3. 逐行解剖：关键路径分析
 
 ### Vue 3 的 computed 实现
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `class ComputedRefImpl` | computed 的核心类，管理缓存和依赖 |
-| `this._dirty = true` | 脏标记：true 表示需要重新计算 |
-| `this._value = undefined` | 缓存值：存储上次计算结果 |
-| `this.effect = new ReactiveEffect(getter)` | 创建响应式副作用，追踪依赖项 |
-| `if (this._dirty)` | 检查是否需要重新计算 |
-| `this._value = this.effect.run()` | 执行计算函数，更新缓存 |
-| `this._dirty = false` | 标记为干净，下次直接返回缓存 |
-| `return this._value` | 返回缓存值（引用稳定） |
+| 源码片段                                       | 逻辑拆解                  |
+|--------------------------------------------|-----------------------|
+| `class ComputedRefImpl`                    | computed 的核心类，管理缓存和依赖 |
+| `this._dirty = true`                       | 脏标记：true 表示需要重新计算     |
+| `this._value = undefined`                  | 缓存值：存储上次计算结果          |
+| `this.effect = new ReactiveEffect(getter)` | 创建响应式副作用，追踪依赖项        |
+| `if (this._dirty)`                         | 检查是否需要重新计算            |
+| `this._value = this.effect.run()`          | 执行计算函数，更新缓存           |
+| `this._dirty = false`                      | 标记为干净，下次直接返回缓存        |
+| `return this._value`                       | 返回缓存值（引用稳定）           |
 
 ### 模板编译差异
 
 **方式 1：内联对象**
+
 ```javascript
 // 模板：<MyChild :foo="{ name: dynamicVar }" />
 // 编译后
@@ -106,6 +105,7 @@ render() {
 ```
 
 **方式 2：computed**
+
 ```javascript
 // 模板：<MyChild :foo="foo" />
 // setup
@@ -121,21 +121,20 @@ render() {
 
 ### 依赖追踪流程
 
-| 步骤 | 操作 | 说明 |
-|-----|------|------|
-| 1 | 首次访问 `computed.value` | 执行 getter，收集依赖 |
-| 2 | 依赖项（如 `dynamicVar`）变化 | 触发 `trigger()` |
-| 3 | 调用 `computed.effect.scheduler()` | 设置 `_dirty = true` |
-| 4 | 下次访问 `computed.value` | 检测到 `_dirty`，重新计算 |
-| 5 | 返回新值，设置 `_dirty = false` | 缓存新结果 |
-
----
+| 步骤 | 操作                               | 说明                 |
+|----|----------------------------------|--------------------|
+| 1  | 首次访问 `computed.value`            | 执行 getter，收集依赖     |
+| 2  | 依赖项（如 `dynamicVar`）变化            | 触发 `trigger()`     |
+| 3  | 调用 `computed.effect.scheduler()` | 设置 `_dirty = true` |
+| 4  | 下次访问 `computed.value`            | 检测到 `_dirty`，重新计算  |
+| 5  | 返回新值，设置 `_dirty = false`         | 缓存新结果              |
 
 ## 4. 细节补充：边界与性能优化
 
 ### 边界情况处理
 
 **1. 循环引用**
+
 ```javascript
 const a = computed(() => ({ b: b.value }));
 const b = computed(() => ({ a: a.value }));
@@ -143,6 +142,7 @@ const b = computed(() => ({ a: a.value }));
 ```
 
 **2. 异步依赖**
+
 ```javascript
 const data = computed(async () => {
   return await fetchData(); // ❌ computed 不支持异步
@@ -155,6 +155,7 @@ watchEffect(async () => {
 ```
 
 **3. 深层对象变化**
+
 ```javascript
 const obj = computed(() => ({
   nested: { value: count.value }
@@ -166,6 +167,7 @@ const obj = computed(() => ({
 ### 性能优化技巧
 
 **1. 避免在 computed 中创建大对象**
+
 ```javascript
 // ❌ 不推荐
 const config = computed(() => ({
@@ -182,20 +184,20 @@ const config = computed(() => ({
 ```
 
 **2. 使用 shallowRef 优化嵌套对象**
+
 ```javascript
 const data = shallowRef({ nested: { value: 1 } });
 // 只追踪第一层，避免深层响应式开销
 ```
 
 **3. 条件计算**
+
 ```javascript
 const result = computed(() => {
   if (!enabled.value) return null; // 提前返回
   return expensiveOperation(); // 仅在需要时计算
 });
 ```
-
----
 
 ## 5. 总结与延伸：连接知识点
 
@@ -206,21 +208,25 @@ const result = computed(() => {
 ### 面试考点
 
 **Q1：为什么 `<MyChild :foo="{ name: x }" />` 会导致性能问题？**
+
 - 每次父组件渲染都创建新对象，引用地址变化
 - 子组件的 `watch` 和 `watchEffect` 会被触发
 - 即使内容相同，子组件也会重新渲染
 
 **Q2：computed 和 watch 的区别？**
+
 - `computed`：有缓存，返回值，适合派生状态
 - `watch`：无缓存，执行副作用，适合响应数据变化
 
 **Q3：如何判断是否需要使用 computed？**
+
 - 对象创建逻辑复杂
 - 需要在多处使用同一对象
 - 子组件对 props 变化敏感
 - 追求性能优化
 
 **Q4：computed 的缓存失效时机？**
+
 - 依赖的响应式数据变化
 - 手动触发（通过 `effect.scheduler`）
 - 组件卸载时清理
@@ -234,10 +240,10 @@ const result = computed(() => {
 
 ### 实战建议
 
-| 场景 | 推荐方案 | 原因 |
-|-----|---------|------|
-| 简单对象 | 内联对象 | 代码简洁，性能影响小 |
-| 复杂计算 | computed | 避免重复计算 |
-| 多处使用 | computed | 引用稳定，便于维护 |
-| 子组件监听 | computed | 避免不必要的触发 |
-| 频繁变化 | 内联对象 | computed 缓存无意义 |
+| 场景    | 推荐方案     | 原因             |
+|-------|----------|----------------|
+| 简单对象  | 内联对象     | 代码简洁，性能影响小     |
+| 复杂计算  | computed | 避免重复计算         |
+| 多处使用  | computed | 引用稳定，便于维护      |
+| 子组件监听 | computed | 避免不必要的触发       |
+| 频繁变化  | 内联对象     | computed 缓存无意义 |

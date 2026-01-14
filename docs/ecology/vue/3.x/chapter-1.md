@@ -3,15 +3,13 @@
 从 `createApp()` 到 `mount()` 的完整流程和关键实现细节
 
 ## 目录
+
 - [概述](#概述)
 - [核心概念](#核心概念)
 - [启动流程](#启动流程)
 - [关键API详解](#关键api详解)
 - [内部数据结构](#内部数据结构)
 - [性能优化](#性能优化)
-
----
-
 
 ## 概述
 
@@ -62,8 +60,6 @@ Vue 3 的启动机制包含两个主要阶段：
               ✅ 应用启动完成
 ```
 
----
-
 ## 核心概念
 
 ### AppContext (应用全局上下文)
@@ -85,6 +81,7 @@ interface AppContext {
 ```
 
 **作用**：
+
 - 存储全局配置和状态
 - 缓存组件选项、props、emits（使用 WeakMap 实现自动清理）
 - 支持插件系统和 provide/inject
@@ -147,8 +144,6 @@ interface ComponentInternalInstance {
 }
 ```
 
----
-
 ## 启动流程
 
 ### 阶段 1: createApp() - 应用创建
@@ -172,6 +167,7 @@ const context = createAppContext() // 行 267
 ```
 
 **为什么使用 WeakMap？**
+
 - 自动垃圾回收：当组件被销毁时，缓存也会被自动清理
 - 防止内存泄漏：不会阻止组件被回收
 - 性能优化：快速查找且不占用内存空间
@@ -195,6 +191,7 @@ const app: App = {
 #### 1.3 App API 详解
 
 **use(plugin, ...options)** - 安装插件
+
 ```typescript
 use(plugin: Plugin, ...options: any[]) {
   if (installedPlugins.has(plugin)) {
@@ -215,6 +212,7 @@ use(plugin: Plugin, ...options: any[]) {
 ```
 
 **component(name, component?)** - 全局组件注册
+
 ```typescript
 component(name: string, component?: Component) {
   if (!component) {
@@ -228,14 +226,13 @@ component(name: string, component?: Component) {
 ```
 
 **provide(key, value)** - 全局注入
+
 ```typescript
 provide(key, value) {
   context.provides[key as string | symbol] = value
   return app
 }
 ```
-
----
 
 ### 阶段 2: app.mount() - 组件挂载
 
@@ -279,8 +276,6 @@ render(vnode, container, namespace)
       └─→ processComponent(vnode, ...) // 处理组件类型
           └─→ mountComponent(...) // 首次挂载
 ```
-
----
 
 ### 阶段 3: createComponentInstance - 实例创建
 
@@ -345,11 +340,10 @@ export function createComponentInstance(
 ```
 
 **为什么创建 EffectScope？**
+
 - 每个组件有独立的响应式作用域
 - 当组件卸载时，可以一次性清理所有副作用
 - 防止副作用泄漏到其他组件
-
----
 
 ### 阶段 4: setupComponent - 组件初始化
 
@@ -381,8 +375,6 @@ export function setupComponent(
 }
 ```
 
----
-
 ### 阶段 5: setupStatefulComponent - 调用 setup()
 
 #### 5.1 创建 Render Proxy（渲染代理）
@@ -395,6 +387,7 @@ instance.proxy = new Proxy(instance.ctx, PublicInstanceProxyHandlers)
 
 **accessCache 的作用**：
 缓存属性查找结果，避免重复执行 proxy handlers。例如：
+
 ```
 第 1 次访问 this.message → 查找 → 缓存结果
 第 2 次访问 this.message → 直接返回缓存 → 性能提升
@@ -482,6 +475,7 @@ export function handleSetupResult(
 ```
 
 **proxyRefs 的作用**：
+
 ```typescript
 // setup 返回的 ref 在模板中自动解包
 const count = ref(0)
@@ -490,8 +484,6 @@ return { count }
 // 在模板中可以直接使用：
 // {{ count }} 而不需要 {{ count.value }}
 ```
-
----
 
 ### 阶段 6: setupRenderEffect - 建立响应式追踪
 
@@ -607,8 +599,6 @@ const componentUpdateFn = () => {
 }
 ```
 
----
-
 ## 关键API详解
 
 ### 1. initProps - Props 初始化
@@ -716,8 +706,6 @@ const patch = (
 }
 ```
 
----
-
 ## 内部数据结构
 
 ### 1. AppConfig - 全局配置
@@ -787,8 +775,6 @@ const PatchFlags = {
 }
 ```
 
----
-
 ## 性能优化
 
 ### 1. WeakMap 缓存
@@ -801,6 +787,7 @@ emitsCache: new WeakMap(),    // 缓存 emits 规范化结果
 ```
 
 **优势**：
+
 - 组件被回收时，缓存自动清理
 - 避免内存泄漏
 - 快速查找（O(1)）
@@ -813,6 +800,7 @@ instance.accessCache = Object.create(null)
 ```
 
 当访问 `this.message` 时：
+
 ```
 render 函数执行
   ↓
@@ -879,8 +867,6 @@ _createVNode('div',
 
 在更新时，只检查标记为变化的属性。
 
----
-
 ## 总结
 
 Vue 3 的启动机制遵循以下流程：
@@ -911,17 +897,15 @@ Vue 3 的启动机制遵循以下流程：
 - **生命周期钩子**：在特定时刻执行用户代码
 - **模块化设计**：renderer 可以自定义（支持 SSR、VR 等）
 
----
-
 ## 相关文件速查
 
-| 功能 | 文件 | 关键函数 |
-|------|------|--------|
-| 应用创建 | `apiCreateApp.ts` | `createApp()`, `createAppContext()` |
-| 组件初始化 | `component.ts` | `createComponentInstance()`, `setupComponent()` |
-| 虚拟 DOM | `vnode.ts` | `createVNode()`, `isVNode()` |
-| 渲染引擎 | `renderer.ts` | `render()`, `patch()`, `mountComponent()` |
-| Props 处理 | `componentProps.ts` | `initProps()`, `normalizePropsOptions()` |
-| 插槽处理 | `componentSlots.ts` | `initSlots()`, `resolveSlots()` |
-| 响应式 | `@vue/reactivity` | `ref()`, `reactive()`, `effect()` |
-| 编译器 | `@vue/compiler-dom` | `compile()`, `compileToFunction()` |
+| 功能       | 文件                  | 关键函数                                            |
+|----------|---------------------|-------------------------------------------------|
+| 应用创建     | `apiCreateApp.ts`   | `createApp()`, `createAppContext()`             |
+| 组件初始化    | `component.ts`      | `createComponentInstance()`, `setupComponent()` |
+| 虚拟 DOM   | `vnode.ts`          | `createVNode()`, `isVNode()`                    |
+| 渲染引擎     | `renderer.ts`       | `render()`, `patch()`, `mountComponent()`       |
+| Props 处理 | `componentProps.ts` | `initProps()`, `normalizePropsOptions()`        |
+| 插槽处理     | `componentSlots.ts` | `initSlots()`, `resolveSlots()`                 |
+| 响应式      | `@vue/reactivity`   | `ref()`, `reactive()`, `effect()`               |
+| 编译器      | `@vue/compiler-dom` | `compile()`, `compileToFunction()`              |

@@ -2,15 +2,13 @@
 
 ## 快速参考表
 
-| 调用方式 | 来源 | Type 参数 | Props 处理 | 性能 | 使用场景 |
-|---------|------|---------|----------|------|---------|
-| 编译器模板 | `<template>` | 字符串/组件引用 | 编译时规范化 | 最优 | 99% 的应用场景 |
-| h() 函数 | 手写渲染函数 | 任意有效类型 | 运行时规范化 | 中等 | 函数式组件/render |
-| JSX 语法 | JSX 编译器 | 组件对象 | 编译器处理 | 优 | React 开发者 |
-| 动态组件 | :is 指令 | 变量/ref | 编译时规范化 | 中等 | `<component :is>` |
-| 特殊类型 | 框架 API | Fragment/Teleport/Suspense | 特殊规则 | 中等 | 多根/传送门/异步 |
-
----
+| 调用方式   | 来源           | Type 参数                    | Props 处理 | 性能 | 使用场景              |
+|--------|--------------|----------------------------|----------|----|-------------------|
+| 编译器模板  | `<template>` | 字符串/组件引用                   | 编译时规范化   | 最优 | 99% 的应用场景         |
+| h() 函数 | 手写渲染函数       | 任意有效类型                     | 运行时规范化   | 中等 | 函数式组件/render      |
+| JSX 语法 | JSX 编译器      | 组件对象                       | 编译器处理    | 优  | React 开发者         |
+| 动态组件   | :is 指令       | 变量/ref                     | 编译时规范化   | 中等 | `<component :is>` |
+| 特殊类型   | 框架 API       | Fragment/Teleport/Suspense | 特殊规则     | 中等 | 多根/传送门/异步         |
 
 ## 基础场景
 
@@ -19,6 +17,7 @@
 最常见的场景，编译器将模板转换为优化的 createVNode 调用。
 
 **模板代码:**
+
 ```vue
 <template>
   <div class="container" :class="{ active: isActive }">
@@ -29,6 +28,7 @@
 ```
 
 **编译后代码:**
+
 ```javascript
 import { createVNode as _createVNode, normalizeClass as _normalizeClass } from 'vue'
 
@@ -58,6 +58,7 @@ export function render(_ctx, _cache) {
 ```
 
 **执行流程:**
+
 ```
 编译模板
   ↓
@@ -73,18 +74,18 @@ PatchFlags 在编译时标记
 ```
 
 **优化特点:**
+
 - 静态 class 被提升，避免重复创建
 - 动态部分被标记 PatchFlags，精确更新
 - 字符串常量被复用
 - 编译时完成 class/style 预处理
-
----
 
 ### 场景 2: 手写 h() 函数
 
 手动编写渲染函数，提供最大灵活性但缺少编译时优化。
 
 **代码示例:**
+
 ```javascript
 import { h } from 'vue'
 
@@ -111,6 +112,7 @@ export default {
 ```
 
 **执行流程:**
+
 ```
 h('div', {...})
   ↓
@@ -128,12 +130,11 @@ createBaseVNode()
 ```
 
 **特点对比:**
+
 - Props 不经过编译器优化
 - 每次 render 都要规范化 class/style
 - 无 PatchFlags 优化，性能不如模板
 - 灵活性高，适合复杂逻辑
-
----
 
 ## 动态场景
 
@@ -142,6 +143,7 @@ createBaseVNode()
 使用 `:is` 指令动态切换组件类型。
 
 **模板代码:**
+
 ```vue
 <template>
   <component
@@ -153,6 +155,7 @@ createBaseVNode()
 ```
 
 **编译后代码:**
+
 ```javascript
 _createVNode(_ctx.currentComponent,
   {
@@ -163,6 +166,7 @@ _createVNode(_ctx.currentComponent,
 ```
 
 **执行流程:**
+
 ```
 _createVNode(type, props)
   ↓
@@ -176,12 +180,11 @@ type 是变量（运行时决定）
 ```
 
 **关键特性:**
+
 - Type 由运行时决定
 - 类型检查发生在 createVNode 内部
 - 每次更新都要重新检查类型
 - 性能略低于静态类型
-
----
 
 ## 特殊类型场景
 
@@ -190,6 +193,7 @@ type 是变量（运行时决定）
 Vue 3 支持多根节点组件，编译器自动使用 Fragment 包装。
 
 **模板代码:**
+
 ```vue
 <template>
   <div>Node 1</div>
@@ -199,6 +203,7 @@ Vue 3 支持多根节点组件，编译器自动使用 Fragment 包装。
 ```
 
 **编译后代码:**
+
 ```javascript
 _createVNode(_Fragment, null, [
   _createVNode('div', null, 'Node 1'),
@@ -208,6 +213,7 @@ _createVNode(_Fragment, null, [
 ```
 
 **执行流程:**
+
 ```
 _createVNode(Fragment, null, [...])
   ↓
@@ -223,18 +229,18 @@ createBaseVNode(Fragment, null, [...], 0, null, 0)
 ```
 
 **使用特点:**
+
 - Fragment 没有对应的 DOM 元素
 - 子节点直接插入父元素
 - 性能优于 div 包装
 - 可在 v-for 中使用
-
----
 
 ### 场景 5: Teleport（传送门）
 
 将内容渲染到 DOM 树的其他位置。
 
 **模板代码:**
+
 ```vue
 <template>
   <Teleport to="#modal">
@@ -247,6 +253,7 @@ createBaseVNode(Fragment, null, [...], 0, null, 0)
 ```
 
 **编译后代码:**
+
 ```javascript
 _createVNode(Teleport,
   { to: '#modal' },
@@ -263,6 +270,7 @@ _createVNode(Teleport,
 ```
 
 **执行流程:**
+
 ```
 _createVNode(Teleport, { to: '#modal' }, [...])
   ↓
@@ -280,18 +288,18 @@ VNode.type.process() 处理 Teleport
 ```
 
 **应用场景:**
+
 - 模态框、弹窗
 - 通知、提示组件
 - 需要脱离父容器的内容
 - Props.to 指定目标位置
-
----
 
 ### 场景 6: Suspense（异步组件）
 
 处理异步组件加载状态。
 
 **模板代码:**
+
 ```vue
 <template>
   <Suspense>
@@ -306,6 +314,7 @@ VNode.type.process() 处理 Teleport
 ```
 
 **编译后代码:**
+
 ```javascript
 _createVNode(Suspense, null, {
   default: () => [_createVNode(AsyncComponent)],
@@ -314,6 +323,7 @@ _createVNode(Suspense, null, {
 ```
 
 **执行流程:**
+
 ```
 _createVNode(Suspense, null, { default, fallback })
   ↓
@@ -333,18 +343,18 @@ AsyncComponent 加载时显示 fallback
 ```
 
 **应用场景:**
+
 - 异步组件加载
 - 代码分割（Code Splitting）
 - Lazy Load
 - Children 以插槽对象形式传递
-
----
 
 ## 性能对比分析
 
 ### Props 处理差异
 
 **编译器模板（优化）:**
+
 ```javascript
 // 静态部分提升
 const _hoisted_class = 'container'
@@ -356,6 +366,7 @@ return _createVNode('div', {
 ```
 
 **手写 h()（实时处理）:**
+
 ```javascript
 return h('div', {
   class: ['container', { active: this.isActive }]
@@ -365,29 +376,29 @@ return h('div', {
 
 ### 性能对比表
 
-| 操作 | 编译模板 | 手写 h() | 动态类型 | 特殊类型 |
-|-----|---------|---------|---------|---------|
-| 类型检查 | O(0)* | O(1) | O(1) | O(1) |
-| Props 规范化 | O(0)* | O(n) | O(n) | O(n) |
-| Children 处理 | O(m) | O(m) | O(m) | O(m) |
-| Block 追踪 | O(1) | O(1) | O(1) | O(1) |
-| 总耗时 | 最快 | 中等 | 中等 | 中等 |
+| 操作          | 编译模板  | 手写 h() | 动态类型 | 特殊类型 |
+|-------------|-------|--------|------|------|
+| 类型检查        | O(0)* | O(1)   | O(1) | O(1) |
+| Props 规范化   | O(0)* | O(n)   | O(n) | O(n) |
+| Children 处理 | O(m)  | O(m)   | O(m) | O(m) |
+| Block 追踪    | O(1)  | O(1)   | O(1) | O(1) |
+| 总耗时         | 最快    | 中等     | 中等   | 中等   |
 
 *编译时完成，运行时不需要
 
 ### 优化总结
 
 **编译器模板:**
+
 - 静态 class 提升（创建一次）
 - 编译时优化 PatchFlags
 - 性能最优
 
 **手写 h():**
+
 - 每次都规范化
 - 无 PatchFlags 优化
 - 性能较差但代码灵活
-
----
 
 ## 类型识别流程
 
@@ -421,20 +432,16 @@ return h('div', {
 └───────────────────────────────────┘
 ```
 
----
-
 ## 使用建议
 
-| 场景 | 推荐方式 | 理由 |
-|------|---------|------|
-| 大多数应用 | 编译模板 | 性能最优，自动优化 |
-| 函数式组件 | h() 函数 | 逻辑可编程性强 |
-| 渲染函数库 | h() 函数 | 公共 API，便于分享 |
-| 动态组件列表 | :is + 编译 | 结合两者优势 |
-| 复杂条件渲染 | h() 或 v-if | 代码清晰度 |
-| 高性能场景 | 编译模板 | 充分利用优化 |
-
----
+| 场景     | 推荐方式       | 理由          |
+|--------|------------|-------------|
+| 大多数应用  | 编译模板       | 性能最优，自动优化   |
+| 函数式组件  | h() 函数     | 逻辑可编程性强     |
+| 渲染函数库  | h() 函数     | 公共 API，便于分享 |
+| 动态组件列表 | :is + 编译   | 结合两者优势      |
+| 复杂条件渲染 | h() 或 v-if | 代码清晰度       |
+| 高性能场景  | 编译模板       | 充分利用优化      |
 
 ## 调试技巧
 

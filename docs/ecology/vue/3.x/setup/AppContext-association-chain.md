@@ -34,8 +34,6 @@ app.mount(container)
         ↓ 整个组件树共享同一个 AppContext
 ```
 
----
-
 ## 2. 最小实现：手写"低配版"
 
 下面是一个 40 行的最小实现，展示 AppContext 的核心机制：
@@ -96,21 +94,20 @@ app.mount(document.getElementById('app'))
 ```
 
 **核心要点：**
+
 - AppContext 在 `createApp` 时创建
 - 在 `mount` 时通过 `vnode.appContext = context` 关联到根 VNode
 - 子组件通过父组件继承，无需手动传递
-
----
 
 ## 3. 逐行解剖：Vue 3 源码关键路径
 
 ### 3.1 AppContext 的创建
 
-| 源码位置 | 说明 |
-|---------|------|
+| 源码位置                                            | 说明                  |
+|-------------------------------------------------|---------------------|
 | `packages/runtime-core/src/apiCreateApp.ts:257` | `createAppAPI` 函数入口 |
-| `const context = createAppContext()` | 创建应用上下文 |
-| `context.app = app` | 双向关联：context ↔ app |
+| `const context = createAppContext()`            | 创建应用上下文             |
+| `context.app = app`                             | 双向关联：context ↔ app  |
 
 **AppContext 的结构：**
 
@@ -122,24 +119,32 @@ export interface AppContext {
   components: Record<string, Component> // 全局组件
   directives: Record<string, Directive> // 全局指令
   provides: Record<string | symbol, any> // 全局 provide
-  optionsCache: WeakMap<...>            // 选项缓存
-  propsCache: WeakMap<...>              // props 缓存
-  emitsCache: WeakMap<...>              // emits 缓存
+  optionsCache: WeakMap<
+  ...>            // 选项缓存
+  propsCache: WeakMap<
+  ...>              // props 缓存
+  emitsCache: WeakMap<
+  ...>              // emits 缓存
 }
 ```
 
 ### 3.2 关联到根 VNode
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
+| 源码片段                                                  | 逻辑拆解                               |
+|-------------------------------------------------------|------------------------------------|
 | `const vnode = createVNode(rootComponent, rootProps)` | 创建根 VNode，此时 `appContext` 为 `null` |
-| `vnode.appContext = context` | **关键一行**：将 AppContext 关联到根 VNode |
-| `render(vnode, container)` | 将带有 AppContext 的 VNode 传给渲染器 |
+| `vnode.appContext = context`                          | **关键一行**：将 AppContext 关联到根 VNode   |
+| `render(vnode, container)`                            | 将带有 AppContext 的 VNode 传给渲染器       |
 
 **源码位置：** `packages/runtime-core/src/apiCreateApp.ts:372-375`
 
 ```typescript
-mount(rootContainer: HostElement, isHydrate?: boolean, namespace?: boolean | ElementNamespace): any {
+mount(rootContainer
+:
+HostElement, isHydrate ? : boolean, namespace ? : boolean | ElementNamespace
+):
+any
+{
   if (!isMounted) {
     const vnode = app._ceVNode || createVNode(rootComponent, rootProps)
     vnode.appContext = context  // ← 核心关联
@@ -159,11 +164,11 @@ mount(rootContainer: HostElement, isHydrate?: boolean, namespace?: boolean | Ele
 
 ### 3.3 传递到组件实例
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
+| 源码片段                                                                 | 逻辑拆解                              |
+|----------------------------------------------------------------------|-----------------------------------|
 | `const appContext = (parent ? parent.appContext : vnode.appContext)` | **继承逻辑**：有父组件则从父组件继承，否则从 VNode 获取 |
-| `\|\| emptyAppContext` | **兜底保护**：确保始终有 AppContext |
-| `instance.appContext = appContext` | 保存到组件实例上 |
+| `\|\| emptyAppContext`                                               | **兜底保护**：确保始终有 AppContext         |
+| `instance.appContext = appContext`                                   | 保存到组件实例上                          |
 
 **源码位置：** `packages/runtime-core/src/component.ts:createComponentInstance`
 
@@ -193,15 +198,13 @@ export function createComponentInstance(
 
 ### 3.4 AppContext 的使用场景
 
-| 使用场景 | 访问路径 | 说明 |
-|---------|---------|------|
-| 解析全局组件 | `instance.appContext.components[name]` | 查找全局注册的组件 |
-| 解析全局指令 | `instance.appContext.directives[name]` | 查找全局注册的指令 |
-| 依赖注入 | `instance.appContext.provides[key]` | 查找应用级 provide 值 |
-| 全局配置 | `instance.appContext.config` | 访问 errorHandler、warnHandler 等 |
-| 选项缓存 | `instance.appContext.optionsCache` | 缓存规范化后的组件选项 |
-
----
+| 使用场景   | 访问路径                                   | 说明                            |
+|--------|----------------------------------------|-------------------------------|
+| 解析全局组件 | `instance.appContext.components[name]` | 查找全局注册的组件                     |
+| 解析全局指令 | `instance.appContext.directives[name]` | 查找全局注册的指令                     |
+| 依赖注入   | `instance.appContext.provides[key]`    | 查找应用级 provide 值               |
+| 全局配置   | `instance.appContext.config`           | 访问 errorHandler、warnHandler 等 |
+| 选项缓存   | `instance.appContext.optionsCache`     | 缓存规范化后的组件选项                   |
 
 ## 4. 细节补充：边界与性能优化
 
@@ -217,11 +220,11 @@ export interface AppContext {
 }
 ```
 
-| 优势 | 说明 |
-|-----|------|
-| **自动垃圾回收** | 当组件对象被销毁时，缓存自动清理，防止内存泄漏 |
-| **O(1) 查找** | 直接通过组件对象作为 key 查找，无需遍历 |
-| **隔离性** | 不同应用实例的缓存互不干扰 |
+| 优势          | 说明                      |
+|-------------|-------------------------|
+| **自动垃圾回收**  | 当组件对象被销毁时，缓存自动清理，防止内存泄漏 |
+| **O(1) 查找** | 直接通过组件对象作为 key 查找，无需遍历  |
+| **隔离性**     | 不同应用实例的缓存互不干扰           |
 
 ### 4.2 emptyAppContext 兜底
 
@@ -230,6 +233,7 @@ export const emptyAppContext = createAppContext()
 ```
 
 **作用：**
+
 - 防止 `appContext` 为 `null` 导致的运行时错误
 - 为测试环境提供默认上下文
 - 确保组件始终能访问到 `appContext.config` 等属性
@@ -248,6 +252,7 @@ app2.mount('#app2')  // app2 的组件树使用 Button2
 ```
 
 **隔离机制：**
+
 - 每个 app 有独立的 AppContext
 - 根 VNode 关联各自的 AppContext
 - 子组件继承时不会跨应用
@@ -266,6 +271,7 @@ app.get('*', (req, res) => {
 ```
 
 **关键点：**
+
 - 每个请求都有独立的 AppContext，避免状态污染
 - 客户端水合时，会重新创建 AppContext 并关联
 
@@ -276,17 +282,17 @@ const vnode = app._ceVNode || createVNode(rootComponent, rootProps)
 ```
 
 **说明：**
+
 - `app._ceVNode` 用于自定义元素场景
 - 自定义元素可能需要复用同一个 VNode
 - 普通场景下 `_ceVNode` 为 `undefined`，走正常流程
-
----
 
 ## 5. 总结与延伸
 
 ### 一句话总结
 
-**AppContext 通过 `vnode.appContext = context` 关联到根 VNode，然后通过组件实例的父子继承机制传递到整个组件树，实现应用级配置的全局共享。**
+**AppContext 通过 `vnode.appContext = context` 关联到根 VNode，然后通过组件实例的父子继承机制传递到整个组件树，实现应用级配置的全局共享。
+**
 
 ### 核心设计亮点
 
@@ -298,23 +304,28 @@ const vnode = app._ceVNode || createVNode(rootComponent, rootProps)
 ### 面试考点
 
 **Q1: AppContext 是在什么时候创建的？**
+
 - 在 `createApp(rootComponent)` 调用时创建
 - 通过 `createAppContext()` 函数初始化
 
 **Q2: AppContext 如何关联到根组件？**
+
 - 在 `app.mount()` 时，通过 `vnode.appContext = context` 关联到根 VNode
 - 在创建根组件实例时，从 `vnode.appContext` 获取
 
 **Q3: 子组件如何获取 AppContext？**
+
 - 通过 `createComponentInstance` 函数中的继承逻辑
 - 优先从父组件的 `parent.appContext` 获取
 - 如果没有父组件（根组件），则从 `vnode.appContext` 获取
 
 **Q4: 为什么使用 WeakMap 而不是 Map？**
+
 - WeakMap 的 key 是弱引用，当组件对象被销毁时，缓存会自动清理
 - 防止内存泄漏，特别是在长时间运行的应用中
 
 **Q5: 多个 Vue 应用实例如何隔离？**
+
 - 每个应用实例有独立的 AppContext
 - 全局注册的组件、指令、provide 值都存储在各自的 AppContext 中
 - 不同应用的组件树不会共享配置
@@ -328,8 +339,8 @@ const vnode = app._ceVNode || createVNode(rootComponent, rootProps)
 
 ### 关键源码位置
 
-| 文件 | 关键函数/代码 |
-|-----|-------------|
-| `packages/runtime-core/src/apiCreateApp.ts` | `createAppContext()`, `mount()` 方法 |
-| `packages/runtime-core/src/component.ts` | `createComponentInstance()` |
-| `packages/runtime-core/src/apiCreateApp.ts:375` | `vnode.appContext = context` |
+| 文件                                              | 关键函数/代码                            |
+|-------------------------------------------------|------------------------------------|
+| `packages/runtime-core/src/apiCreateApp.ts`     | `createAppContext()`, `mount()` 方法 |
+| `packages/runtime-core/src/component.ts`        | `createComponentInstance()`        |
+| `packages/runtime-core/src/apiCreateApp.ts:375` | `vnode.appContext = context`       |

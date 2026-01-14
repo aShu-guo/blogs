@@ -103,6 +103,7 @@ function generate(ast, options) {
 ### VNode 创建代码生成
 
 **输入 AST**：
+
 ```typescript
 {
   type: NodeTypes.ELEMENT,
@@ -118,11 +119,13 @@ function generate(ast, options) {
 ```
 
 **生成代码**：
+
 ```javascript
 _createVNode('div', { class: 'box', id: 'app' }, 'Hello')
 ```
 
 **完整 VNode 创建签名**：
+
 ```typescript
 _createVNode(
   type,                  // 'div' 或组件名
@@ -139,6 +142,7 @@ _createVNode(
 ### Props 代码生成
 
 **输入 props**：
+
 ```typescript
 [
   { type: NodeTypes.ATTRIBUTE, name: 'class', value: 'box' },
@@ -148,6 +152,7 @@ _createVNode(
 ```
 
 **生成代码**：
+
 ```javascript
 {
   class: 'box',
@@ -159,6 +164,7 @@ _createVNode(
 ### 条件语句代码生成（v-if）
 
 **输入 AST**：
+
 ```typescript
 IfNode {
   branches: [
@@ -170,6 +176,7 @@ IfNode {
 ```
 
 **生成代码**：
+
 ```javascript
 _ctx.show
   ? _createVNode(...)
@@ -181,6 +188,7 @@ _ctx.show
 ### 循环语句代码生成（v-for）
 
 **输入 AST**：
+
 ```typescript
 ForNode {
   source: 'items',
@@ -191,6 +199,7 @@ ForNode {
 ```
 
 **生成代码**：
+
 ```javascript
 _renderList(_ctx.items, (item, index) => {
   return _createVNode(...)
@@ -200,6 +209,7 @@ _renderList(_ctx.items, (item, index) => {
 ### 插值表达式代码生成
 
 **输入 AST**：
+
 ```typescript
 InterpolationNode {
   content: SimpleExpressionNode { content: 'msg' }
@@ -207,6 +217,7 @@ InterpolationNode {
 ```
 
 **生成代码**：
+
 ```javascript
 _toDisplayString(_ctx.msg)
 ```
@@ -282,10 +293,10 @@ const render = (_ctx, _cache, $props, $attrs, $slots, $emit, $options) => {
 1. **导入 helpers**：引入必需的 runtime helpers
 2. **提升静态节点**：`_hoisted_1` 是提升的 props 对象
 3. **生成 render 函数**：
-   - 参数：`_ctx`（组件实例）、`_cache`（缓存）等
-   - 条件判断：`_ctx.show ? ... : ...`
-   - Block 包装：使用 openBlock/createBlock 优化 diff
-   - 子节点：递归生成子 VNode
+    - 参数：`_ctx`（组件实例）、`_cache`（缓存）等
+    - 条件判断：`_ctx.show ? ... : ...`
+    - Block 包装：使用 openBlock/createBlock 优化 diff
+    - 子节点：递归生成子 VNode
 4. **PatchFlags**：标记动态部分（如 `PatchFlags.TEXT` 表示文本动态）
 5. **事件缓存**：使用 `_cache` 缓存事件处理函数
 
@@ -377,6 +388,7 @@ enum PatchFlags {
 ```
 
 **示例**：
+
 ```html
 <div :class="dynamicClass" class="static">
   {{ text }}
@@ -412,13 +424,13 @@ WITH_CTX,                // _withCtx
 
 ## 总结
 
-| 功能 | 说明 | 输出 |
-|------|------|------|
-| **VNode 生成** | 元素转 _createVNode 调用 | JavaScript 字符串 |
-| **Props 生成** | 属性转对象字面量 | `{ class: '...', ... }` |
-| **条件生成** | v-if 转三元表达式 | `condition ? node : fallback` |
-| **循环生成** | v-for 转 _renderList 调用 | `_renderList(array, item => ...)` |
-| **静态提升** | 提升常量到模块级 | `const _hoisted_1 = ...` |
-| **Helper 引入** | 收集并生成导入 | `import { ... } from 'vue'` |
-| **PatchFlags** | 标记动态节点 | `PatchFlags.CLASS \| PatchFlags.TEXT` |
-| **Block 树** | 构建优化 diff 树 | openBlock/createBlock 调用 |
+| 功能             | 说明                     | 输出                                    |
+|----------------|------------------------|---------------------------------------|
+| **VNode 生成**   | 元素转 _createVNode 调用    | JavaScript 字符串                        |
+| **Props 生成**   | 属性转对象字面量               | `{ class: '...', ... }`               |
+| **条件生成**       | v-if 转三元表达式            | `condition ? node : fallback`         |
+| **循环生成**       | v-for 转 _renderList 调用 | `_renderList(array, item => ...)`     |
+| **静态提升**       | 提升常量到模块级               | `const _hoisted_1 = ...`              |
+| **Helper 引入**  | 收集并生成导入                | `import { ... } from 'vue'`           |
+| **PatchFlags** | 标记动态节点                 | `PatchFlags.CLASS \| PatchFlags.TEXT` |
+| **Block 树**    | 构建优化 diff 树            | openBlock/createBlock 调用              |

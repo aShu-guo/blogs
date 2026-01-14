@@ -4,7 +4,8 @@
 
 ### 解决什么问题
 
-在 Vue 3 中，当组件的响应式数据发生变化时，视图需要自动更新。`setupRenderEffect` 就是连接响应式系统和渲染系统的桥梁，它创建了一个"自动监听数据变化并重新渲染"的机制。
+在 Vue 3 中，当组件的响应式数据发生变化时，视图需要自动更新。`setupRenderEffect`
+就是连接响应式系统和渲染系统的桥梁，它创建了一个"自动监听数据变化并重新渲染"的机制。
 
 ### 核心直觉：订阅报纸的故事
 
@@ -16,6 +17,7 @@
 - **你读报纸（componentUpdateFn）**：收到报纸后，你会阅读并了解最新内容
 
 `setupRenderEffect` 就是帮组件"订阅"数据变化的过程：
+
 - 首次订阅时，立即读一次报纸（初始渲染）
 - 之后每当报社有新内容，送报员会在合适的时机送来（异步更新）
 - 你每次读报纸时，报社都会记录你关心哪些版面（依赖收集）
@@ -43,8 +45,6 @@ graph TD
     P --> Q[queueJob 异步调度]
     Q --> C
 ```
-
----
 
 ## 2. 最小实现：手写"低配版"
 
@@ -119,8 +119,6 @@ setupRenderEffect(instance, document.body)
 count.value++ // 触发 scheduler -> queueJob -> 异步执行 update
 ```
 
----
-
 ## 3. 逐行解剖：关键路径分析
 
 ### 3.1 setupRenderEffect 函数签名
@@ -141,12 +139,12 @@ const setupRenderEffect: SetupRenderEffectFn = (
 
 ### 3.2 核心步骤拆解
 
-| 步骤 | 源码片段 | 逻辑拆解 |
-|------|----------|----------|
-| **1. 定义更新函数** | `const componentUpdateFn = () => { ... }` | 包含初始渲染和更新渲染两个分支，是组件渲染的核心逻辑 |
-| **2. 创建响应式副作用** | `new ReactiveEffect(componentUpdateFn, scheduler, scope)` | 将更新函数包装为响应式副作用，使其能够自动追踪依赖 |
-| **3. 绑定 update 方法** | `instance.update = effect.run.bind(effect)` | 将副作用的执行方法暴露为 `instance.update`，供外部调用 |
-| **4. 首次执行** | `effect.run()` | 立即执行一次，触发初始渲染并收集依赖 |
+| 步骤                  | 源码片段                                                      | 逻辑拆解                                 |
+|---------------------|-----------------------------------------------------------|--------------------------------------|
+| **1. 定义更新函数**       | `const componentUpdateFn = () => { ... }`                 | 包含初始渲染和更新渲染两个分支，是组件渲染的核心逻辑           |
+| **2. 创建响应式副作用**     | `new ReactiveEffect(componentUpdateFn, scheduler, scope)` | 将更新函数包装为响应式副作用，使其能够自动追踪依赖            |
+| **3. 绑定 update 方法** | `instance.update = effect.run.bind(effect)`               | 将副作用的执行方法暴露为 `instance.update`，供外部调用 |
+| **4. 首次执行**         | `effect.run()`                                            | 立即执行一次，触发初始渲染并收集依赖                   |
 
 ### 3.3 componentUpdateFn：初始渲染分支
 
@@ -246,14 +244,14 @@ graph LR
 
 **关键点解析**：
 
-| 源码片段 | 设计意图 |
-|----------|----------|
-| `toggleRecurse(instance, false/true)` | 防止在生命周期钩子中触发的更新导致无限递归 |
-| `renderComponentRoot(instance)` | 执行组件的 render 函数，访问响应式数据时会触发 track 进行依赖收集 |
-| `patch(null, subTree, ...)` | 首次渲染传入 `null` 作为旧节点，表示全新创建 DOM |
-| `queuePostRenderEffect(m, ...)` | mounted 钩子异步执行，确保 DOM 已完全渲染 |
-| `instance.isMounted = true` | 标记已挂载，后续更新会走 else 分支 |
-| `initialVNode = ... = null` | 释放不再需要的引用，避免内存泄漏 |
+| 源码片段                                  | 设计意图                                     |
+|---------------------------------------|------------------------------------------|
+| `toggleRecurse(instance, false/true)` | 防止在生命周期钩子中触发的更新导致无限递归                    |
+| `renderComponentRoot(instance)`       | 执行组件的 render 函数，访问响应式数据时会触发 track 进行依赖收集 |
+| `patch(null, subTree, ...)`           | 首次渲染传入 `null` 作为旧节点，表示全新创建 DOM           |
+| `queuePostRenderEffect(m, ...)`       | mounted 钩子异步执行，确保 DOM 已完全渲染              |
+| `instance.isMounted = true`           | 标记已挂载，后续更新会走 else 分支                     |
+| `initialVNode = ... = null`           | 释放不再需要的引用，避免内存泄漏                         |
 
 ### 3.4 componentUpdateFn：更新渲染分支
 
@@ -345,12 +343,12 @@ graph LR
 
 **关键点解析**：
 
-| 源码片段 | 设计意图 |
-|----------|----------|
-| `next` 的判断 | `next` 存在表示父组件触发的更新（props 变化），需要调用 `updateComponentPreRender` 更新 props/slots |
-| `renderComponentRoot(instance)` | 再次执行 render 函数，生成新的 vnode 树，同时重新收集依赖 |
-| `patch(prevTree, nextTree, ...)` | 传入新旧两棵树，进行 diff 算法对比，最小化 DOM 操作 |
-| `queuePostRenderEffect(u, ...)` | updated 钩子异步执行，确保 DOM 已更新完成 |
+| 源码片段                             | 设计意图                                                                         |
+|----------------------------------|------------------------------------------------------------------------------|
+| `next` 的判断                       | `next` 存在表示父组件触发的更新（props 变化），需要调用 `updateComponentPreRender` 更新 props/slots |
+| `renderComponentRoot(instance)`  | 再次执行 render 函数，生成新的 vnode 树，同时重新收集依赖                                         |
+| `patch(prevTree, nextTree, ...)` | 传入新旧两棵树，进行 diff 算法对比，最小化 DOM 操作                                              |
+| `queuePostRenderEffect(u, ...)`  | updated 钩子异步执行，确保 DOM 已更新完成                                                  |
 
 ### 3.5 ReactiveEffect：响应式副作用
 
@@ -364,11 +362,11 @@ const effect = (instance.effect = new ReactiveEffect(
 
 **ReactiveEffect 的作用**：
 
-| 参数 | 作用 |
-|------|------|
-| `componentUpdateFn` | 副作用函数，会在首次执行和依赖变化时被调用 |
-| `scheduler` | 调度器函数，当依赖变化时不会立即执行副作用，而是调用 scheduler |
-| `instance.scope` | EffectScope 实例，用于管理副作用的生命周期 |
+| 参数                  | 作用                                   |
+|---------------------|--------------------------------------|
+| `componentUpdateFn` | 副作用函数，会在首次执行和依赖变化时被调用                |
+| `scheduler`         | 调度器函数，当依赖变化时不会立即执行副作用，而是调用 scheduler |
+| `instance.scope`    | EffectScope 实例，用于管理副作用的生命周期          |
 
 **依赖收集流程**：
 
@@ -482,8 +480,6 @@ instance.scope.stop()
 // 4. 释放内存引用
 ```
 
----
-
 ## 4. 细节补充：边界与性能优化
 
 ### 4.1 为什么 mounted/updated 要异步执行？
@@ -535,10 +531,10 @@ initialVNode = container = anchor = null as any
 
 ### 4.4 next 的两种情况
 
-| 情况 | next 的值 | 触发原因 | 处理方式 |
-|------|-----------|----------|----------|
-| **自身数据变化** | `undefined` | 组件内部响应式数据修改 | `next = vnode`，直接使用当前 vnode |
-| **父组件触发更新** | 新的 vnode | 父组件传递的 props 变化 | 调用 `updateComponentPreRender` 更新 props/slots |
+| 情况          | next 的值     | 触发原因            | 处理方式                                         |
+|-------------|-------------|-----------------|----------------------------------------------|
+| **自身数据变化**  | `undefined` | 组件内部响应式数据修改     | `next = vnode`，直接使用当前 vnode                  |
+| **父组件触发更新** | 新的 vnode    | 父组件传递的 props 变化 | 调用 `updateComponentPreRender` 更新 props/slots |
 
 ### 4.5 性能优化：批量更新的威力
 
@@ -590,13 +586,12 @@ if (el && hydrateNode) {
 - 客户端不需要重新创建 DOM，只需要"激活"现有 DOM
 - `hydrateNode` 会将 vnode 和现有 DOM 关联起来，并绑定事件监听器
 
----
-
 ## 5. 总结与延伸
 
 ### 一句话总结
 
-`setupRenderEffect` 通过创建 ReactiveEffect 将组件的渲染函数包装为响应式副作用，实现了"数据变化 → 自动重新渲染"的核心机制，并通过 scheduler 实现了异步批量更新优化。
+`setupRenderEffect` 通过创建 ReactiveEffect 将组件的渲染函数包装为响应式副作用，实现了"数据变化 → 自动重新渲染"的核心机制，并通过
+scheduler 实现了异步批量更新优化。
 
 ### 完整流程回顾
 
@@ -627,6 +622,7 @@ graph TD
 **Q1：Vue 3 的组件更新是同步还是异步的？为什么？**
 
 异步的。通过 scheduler 将更新任务放入队列，在下一个微任务中批量执行。这样可以：
+
 1. 合并多次数据修改，只触发一次渲染
 2. 避免阻塞当前执行栈
 3. 提升性能
@@ -642,6 +638,7 @@ graph TD
 **Q4：Vue 3 如何实现批量更新？**
 
 通过 `queueJob` 函数：
+
 1. 将 update 任务添加到队列
 2. 使用 `Promise.resolve().then()` 在微任务中执行
 3. 队列中的重复任务会被去重

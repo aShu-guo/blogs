@@ -215,8 +215,6 @@ graph LR
 - **Trigger（依赖通知）**: 数据变化时，通知所有依赖该数据的副作用
 - **Scheduler（调度）**: 批量收集多个更新，合并成一次 render
 
----
-
 ## 启动流程时序图
 
 ```mermaid
@@ -255,8 +253,6 @@ sequenceDiagram
     Renderer ->> Renderer: patch(oldVNode, newVNode)
     deactivate Reactivity
 ```
-
----
 
 ## 关键执行流程
 
@@ -351,8 +347,6 @@ renderComponentRoot()
   ↓
 返回 VNode
 ```
-
----
 
 ## 核心优化机制
 
@@ -455,8 +449,6 @@ _createVNode(
 );
 ```
 
----
-
 ## 文档导航结构
 
 ```
@@ -475,21 +467,17 @@ _createVNode(
 1-6-architecture.md      ← 架构优化：缓存、标志、编译器优化
 ```
 
----
-
 ## 核心概念速查
 
-| 概念                          | 作用             | 关键特性                               |
-| ----------------------------- | ---------------- | -------------------------------------- |
-| **AppContext**                | 应用全局上下文   | WeakMap 缓存、provide/inject、全局配置 |
-| **VNode**                     | 虚拟 DOM 节点    | shapeFlag、patchFlag、与 DOM 映射      |
-| **ComponentInternalInstance** | 组件运行时实例   | 120+ 属性、EffectScope、生命周期管理   |
-| **ReactiveEffect**            | 响应式副作用     | 依赖追踪、调度器、自动更新             |
-| **SetupContext**              | setup 执行上下文 | attrs、slots、emit、expose             |
-| **Render Proxy**              | 渲染代理         | 属性访问优化、accessCache、统一访问    |
-| **EffectScope**               | 效果作用域       | 隔离响应式、批量停止、防止泄漏         |
-
----
+| 概念                            | 作用          | 关键特性                           |
+|-------------------------------|-------------|--------------------------------|
+| **AppContext**                | 应用全局上下文     | WeakMap 缓存、provide/inject、全局配置 |
+| **VNode**                     | 虚拟 DOM 节点   | shapeFlag、patchFlag、与 DOM 映射   |
+| **ComponentInternalInstance** | 组件运行时实例     | 120+ 属性、EffectScope、生命周期管理     |
+| **ReactiveEffect**            | 响应式副作用      | 依赖追踪、调度器、自动更新                  |
+| **SetupContext**              | setup 执行上下文 | attrs、slots、emit、expose        |
+| **Render Proxy**              | 渲染代理        | 属性访问优化、accessCache、统一访问        |
+| **EffectScope**               | 效果作用域       | 隔离响应式、批量停止、防止泄漏                |
 
 ## 学习路径建议
 
@@ -510,8 +498,6 @@ _createVNode(
 1. 阅读 [1-4-setup.md](./1-4-setup.md) 了解 setup 函数细节
 2. 阅读 [1-5-render-effect.md](./1-5-render-effect.md) 了解响应式系统
 3. 阅读 [1-6-architecture.md](./1-6-architecture.md) 了解优化机制
-
----
 
 ## 常见问题
 

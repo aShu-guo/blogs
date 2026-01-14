@@ -264,7 +264,8 @@ if (xiaoming & languageFlag.C) {
 
 那么只需要通过xiaoming记录的信息，我们便可以轻松的知道他可以熟练使用哪些编程语言。
 
-回到`patchFlag`上，通过patchFlag上记录了动态props和子节点的信息，我们就可以轻而易举的知道在diff时，**哪些VNode需要diff**、**需要diff哪些props**。
+回到`patchFlag`上，通过patchFlag上记录了动态props和子节点的信息，我们就可以轻而易举的知道在diff时，**哪些VNode需要diff**、*
+*需要diff哪些props**。
 
 ## 举个🌰
 

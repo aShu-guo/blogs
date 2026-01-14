@@ -7,6 +7,7 @@
 想象你是一家连锁企业的管理者：
 
 **Vue 2 的问题（总部统一管理）**：
+
 ```
 总部制定规则 → 所有分店必须遵守
 - 总部说用红色 Logo → 所有分店都用红色
@@ -15,6 +16,7 @@
 ```
 
 **Vue 3 的解决方案（分店独立管理）**：
+
 ```
 每个分店有自己的管理系统：
 - 北京分店：红色 Logo + 本地会员系统
@@ -27,7 +29,11 @@
 ```typescript
 // Vue 2 的问题：全局污染
 Vue.component('Button', ButtonV1);  // 所有应用都被影响
-Vue.mixin({ created() { console.log('Global') } });  // 所有组件都执行
+Vue.mixin({
+  created() {
+    console.log('Global')
+  }
+});  // 所有组件都执行
 
 // Vue 3 的解决：应用隔离
 const app1 = createApp(App1);
@@ -141,17 +147,17 @@ app.mount('#app');
 
 ### 3.1 createAppContext - 创建应用上下文
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `app: null as any` | **延迟设置**：app 对象稍后才创建，先占位 |
-| `config: { ... }` | **应用配置**：存储全局配置，如 errorHandler、globalProperties |
-| `mixins: []` | **全局混入**：存储通过 app.mixin() 注册的混入 |
-| `components: {}` | **全局组件**：存储通过 app.component() 注册的组件 |
-| `directives: {}` | **全局指令**：存储通过 app.directive() 注册的指令 |
-| `provides: Object.create(null)` | **依赖注入**：存储通过 app.provide() 提供的值 |
-| `optionsCache: new WeakMap()` | **选项缓存**：缓存组件选项，WeakMap 自动 GC |
-| `propsCache: new WeakMap()` | **Props 缓存**：缓存 props 定义，避免重复解析 |
-| `emitsCache: new WeakMap()` | **Emits 缓存**：缓存 emits 定义，避免重复解析 |
+| 源码片段                            | 逻辑拆解                                            |
+|---------------------------------|-------------------------------------------------|
+| `app: null as any`              | **延迟设置**：app 对象稍后才创建，先占位                        |
+| `config: { ... }`               | **应用配置**：存储全局配置，如 errorHandler、globalProperties |
+| `mixins: []`                    | **全局混入**：存储通过 app.mixin() 注册的混入                 |
+| `components: {}`                | **全局组件**：存储通过 app.component() 注册的组件             |
+| `directives: {}`                | **全局指令**：存储通过 app.directive() 注册的指令             |
+| `provides: Object.create(null)` | **依赖注入**：存储通过 app.provide() 提供的值                |
+| `optionsCache: new WeakMap()`   | **选项缓存**：缓存组件选项，WeakMap 自动 GC                   |
+| `propsCache: new WeakMap()`     | **Props 缓存**：缓存 props 定义，避免重复解析                 |
+| `emitsCache: new WeakMap()`     | **Emits 缓存**：缓存 emits 定义，避免重复解析                 |
 
 ```typescript
 export function createAppContext(): AppContext {
@@ -179,13 +185,13 @@ export function createAppContext(): AppContext {
 
 ### 3.2 createApp - 创建应用实例
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `const context = createAppContext()` | **创建上下文**：每个应用有独立的上下文 |
-| `const installedPlugins = new WeakSet()` | **插件去重**：使用 WeakSet 防止重复安装 |
-| `let isMounted = false` | **挂载标志**：防止重复挂载 |
-| `const app: App = { ... }` | **创建 app 对象**：包含所有 API 方法 |
-| `context.app = app` | **双向引用**：context 和 app 互相引用 |
+| 源码片段                                     | 逻辑拆解                        |
+|------------------------------------------|-----------------------------|
+| `const context = createAppContext()`     | **创建上下文**：每个应用有独立的上下文       |
+| `const installedPlugins = new WeakSet()` | **插件去重**：使用 WeakSet 防止重复安装  |
+| `let isMounted = false`                  | **挂载标志**：防止重复挂载             |
+| `const app: App = { ... }`               | **创建 app 对象**：包含所有 API 方法   |
+| `context.app = app`                      | **双向引用**：context 和 app 互相引用 |
 
 ```typescript
 export function createApp(
@@ -257,16 +263,22 @@ export function createApp(
 
 ### 3.3 use - 安装插件
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `if (installedPlugins.has(plugin))` | **去重检查**：防止重复安装同一个插件 |
-| `installedPlugins.add(plugin)` | **标记已安装**：使用 WeakSet 存储 |
+| 源码片段                                        | 逻辑拆解                                        |
+|---------------------------------------------|---------------------------------------------|
+| `if (installedPlugins.has(plugin))`         | **去重检查**：防止重复安装同一个插件                        |
+| `installedPlugins.add(plugin)`              | **标记已安装**：使用 WeakSet 存储                     |
 | `if (plugin && isFunction(plugin.install))` | **对象插件**：调用 plugin.install(app, ...options) |
-| `else if (isFunction(plugin))` | **函数插件**：直接调用 plugin(app, ...options) |
-| `return this` | **链式调用**：支持 app.use().use() |
+| `else if (isFunction(plugin))`              | **函数插件**：直接调用 plugin(app, ...options)       |
+| `return this`                               | **链式调用**：支持 app.use().use()                 |
 
 ```typescript
-use(plugin: Plugin, ...options: any[]) {
+use(plugin
+:
+Plugin,
+...
+options: any[]
+)
+{
   if (installedPlugins.has(plugin)) {
     __DEV__ && warn(`Plugin has already been applied.`);
     return this;
@@ -286,15 +298,20 @@ use(plugin: Plugin, ...options: any[]) {
 
 ### 3.4 component - 注册全局组件
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `validateComponentName(name, context.config)` | **名称验证**：检查组件名是否合法（仅开发环境） |
-| `if (!component)` | **获取模式**：没有第二个参数时，返回已注册的组件 |
-| `context.components[name] = component` | **注册组件**：存储到 context.components |
-| `return this` | **链式调用**：支持连续注册 |
+| 源码片段                                          | 逻辑拆解                            |
+|-----------------------------------------------|---------------------------------|
+| `validateComponentName(name, context.config)` | **名称验证**：检查组件名是否合法（仅开发环境）       |
+| `if (!component)`                             | **获取模式**：没有第二个参数时，返回已注册的组件      |
+| `context.components[name] = component`        | **注册组件**：存储到 context.components |
+| `return this`                                 | **链式调用**：支持连续注册                 |
 
 ```typescript
-component(name: string, component?: Component): any {
+component(name
+:
+string, component ? : Component
+):
+any
+{
   if (__DEV__) {
     validateComponentName(name, context.config);
   }
@@ -314,23 +331,27 @@ component(name: string, component?: Component): any {
 
 ### 3.5 mount - 挂载应用
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `if (!isMounted)` | **挂载检查**：防止重复挂载 |
-| `const vnode = createVNode(rootComponent, rootProps)` | **创建根 VNode**：将组件转换为 VNode |
-| `vnode.appContext = context` | **关联上下文**：将 AppContext 传递给 VNode |
-| `if (isHydrate && hydrate)` | **SSR 激活**：服务端渲染时使用 hydrate |
-| `else render(vnode, rootContainer)` | **客户端渲染**：从零创建 DOM |
-| `isMounted = true` | **标记已挂载**：防止重复挂载 |
-| `app._container = rootContainer` | **保存容器**：用于 unmount |
-| `return getComponentPublicInstance(vnode.component!)` | **返回实例**：返回组件的公共实例 |
+| 源码片段                                                  | 逻辑拆解                             |
+|-------------------------------------------------------|----------------------------------|
+| `if (!isMounted)`                                     | **挂载检查**：防止重复挂载                  |
+| `const vnode = createVNode(rootComponent, rootProps)` | **创建根 VNode**：将组件转换为 VNode       |
+| `vnode.appContext = context`                          | **关联上下文**：将 AppContext 传递给 VNode |
+| `if (isHydrate && hydrate)`                           | **SSR 激活**：服务端渲染时使用 hydrate      |
+| `else render(vnode, rootContainer)`                   | **客户端渲染**：从零创建 DOM               |
+| `isMounted = true`                                    | **标记已挂载**：防止重复挂载                 |
+| `app._container = rootContainer`                      | **保存容器**：用于 unmount              |
+| `return getComponentPublicInstance(vnode.component!)` | **返回实例**：返回组件的公共实例               |
 
 ```typescript
 mount(
-  rootContainer: HostElement | string,
-  isHydrate?: boolean,
-  namespace?: ElementNamespace | boolean
-): ComponentPublicInstance {
+  rootContainer
+:
+HostElement | string,
+  isHydrate ? : boolean,
+  namespace ? : ElementNamespace | boolean
+):
+ComponentPublicInstance
+{
   if (!isMounted) {
     const vnode = createVNode(rootComponent, rootProps);
     vnode.appContext = context;
@@ -365,16 +386,17 @@ mount(
 
 ### 3.6 unmount - 卸载应用
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `if (isMounted)` | **挂载检查**：只有已挂载的应用才能卸载 |
-| `callWithAsyncErrorHandling(pluginCleanupFns, ...)` | **插件清理**：执行所有插件的清理函数 |
-| `render(null, app._container)` | **清除 DOM**：渲染 null 会删除所有 DOM |
-| `app._instance = null` | **清理引用**：释放组件实例引用 |
-| `delete (app._container as any).__vue_app__` | **移除标记**：删除容器上的应用引用 |
+| 源码片段                                                | 逻辑拆解                         |
+|-----------------------------------------------------|------------------------------|
+| `if (isMounted)`                                    | **挂载检查**：只有已挂载的应用才能卸载        |
+| `callWithAsyncErrorHandling(pluginCleanupFns, ...)` | **插件清理**：执行所有插件的清理函数         |
+| `render(null, app._container)`                      | **清除 DOM**：渲染 null 会删除所有 DOM |
+| `app._instance = null`                              | **清理引用**：释放组件实例引用            |
+| `delete (app._container as any).__vue_app__`        | **移除标记**：删除容器上的应用引用          |
 
 ```typescript
-unmount() {
+unmount()
+{
   if (isMounted) {
     callWithAsyncErrorHandling(
       pluginCleanupFns,
@@ -428,7 +450,10 @@ app.component('ButtonV2', ButtonV2);
 ### 4.3 边界情况 3：插件重复安装
 
 ```typescript
-const myPlugin = { install(app) { ... } };
+const myPlugin = {
+  install(app) { ...
+  }
+};
 
 app.use(myPlugin);
 app.use(myPlugin);  // 警告：Plugin has already been applied
@@ -451,6 +476,7 @@ emitsCache: new WeakMap();
 ```
 
 **对比 Map**：
+
 ```typescript
 // 使用 Map（错误）
 const cache = new Map();
@@ -492,7 +518,8 @@ app
   .mount('#app');
 
 // 实现方式：所有方法都返回 this
-component(name, component) {
+component(name, component)
+{
   // ...
   return this;  // ← 关键
 }
@@ -507,7 +534,8 @@ const app = createApp(App);
 app.config = { ... };  // 警告：app.config cannot be replaced
 
 // 正确：修改 config 的属性
-app.config.errorHandler = (err) => { ... };
+app.config.errorHandler = (err) => { ...
+};
 app.config.globalProperties.$api = axios;
 ```
 
@@ -544,6 +572,7 @@ console.log(app._instance);  // ComponentInternalInstance
 **Q1：Vue 3 的 createApp 相比 Vue 2 有什么优势？**
 
 A：主要优势：
+
 1. **应用隔离**：每个应用有独立的全局配置，不会互相污染
 2. **多应用共存**：可以在同一页面创建多个独立的 Vue 应用
 3. **Tree-shaking 友好**：全局 API 变成实例方法，未使用的功能可以被移除
@@ -552,6 +581,7 @@ A：主要优势：
 **Q2：为什么 AppContext 使用 WeakMap 而不是 Map？**
 
 A：原因：
+
 1. **自动 GC**：组件对象不再使用时，WeakMap 中的条目会自动清除
 2. **防止内存泄漏**：Map 会持有强引用，阻止组件被垃圾回收
 3. **性能**：WeakMap 的查询是 O(1)，与 Map 相同
@@ -560,6 +590,7 @@ A：原因：
 **Q3：createApp 的 mount 方法做了什么？**
 
 A：主要步骤：
+
 1. **创建根 VNode**：调用 createVNode(rootComponent, rootProps)
 2. **关联上下文**：vnode.appContext = context
 3. **渲染**：调用 render(vnode, container) 或 hydrate(vnode, container)
@@ -569,6 +600,7 @@ A：主要步骤：
 **Q4：如何在同一页面创建多个 Vue 应用？**
 
 A：使用工厂函数：
+
 ```typescript
 function createMyApp(config) {
   const app = createApp(App, config);

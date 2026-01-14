@@ -233,6 +233,31 @@ export default {
       ],
     },
     {
+      text: '优化',
+      items: [
+        {
+          text: '编译时优化',
+          link: '/ecology/vue/3.x/others/compile-optimize',
+        },
+        {
+          text: '运行时优化',
+          link: '/ecology/vue/3.x/others/runtime-optimize',
+        },
+        {
+          text: 'Vite构建性能优化实践',
+          link: '/ecology/vue/3.x/others/biz-vite-optimize',
+        },
+        {
+          text: '与Vite协同',
+          link: '/ecology/vue/3.x/others/vite-collaboration',
+        },
+        {
+          text: 'weak-map',
+          link: '/ecology/vue/3.x/others/weak-map',
+        },
+      ],
+    },
+    {
       text: '拓展',
       items: [
         { text: 'WeekMap', link: '/ecology/vue/3.x/others/weak-map' },

@@ -11,6 +11,7 @@ Vue 3 在源码级别分为 **3 个核心模块**：
 **职责**：为数据添加响应式能力，跟踪数据变化
 
 **核心能力**：
+
 - `reactive()` / `ref()` - 创建响应式对象
 - `computed()` - 计算属性
 - `watch()` / `watchEffect()` - 侦听数据变化
@@ -22,18 +23,20 @@ Vue 3 在源码级别分为 **3 个核心模块**：
 
 编译器分为多个包，各有侧重：
 
-| 包名 | 用途 | 说明 |
-|------|------|------|
-| **compiler-core** | 核心编译逻辑 | 与框架无关的通用编译逻辑，包括 AST 解析、transform、codegen |
-| **compiler-dom** | DOM 相关编译 | 基于 compiler-core，处理 HTML 特定语法（v-show、v-html 等） |
-| **compiler-sfc** | SFC 编译 | 处理 .vue 单文件组件的解析和编译 |
-| **compiler-ssr** | SSR 编译 | 为服务端渲染生成优化代码 |
+| 包名                | 用途       | 说明                                             |
+|-------------------|----------|------------------------------------------------|
+| **compiler-core** | 核心编译逻辑   | 与框架无关的通用编译逻辑，包括 AST 解析、transform、codegen       |
+| **compiler-dom**  | DOM 相关编译 | 基于 compiler-core，处理 HTML 特定语法（v-show、v-html 等） |
+| **compiler-sfc**  | SFC 编译   | 处理 .vue 单文件组件的解析和编译                            |
+| **compiler-ssr**  | SSR 编译   | 为服务端渲染生成优化代码                                   |
 
 **职责**：将模板编译为 render 函数
+
 - 可以在构建时编译（推荐，性能最优）
 - 也可以在浏览器运行时编译（需要完整版 Vue）
 
 **编译阶段**：
+
 1. **解析**: 模板字符串 → AST（抽象语法树）
 2. **转换**: AST → 优化后的 AST（添加 PatchFlags、动态追踪等）
 3. **生成**: AST → JavaScript 代码（render 函数）
@@ -42,30 +45,32 @@ Vue 3 在源码级别分为 **3 个核心模块**：
 
 渲染器分为不同的平台实现：
 
-| 包名 | 用途 | 说明 |
-|------|------|------|
-| **runtime-core** | 核心渲染逻辑 | 与平台无关的通用渲染逻辑（VNode、patch、生命周期等） |
-| **runtime-dom** | DOM 渲染 | 基于 runtime-core，针对浏览器 DOM 的具体实现 |
-| **runtime-test** | 测试渲染 | 用于单元测试的模拟渲染器 |
-| **server-renderer** | SSR 渲染 | 服务端渲染的实现 |
+| 包名                  | 用途     | 说明                              |
+|---------------------|--------|---------------------------------|
+| **runtime-core**    | 核心渲染逻辑 | 与平台无关的通用渲染逻辑（VNode、patch、生命周期等） |
+| **runtime-dom**     | DOM 渲染 | 基于 runtime-core，针对浏览器 DOM 的具体实现 |
+| **runtime-test**    | 测试渲染   | 用于单元测试的模拟渲染器                    |
+| **server-renderer** | SSR 渲染 | 服务端渲染的实现                        |
 
 **职责**：
+
 - 将虚拟 DOM（VNode）转换为真实 DOM
 - 数据更新时进行高效的局部更新（patch）
 - 管理组件生命周期
 
 **三个阶段**：
+
 1. **渲染阶段**: render 函数 → VNode 树
 2. **挂载阶段**: VNode 树 → 真实 DOM（mount）
 3. **更新阶段**: 新旧 VNode diff → 局部更新（patch）
 
 ### 4. 辅助模块（Supporting Modules）
 
-| 包名 | 用途 |
-|------|------|
-| **shared** | 内部工具函数，供其他包使用 |
-| **vue** | 官方 Vue 包，整合所有模块 |
-| **vue-compat** | Vue 2 兼容性构建 |
+| 包名             | 用途              |
+|----------------|-----------------|
+| **shared**     | 内部工具函数，供其他包使用   |
+| **vue**        | 官方 Vue 包，整合所有模块 |
+| **vue-compat** | Vue 2 兼容性构建     |
 
 ## 完整执行流程
 
@@ -172,20 +177,20 @@ Vue 3 在源码级别分为 **3 个核心模块**：
 ## 学习路径建议
 
 1. **理解基础**：先学习响应式系统（reactivity）
-   - 理解 Proxy、Reflect、effect 系统
-   - 掌握 ref、reactive、computed、watch 的实现
+    - 理解 Proxy、Reflect、effect 系统
+    - 掌握 ref、reactive、computed、watch 的实现
 
 2. **编译原理**：学习编译器的工作流程
-   - 模板解析（Parse）
-   - AST 转换（Transform）
-   - 代码生成（Codegen）
+    - 模板解析（Parse）
+    - AST 转换（Transform）
+    - 代码生成（Codegen）
 
 3. **渲染器**：理解虚拟 DOM 和 patch 算法
-   - VNode 结构
-   - diff 算法
-   - 生命周期
+    - VNode 结构
+    - diff 算法
+    - 生命周期
 
 4. **进阶**：深入理解性能优化
-   - Block 机制
-   - PatchFlags
-   - 静态提升（Static Hoisting）
+    - Block 机制
+    - PatchFlags
+    - 静态提升（Static Hoisting）

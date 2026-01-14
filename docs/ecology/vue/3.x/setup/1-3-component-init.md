@@ -7,6 +7,7 @@
 想象你是一家公司的 HR，负责新员工入职：
 
 **没有初始化流程（直接上岗）**：
+
 ```
 新员工到岗 → 直接开始工作
 问题：
@@ -18,6 +19,7 @@
 ```
 
 **有初始化流程（完整入职）**：
+
 ```
 1. 创建档案 → createComponentInstance（建立员工档案）
 2. 分配资源 → setupComponent（分配工位、工具、团队）
@@ -217,18 +219,18 @@ console.log('Render:', instance.render); // function
 
 ### 3.1 createComponentInstance - 创建组件实例
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `const type = vnode.type as ConcreteComponent` | **提取组件定义**：从 VNode 获取组件对象 |
-| `const appContext = (parent ? parent.appContext : vnode.appContext) \|\| emptyAppContext` | **AppContext 继承**：子组件从父组件继承，根组件从 VNode 获取 |
-| `const instance: ComponentInternalInstance = { uid: uid++, ... }` | **创建实例对象**：初始化 120+ 个属性 |
-| `scope: new EffectScope(true)` | **隔离作用域**：detached=true 表示独立的响应式作用域，组件卸载时批量清理 |
-| `props: EMPTY_OBJ` | **延迟初始化**：使用共享的空对象，减少内存分配 |
-| `accessCache: null!` | **属性访问缓存**：首次访问后缓存查找路径，后续访问 10+ 倍快 |
-| `propsOptions: normalizePropsOptions(type, appContext)` | **Props 定义缓存**：使用 WeakMap 缓存，避免重复规范化 |
-| `provides: parent ? parent.provides : Object.create(appContext.provides)` | **Provides 链式继承**：子组件继承父组件，根组件继承 appContext |
-| `instance.root = parent ? parent.root : instance` | **Root 指针**：所有组件都指向根组件实例 |
-| `instance.emit = emit.bind(null, instance)` | **绑定 emit**：预绑定 instance，调用时自动传递 |
+| 源码片段                                                                                      | 逻辑拆解                                          |
+|-------------------------------------------------------------------------------------------|-----------------------------------------------|
+| `const type = vnode.type as ConcreteComponent`                                            | **提取组件定义**：从 VNode 获取组件对象                     |
+| `const appContext = (parent ? parent.appContext : vnode.appContext) \|\| emptyAppContext` | **AppContext 继承**：子组件从父组件继承，根组件从 VNode 获取     |
+| `const instance: ComponentInternalInstance = { uid: uid++, ... }`                         | **创建实例对象**：初始化 120+ 个属性                       |
+| `scope: new EffectScope(true)`                                                            | **隔离作用域**：detached=true 表示独立的响应式作用域，组件卸载时批量清理 |
+| `props: EMPTY_OBJ`                                                                        | **延迟初始化**：使用共享的空对象，减少内存分配                     |
+| `accessCache: null!`                                                                      | **属性访问缓存**：首次访问后缓存查找路径，后续访问 10+ 倍快            |
+| `propsOptions: normalizePropsOptions(type, appContext)`                                   | **Props 定义缓存**：使用 WeakMap 缓存，避免重复规范化          |
+| `provides: parent ? parent.provides : Object.create(appContext.provides)`                 | **Provides 链式继承**：子组件继承父组件，根组件继承 appContext   |
+| `instance.root = parent ? parent.root : instance`                                         | **Root 指针**：所有组件都指向根组件实例                      |
+| `instance.emit = emit.bind(null, instance)`                                               | **绑定 emit**：预绑定 instance，调用时自动传递              |
 
 ```typescript
 export function createComponentInstance(
@@ -286,13 +288,13 @@ export function createComponentInstance(
 
 ### 3.2 setupComponent - Props 和 Slots 初始化
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `const { props, children } = instance.vnode` | **提取 VNode 数据**：获取父组件传入的 props 和 children |
-| `const isStateful = isStatefulComponent(instance)` | **判断组件类型**：有状态组件（有 setup/data）vs 函数式组件 |
-| `initProps(instance, props, isStateful, isSSR)` | **初始化 Props**：分离 props 和 attrs，应用默认值，响应式化 |
-| `initSlots(instance, children, optimized \|\| isSSR)` | **初始化 Slots**：规范化插槽为函数形式 |
-| `setupStatefulComponent(instance, isSSR)` | **执行 setup**：仅针对有状态组件，函数式组件跳过 |
+| 源码片段                                                  | 逻辑拆解                                      |
+|-------------------------------------------------------|-------------------------------------------|
+| `const { props, children } = instance.vnode`          | **提取 VNode 数据**：获取父组件传入的 props 和 children |
+| `const isStateful = isStatefulComponent(instance)`    | **判断组件类型**：有状态组件（有 setup/data）vs 函数式组件    |
+| `initProps(instance, props, isStateful, isSSR)`       | **初始化 Props**：分离 props 和 attrs，应用默认值，响应式化 |
+| `initSlots(instance, children, optimized \|\| isSSR)` | **初始化 Slots**：规范化插槽为函数形式                  |
+| `setupStatefulComponent(instance, isSSR)`             | **执行 setup**：仅针对有状态组件，函数式组件跳过             |
 
 ```typescript
 export function setupComponent(
@@ -320,38 +322,38 @@ export function setupComponent(
 
 ### 3.3 initProps - Props 初始化
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `const props: Data = {}; const attrs: Data = {}` | **创建容器**：分别存储 props 和 attrs |
-| `for (const key in rawProps)` | **遍历原始 props**：处理父组件传入的所有属性 |
-| `if (isInPropsOptions(key, propsOptions))` | **判断是否声明**：检查属性是否在组件 props 选项中声明 |
-| `props[key] = value` | **分配到 props**：声明的属性放入 props |
-| `attrs[key] = value` | **分配到 attrs**：未声明的属性放入 attrs（$attrs） |
-| `setFullProps(instance, props, rawProps, attrs)` | **应用默认值**：为缺失的 props 应用默认值 |
-| `instance.props = reactive(props)` | **响应式化 props**：包装为响应式对象 |
-| `instance.attrs = reactive(attrs)` | **响应式化 attrs**：包装为响应式对象 |
+| 源码片段                                             | 逻辑拆解                                 |
+|--------------------------------------------------|--------------------------------------|
+| `const props: Data = {}; const attrs: Data = {}` | **创建容器**：分别存储 props 和 attrs          |
+| `for (const key in rawProps)`                    | **遍历原始 props**：处理父组件传入的所有属性          |
+| `if (isInPropsOptions(key, propsOptions))`       | **判断是否声明**：检查属性是否在组件 props 选项中声明     |
+| `props[key] = value`                             | **分配到 props**：声明的属性放入 props          |
+| `attrs[key] = value`                             | **分配到 attrs**：未声明的属性放入 attrs（$attrs） |
+| `setFullProps(instance, props, rawProps, attrs)` | **应用默认值**：为缺失的 props 应用默认值           |
+| `instance.props = reactive(props)`               | **响应式化 props**：包装为响应式对象              |
+| `instance.attrs = reactive(attrs)`               | **响应式化 attrs**：包装为响应式对象              |
 
 ### 3.4 initSlots - Slots 初始化
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `if (instance.vnode.shapeFlag & ShapeFlags.SLOTS_CHILDREN)` | **快速判断**：使用位运算检查是否有插槽 |
-| `const slots: Record<string, Slot> = Object.create(null)` | **创建无原型对象**：避免原型链污染 |
-| `for (const key in children)` | **遍历插槽**：处理所有命名插槽 |
-| `slots[key] = normalizeSlot(children[key])` | **规范化插槽**：确保所有插槽都是函数形式 |
-| `instance.slots = slots` | **保存插槽**：存储到实例 |
+| 源码片段                                                        | 逻辑拆解                   |
+|-------------------------------------------------------------|------------------------|
+| `if (instance.vnode.shapeFlag & ShapeFlags.SLOTS_CHILDREN)` | **快速判断**：使用位运算检查是否有插槽  |
+| `const slots: Record<string, Slot> = Object.create(null)`   | **创建无原型对象**：避免原型链污染    |
+| `for (const key in children)`                               | **遍历插槽**：处理所有命名插槽      |
+| `slots[key] = normalizeSlot(children[key])`                 | **规范化插槽**：确保所有插槽都是函数形式 |
+| `instance.slots = slots`                                    | **保存插槽**：存储到实例         |
 
 ### 3.5 setupStatefulComponent - Setup 函数执行
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `instance.accessCache = Object.create(null)` | **创建访问缓存**：加速属性访问，首次后 10+ 倍快 |
-| `instance.proxy = new Proxy(instance.ctx, PublicInstanceProxyHandlers)` | **创建 Render Proxy**：统一模板中的 this 访问 |
-| `pauseTracking()` | **暂停依赖追踪**：setup 只执行一次，不需要追踪 |
-| `const setupContext = setup.length > 1 ? createSetupContext(instance) : null` | **创建 context**：仅当 setup 有 2 个参数时创建 |
-| `const setupResult = callWithErrorHandling(setup, ...)` | **执行 setup**：错误处理包装，传入 props 和 context |
-| `resetTracking()` | **恢复依赖追踪**：render 函数需要完整的追踪功能 |
-| `handleSetupResult(instance, setupResult, isSSR)` | **处理返回值**：根据类型设置 render 或 setupState |
+| 源码片段                                                                          | 逻辑拆解                                   |
+|-------------------------------------------------------------------------------|----------------------------------------|
+| `instance.accessCache = Object.create(null)`                                  | **创建访问缓存**：加速属性访问，首次后 10+ 倍快           |
+| `instance.proxy = new Proxy(instance.ctx, PublicInstanceProxyHandlers)`       | **创建 Render Proxy**：统一模板中的 this 访问     |
+| `pauseTracking()`                                                             | **暂停依赖追踪**：setup 只执行一次，不需要追踪           |
+| `const setupContext = setup.length > 1 ? createSetupContext(instance) : null` | **创建 context**：仅当 setup 有 2 个参数时创建     |
+| `const setupResult = callWithErrorHandling(setup, ...)`                       | **执行 setup**：错误处理包装，传入 props 和 context |
+| `resetTracking()`                                                             | **恢复依赖追踪**：render 函数需要完整的追踪功能          |
+| `handleSetupResult(instance, setupResult, isSSR)`                             | **处理返回值**：根据类型设置 render 或 setupState   |
 
 ```typescript
 function setupStatefulComponent(
@@ -395,13 +397,13 @@ function setupStatefulComponent(
 
 ### 3.6 handleSetupResult - 返回值处理
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `if (isFunction(setupResult))` | **判断是否函数**：setup 返回渲染函数 |
-| `instance.render = setupResult` | **设置 render**：直接作为组件的渲染函数 |
-| `else if (isObject(setupResult))` | **判断是否对象**：setup 返回响应式对象 |
-| `instance.setupState = proxyRefs(setupResult)` | **自动解包 ref**：模板中无需 .value |
-| `finishComponentSetup(instance, isSSR)` | **完成初始化**：处理 Options API，调用生命周期 |
+| 源码片段                                           | 逻辑拆解                            |
+|------------------------------------------------|---------------------------------|
+| `if (isFunction(setupResult))`                 | **判断是否函数**：setup 返回渲染函数         |
+| `instance.render = setupResult`                | **设置 render**：直接作为组件的渲染函数       |
+| `else if (isObject(setupResult))`              | **判断是否对象**：setup 返回响应式对象        |
+| `instance.setupState = proxyRefs(setupResult)` | **自动解包 ref**：模板中无需 .value       |
+| `finishComponentSetup(instance, isSSR)`        | **完成初始化**：处理 Options API，调用生命周期 |
 
 ```typescript
 export function handleSetupResult(
@@ -428,13 +430,13 @@ export function handleSetupResult(
 
 ### 3.7 finishComponentSetup - 完成初始化
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
+| 源码片段                                          | 逻辑拆解                                        |
+|-----------------------------------------------|---------------------------------------------|
 | `if (!instance.render && Component.template)` | **编译模板**：如果没有 render 且有 template，编译为 render |
-| `if (Component.data)` | **初始化 data**：调用 data 函数，响应式化返回值 |
-| `if (Component.computed)` | **初始化 computed**：创建计算属性 |
-| `if (Component.methods)` | **初始化 methods**：绑定方法到实例 |
-| `if (Component.watch)` | **初始化 watch**：创建侦听器 |
+| `if (Component.data)`                         | **初始化 data**：调用 data 函数，响应式化返回值             |
+| `if (Component.computed)`                     | **初始化 computed**：创建计算属性                     |
+| `if (Component.methods)`                      | **初始化 methods**：绑定方法到实例                     |
+| `if (Component.watch)`                        | **初始化 watch**：创建侦听器                         |
 
 ## 4. 细节补充：边界与优化
 
@@ -646,7 +648,8 @@ instance.setupState = proxyRefs({ count: ref(0) });
 
 ### 一句话总结
 
-**组件初始化是将 VNode"招聘信息"转化为完整"员工档案"的过程，通过 createComponentInstance 创建实例、setupComponent 分配资源、setupStatefulComponent 执行培训，最终建立响应式系统和渲染能力。**
+**组件初始化是将 VNode"招聘信息"转化为完整"员工档案"的过程，通过 createComponentInstance 创建实例、setupComponent
+分配资源、setupStatefulComponent 执行培训，最终建立响应式系统和渲染能力。**
 
 ### 核心要点
 
@@ -661,6 +664,7 @@ instance.setupState = proxyRefs({ count: ref(0) });
 **Q1：组件初始化的完整流程是什么？**
 
 A：流程分为 5 个步骤：
+
 1. **createComponentInstance**：创建实例对象，初始化 120+ 属性
 2. **setupComponent**：初始化 Props 和 Slots
 3. **setupStatefulComponent**：创建 Render Proxy，执行 setup 函数
@@ -670,6 +674,7 @@ A：流程分为 5 个步骤：
 **Q2：AppContext 如何在组件树中传递？**
 
 A：传递方式：
+
 1. **根组件**：从 `vnode.appContext` 获取（app.mount 时设置）
 2. **子组件**：从 `parent.appContext` 继承
 3. **效果**：整个组件树共享同一个 AppContext
@@ -678,6 +683,7 @@ A：传递方式：
 **Q3：为什么 setup 执行时要暂停依赖追踪？**
 
 A：原因：
+
 1. **setup 只执行一次**：不需要追踪数据访问
 2. **避免误追踪**：setup 中访问的数据不应该绑定到响应式系统
 3. **render 才需要追踪**：只有 render 函数中的数据访问才需要追踪
@@ -686,6 +692,7 @@ A：原因：
 **Q4：proxyRefs 的作用是什么？**
 
 A：作用：
+
 1. **自动解包 ref**：模板中访问 ref 无需 .value
 2. **GET 操作**：`proxy.count` → `setupResult.count.value`（如果是 ref）
 3. **SET 操作**：`proxy.count = 5` → `setupResult.count.value = 5`

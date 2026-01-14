@@ -111,6 +111,7 @@ const resolvedOptions = extend({}, options, {
 ```
 
 主要配置项：
+
 - `mode`：'function' | 'module' | 'ssr'
 - `prefixIdentifiers`：是否为标识符添加前缀（用于模块模式）
 - `hoistStatic`：是否进行静态提升
@@ -491,14 +492,14 @@ Compiler-core
 
 ## 总结
 
-| 概念 | 说明 |
-|------|------|
-| **baseCompile** | 编译流水线的主入口函数 |
-| **Parser 调用** | `baseParse(source, options)` |
-| **Transform 调用** | `transform(ast, context)` |
-| **Codegen 调用** | `generate(ast, options)` |
-| **预设系统** | `getBaseTransformPreset()` 提供默认配置 |
-| **插件系统** | 支持自定义 `nodeTransforms` 和 `directiveTransforms` |
-| **配置选项** | `CompilerOptions` 接口定义所有配置 |
-| **错误处理** | `onError` 和 `onWarn` 回调 |
-| **源码映射** | 支持调试用的源码位置映射 |
+| 概念               | 说明                                             |
+|------------------|------------------------------------------------|
+| **baseCompile**  | 编译流水线的主入口函数                                    |
+| **Parser 调用**    | `baseParse(source, options)`                   |
+| **Transform 调用** | `transform(ast, context)`                      |
+| **Codegen 调用**   | `generate(ast, options)`                       |
+| **预设系统**         | `getBaseTransformPreset()` 提供默认配置              |
+| **插件系统**         | 支持自定义 `nodeTransforms` 和 `directiveTransforms` |
+| **配置选项**         | `CompilerOptions` 接口定义所有配置                     |
+| **错误处理**         | `onError` 和 `onWarn` 回调                        |
+| **源码映射**         | 支持调试用的源码位置映射                                   |

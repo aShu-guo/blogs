@@ -7,11 +7,13 @@
 想象一个图书馆的借阅卡系统：
 
 **普通 Map（强引用）**：
+
 - 图书馆为每个读者建立永久档案
 - 即使读者已经搬走、不再来借书，档案仍然保留
 - 档案柜越来越满，永远不会自动清理
 
 **WeakMap（弱引用）**：
+
 - 图书馆只在读者活跃时保留借阅记录
 - 当读者不再来图书馆（没有其他地方记录这个人），记录自动消失
 - 档案柜自动保持整洁，无需手动清理
@@ -37,8 +39,6 @@ const proxy2 = reactive(obj)  // 应该返回同一个 proxy1
 // 方案 1：使用 Map → 当 obj 不再使用时，Map 仍然持有引用，导致内存泄漏
 // 方案 2：使用 WeakMap → 当 obj 不再使用时，自动清理缓存
 ```
-
----
 
 ## 2. 最小实现：手写"低配版"
 
@@ -90,11 +90,10 @@ obj = null
 ```
 
 **核心要点**：
+
 - WeakMap 的键必须是对象（这里是 `target`）
 - 当 `target` 不再被引用时，WeakMap 自动清理
 - 这避免了因缓存导致的内存泄漏
-
----
 
 ## 3. 逐行解剖：Vue 3 的 WeakMap 使用
 
@@ -102,12 +101,12 @@ obj = null
 
 Vue 3 在 `reactivity` 模块中使用了多个 WeakMap：
 
-| WeakMap 名称 | 键 | 值 | 作用 |
-|-------------|----|----|------|
-| `reactiveMap` | 原始对象 | 响应式代理 | 缓存 `reactive()` 创建的代理 |
-| `readonlyMap` | 原始对象 | 只读代理 | 缓存 `readonly()` 创建的代理 |
-| `shallowReactiveMap` | 原始对象 | 浅层响应式代理 | 缓存 `shallowReactive()` 创建的代理 |
-| `targetMap` | 响应式对象 | 依赖映射表 | 存储对象的依赖关系 |
+| WeakMap 名称           | 键     | 值       | 作用                           |
+|----------------------|-------|---------|------------------------------|
+| `reactiveMap`        | 原始对象  | 响应式代理   | 缓存 `reactive()` 创建的代理        |
+| `readonlyMap`        | 原始对象  | 只读代理    | 缓存 `readonly()` 创建的代理        |
+| `shallowReactiveMap` | 原始对象  | 浅层响应式代理 | 缓存 `shallowReactive()` 创建的代理 |
+| `targetMap`          | 响应式对象 | 依赖映射表   | 存储对象的依赖关系                    |
 
 ### 关键代码分析
 
@@ -152,13 +151,13 @@ function createReactiveObject(
 }
 ```
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `const reactiveMap = new WeakMap<Target, any>()` | **全局缓存**：使用 WeakMap 存储所有响应式代理，键是原始对象 |
-| `const existingProxy = proxyMap.get(target)` | **缓存查询**：检查是否已为该对象创建过代理 |
-| `if (existingProxy) return existingProxy` | **避免重复**：同一对象多次调用 `reactive()` 返回同一代理 |
-| `proxyMap.set(target, proxy)` | **缓存存储**：将新创建的代理存入 WeakMap |
-| 使用 WeakMap 而非 Map | **自动清理**：当 `target` 不再被引用时，缓存自动清理，防止内存泄漏 |
+| 源码片段                                             | 逻辑拆解                                     |
+|--------------------------------------------------|------------------------------------------|
+| `const reactiveMap = new WeakMap<Target, any>()` | **全局缓存**：使用 WeakMap 存储所有响应式代理，键是原始对象     |
+| `const existingProxy = proxyMap.get(target)`     | **缓存查询**：检查是否已为该对象创建过代理                  |
+| `if (existingProxy) return existingProxy`        | **避免重复**：同一对象多次调用 `reactive()` 返回同一代理    |
+| `proxyMap.set(target, proxy)`                    | **缓存存储**：将新创建的代理存入 WeakMap               |
+| 使用 WeakMap 而非 Map                                | **自动清理**：当 `target` 不再被引用时，缓存自动清理，防止内存泄漏 |
 
 ### 依赖收集中的 WeakMap
 
@@ -189,14 +188,12 @@ export function track(target: object, key: unknown) {
 }
 ```
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `const targetMap = new WeakMap<any, KeyToDepMap>()` | **依赖存储**：为每个响应式对象存储其依赖关系 |
-| `let depsMap = targetMap.get(target)` | **查找依赖表**：获取该对象的所有属性依赖 |
-| `targetMap.set(target, (depsMap = new Map()))` | **初始化**：首次访问时创建依赖映射表 |
-| 使用 WeakMap 作为外层容器 | **自动清理**：当响应式对象被销毁时，其依赖关系自动清理 |
-
----
+| 源码片段                                                | 逻辑拆解                          |
+|-----------------------------------------------------|-------------------------------|
+| `const targetMap = new WeakMap<any, KeyToDepMap>()` | **依赖存储**：为每个响应式对象存储其依赖关系      |
+| `let depsMap = targetMap.get(target)`               | **查找依赖表**：获取该对象的所有属性依赖        |
+| `targetMap.set(target, (depsMap = new Map()))`      | **初始化**：首次访问时创建依赖映射表          |
+| 使用 WeakMap 作为外层容器                                   | **自动清理**：当响应式对象被销毁时，其依赖关系自动清理 |
 
 ## 4. 细节补充：边界与性能优化
 
@@ -235,7 +232,8 @@ const wm = new WeakMap()
 // ✓ 正确
 wm.set({}, 'value')
 wm.set([], 'value')
-wm.set(function() {}, 'value')
+wm.set(function() {
+}, 'value')
 
 // ✗ 错误
 wm.set('string', 'value')  // TypeError
@@ -256,7 +254,8 @@ wm.keys()         // TypeError
 wm.values()       // TypeError
 wm.entries()      // TypeError
 wm.forEach()      // TypeError
-for (const [k, v] of wm) {}  // TypeError
+for (const [k, v] of wm) {
+}  // TypeError
 
 // 原因：键是弱引用，可能随时被垃圾回收，无法可靠遍历
 ```
@@ -331,8 +330,6 @@ type KeyToDepMap = Map<any, Dep>
 // - 分层设计平衡了性能和内存管理
 ```
 
----
-
 ## 5. 总结与延伸
 
 ### 一句话总结
@@ -344,6 +341,7 @@ WeakMap 是 Vue 3 响应式系统的"自动清洁工"，它为对象缓存代理
 #### Q1: WeakMap 和 Map 的区别是什么？
 
 **答案**：
+
 - **键的类型**：WeakMap 只接受对象作为键，Map 接受任意类型
 - **引用强度**：WeakMap 是弱引用，Map 是强引用
 - **垃圾回收**：WeakMap 的键可被垃圾回收，Map 的键不会
@@ -353,6 +351,7 @@ WeakMap 是 Vue 3 响应式系统的"自动清洁工"，它为对象缓存代理
 #### Q2: Vue 3 为什么使用 WeakMap 而不是 Map？
 
 **答案**：
+
 1. **防止内存泄漏**：当组件销毁时，原始对象不再被引用，WeakMap 自动清理缓存的代理对象
 2. **自动垃圾回收**：不需要手动清理缓存，减少内存管理负担
 3. **对象关联**：响应式系统需要为对象关联代理和依赖，WeakMap 是天然的对象→数据映射工具
@@ -360,6 +359,7 @@ WeakMap 是 Vue 3 响应式系统的"自动清洁工"，它为对象缓存代理
 #### Q3: 如果用 Map 代替 WeakMap 会有什么问题？
 
 **答案**：
+
 ```typescript
 // 使用 Map
 const reactiveMap = new Map()
@@ -390,6 +390,7 @@ reactiveMap.delete(obj)  // 但如何知道何时清理？
 #### Q4: WeakMap 的实际应用场景有哪些？
 
 **答案**：
+
 1. **对象元数据存储**：为对象关联额外信息而不污染对象本身
 2. **缓存计算结果**：缓存基于对象的计算结果，对象销毁时自动清理
 3. **私有属性实现**：存储类的私有数据
@@ -399,19 +400,19 @@ reactiveMap.delete(obj)  // 但如何知道何时清理？
 
 - **下一章节**：[Vue 3 响应式系统 - Proxy 与 Reflect](/ecology/vue/3.x/reactivity/proxy-reflect)
 - **相关主题**：
-  - [依赖收集与触发](/ecology/vue/3.x/reactivity/effect)
-  - [响应式 API 设计](/ecology/vue/3.x/reactivity/api-design)
-  - [内存管理与性能优化](/ecology/vue/3.x/performance/memory)
+    - [依赖收集与触发](/ecology/vue/3.x/reactivity/effect)
+    - [响应式 API 设计](/ecology/vue/3.x/reactivity/api-design)
+    - [内存管理与性能优化](/ecology/vue/3.x/performance/memory)
 
 ### 实践建议
 
 1. **何时使用 WeakMap**：
-   - 需要为对象关联数据且不想污染对象
-   - 需要自动清理不再使用的对象相关数据
-   - 实现对象级别的缓存
+    - 需要为对象关联数据且不想污染对象
+    - 需要自动清理不再使用的对象相关数据
+    - 实现对象级别的缓存
 
 2. **何时不使用 WeakMap**：
-   - 需要遍历所有键值对
-   - 需要获取集合大小
-   - 键可能是基本类型
-   - 需要手动控制清理时机
+    - 需要遍历所有键值对
+    - 需要获取集合大小
+    - 键可能是基本类型
+    - 需要手动控制清理时机

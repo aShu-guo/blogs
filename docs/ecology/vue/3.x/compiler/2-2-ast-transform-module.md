@@ -141,12 +141,14 @@ console.log('Helpers needed:', Array.from(transformed.helpers))
 ```
 
 **输出**：
+
 ```
 Hoisted nodes: [{ type: 'TEXT', content: 'Static' }]
 Helpers needed: ['CREATE_VNODE']
 ```
 
 **核心要点**：
+
 - 静态节点被提取到 `hoists` 数组
 - 动态节点被标记 `patchFlag`
 - 记录需要的 helper 函数
@@ -209,6 +211,7 @@ visit(node, transformer) {
 ```
 
 **设计要点**：
+
 - **为什么需要 exit 回调**：子节点处理完后，父节点可能需要根据子节点的结果做调整
 - **插件式架构**：每个 Transform 独立，便于维护和扩展
 
@@ -229,6 +232,7 @@ visit(node, transformer) {
 ```
 
 **没有提升的代码**：
+
 ```javascript
 const render = () => {
   return _createVNode('div', { class: 'static-div' }, [
@@ -239,6 +243,7 @@ const render = () => {
 ```
 
 **提升后的代码**：
+
 ```javascript
 const _hoisted_1 = _createVNode('p', null, 'Static paragraph')
 
@@ -253,6 +258,7 @@ const render = () => {
 **提升条件**：
 
 一个节点可以被提升，当且仅当：
+
 1. 所有子节点都是静态的
 2. 所有属性都是静态的（不包含 v-if、v-for 等结构指令）
 3. 不包含动态绑定或事件
@@ -270,6 +276,7 @@ enum ConstantTypes {
 ```
 
 **设计要点**：
+
 - **为什么提升**：避免每次渲染都创建相同的 VNode，减少内存分配和 GC 压力
 - **CAN_STRINGIFY 的优势**：可以直接生成字符串，跳过 VNode 创建
 
@@ -316,6 +323,7 @@ enum PatchFlags {
 ```
 
 **生成的代码**：
+
 ```javascript
 _createVNode(
   'div',
@@ -332,6 +340,7 @@ _createVNode(
 ```
 
 **设计要点**：
+
 - **为什么需要 PatchFlags**：告诉 diff 算法只检查动态部分，跳过静态部分
 - **Block 树的优势**：扁平化动态节点列表，避免深度遍历
 
@@ -342,6 +351,7 @@ _createVNode(
 将 `v-if/v-else-if/v-else` 转换为三元表达式。
 
 **输入 AST**：
+
 ```html
 <div v-if="show">A</div>
 <div v-else-if="showB">B</div>
@@ -349,6 +359,7 @@ _createVNode(
 ```
 
 **输出 AST**：
+
 ```
 IfNode {
   branches: [
@@ -363,11 +374,13 @@ IfNode {
 ```
 
 **生成代码**：
+
 ```javascript
 show ? _createVNode(...) : showB ? _createVNode(...) : _createVNode(...)
 ```
 
 **设计要点**：
+
 - **为什么转换为三元表达式**：JavaScript 原生支持，性能好
 - **多分支处理**：嵌套三元表达式
 
@@ -376,6 +389,7 @@ show ? _createVNode(...) : showB ? _createVNode(...) : _createVNode(...)
 处理 `v-for` 指令，生成循环逻辑。
 
 **输入 AST**：
+
 ```html
 <div v-for="(item, index) in items" :key="index">
   {{ item.name }}
@@ -404,6 +418,7 @@ show ? _createVNode(...) : showB ? _createVNode(...) : _createVNode(...)
    ```
 
 **设计要点**：
+
 - **为什么用 _renderList**：封装循环逻辑，支持数组和对象遍历
 - **key 的处理**：提取 `:key` 属性，用于 diff 优化
 
@@ -412,12 +427,14 @@ show ? _createVNode(...) : showB ? _createVNode(...) : _createVNode(...)
 处理普通元素节点，收集动态属性。
 
 **关键职责**：
+
 - 分析 class、style 的动态/静态部分
 - 提取动态 props
 - 生成 patchFlag（标记此节点的动态部分）
 - 处理内置组件的特殊逻辑
 
 **示例**：
+
 ```html
 <div :class="{ active: isActive }" class="box" :style="dynamicStyle">
   content
@@ -425,6 +442,7 @@ show ? _createVNode(...) : showB ? _createVNode(...) : _createVNode(...)
 ```
 
 **转换后**：
+
 ```
 {
   type: NodeTypes.ELEMENT,
@@ -452,6 +470,7 @@ show ? _createVNode(...) : showB ? _createVNode(...) : _createVNode(...)
 ```
 
 **设计要点**：
+
 - **为什么合并 class 和 :class**：统一处理，生成更优的代码
 - **patchFlag 的作用**：告诉 diff 算法只检查 class 和 style
 
@@ -460,11 +479,13 @@ show ? _createVNode(...) : showB ? _createVNode(...) : _createVNode(...)
 分析 JavaScript 表达式，标记其中的变量依赖。
 
 **功能**：
+
 - 使用 Babel 解析表达式
 - 识别变量引用（用于作用域分析）
 - 标记常量表达式
 
 **示例**：
+
 ```javascript
 // 表达式
 "count + 1"
@@ -479,6 +500,7 @@ show ? _createVNode(...) : showB ? _createVNode(...) : _createVNode(...)
 ```
 
 **设计要点**：
+
 - **为什么需要识别变量**：用于作用域分析（区分全局变量和局部变量）
 - **Babel 的作用**：准确解析复杂的 JavaScript 表达式
 
@@ -519,6 +541,7 @@ interface TransformContext {
 ```
 
 **设计要点**：
+
 - **scopes 追踪**：记录当前在哪些作用域内（v-for、v-slot 等）
 - **helper 注册**：记录需要导入的运行时函数
 
@@ -533,6 +556,7 @@ interface TransformContext {
 ```
 
 Transform 处理顺序：
+
 1. transformIf 处理 v-if
 2. transformFor 处理 v-for（嵌套在 if 内）
 3. transformElement 分析元素
@@ -551,6 +575,7 @@ Transform 处理顺序：
 ```
 
 Transform 输出：
+
 - class 和 :class 合并成单一属性
 - style 和 :style 合并成单一属性
 - 其他 props 保持独立
@@ -566,6 +591,7 @@ Transform 输出：
 ```
 
 Transform 识别：
+
 - `item` 作为 slot prop（不是全局变量）
 - 只在 slot 内有效
 - 其他作用域规则不适用
@@ -614,36 +640,37 @@ Diff time: 3ms  // -62.5%
 
 ### 一句话总结
 
-Transform 通过**静态提升 + PatchFlags 标记 + 指令转换**，将原始 AST 优化为高性能的可执行结构，为 Codegen 生成高效的 render 函数做好准备。
+Transform 通过**静态提升 + PatchFlags 标记 + 指令转换**，将原始 AST 优化为高性能的可执行结构，为 Codegen 生成高效的 render
+函数做好准备。
 
 ### 核心设计理念
 
-| 功能 | 说明 | 重要性 |
-|------|------|--------|
-| **静态提升** | 将不变节点提取外部，运行时复用 | ⭐⭐⭐⭐⭐ |
-| **PatchFlags** | 标记动态节点，优化 diff | ⭐⭐⭐⭐⭐ |
-| **指令转换** | v-if/for/model 等特殊处理 | ⭐⭐⭐⭐⭐ |
-| **表达式分析** | 识别变量依赖和作用域 | ⭐⭐⭐⭐ |
-| **属性规范化** | class/style 智能合并 | ⭐⭐⭐ |
-| **Block 树构建** | 构建高效的 diff 树 | ⭐⭐⭐⭐ |
+| 功能             | 说明                   | 重要性   |
+|----------------|----------------------|-------|
+| **静态提升**       | 将不变节点提取外部，运行时复用      | ⭐⭐⭐⭐⭐ |
+| **PatchFlags** | 标记动态节点，优化 diff       | ⭐⭐⭐⭐⭐ |
+| **指令转换**       | v-if/for/model 等特殊处理 | ⭐⭐⭐⭐⭐ |
+| **表达式分析**      | 识别变量依赖和作用域           | ⭐⭐⭐⭐  |
+| **属性规范化**      | class/style 智能合并     | ⭐⭐⭐   |
+| **Block 树构建**  | 构建高效的 diff 树         | ⭐⭐⭐⭐  |
 
 ### 面试考点
 
 1. **什么是静态提升？为什么需要？**
-   - 将永久不变的 VNode 提取到 render 函数外部
-   - 避免每次渲染都创建相同的对象，减少内存分配和 GC 压力
+    - 将永久不变的 VNode 提取到 render 函数外部
+    - 避免每次渲染都创建相同的对象，减少内存分配和 GC 压力
 
 2. **PatchFlags 的作用是什么？**
-   - 标记节点的动态部分（TEXT、CLASS、STYLE 等）
-   - 告诉 diff 算法只检查动态部分，跳过静态部分
+    - 标记节点的动态部分（TEXT、CLASS、STYLE 等）
+    - 告诉 diff 算法只检查动态部分，跳过静态部分
 
 3. **Block 树是什么？如何优化 diff？**
-   - 扁平化动态节点列表，记录在 `dynamicChildren` 中
-   - diff 时只遍历 `dynamicChildren`，跳过静态节点
+    - 扁平化动态节点列表，记录在 `dynamicChildren` 中
+    - diff 时只遍历 `dynamicChildren`，跳过静态节点
 
 4. **Transform 的执行顺序为什么重要？**
-   - 某些 Transform 依赖其他 Transform 的结果
-   - 例如：transformElement 需要在 transformIf 之后，因为需要处理 if 分支内的元素
+    - 某些 Transform 依赖其他 Transform 的结果
+    - 例如：transformElement 需要在 transformIf 之后，因为需要处理 if 分支内的元素
 
 ### 延伸阅读
 

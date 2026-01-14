@@ -21,6 +21,7 @@ Effect 系统通过以下机制实现：
 - **activeSub** - 当前活跃的订阅者追踪
 
 **源代码位置**：
+
 - Effect 类：`packages/reactivity/src/effect.ts` (572 lines)
 - Dep 和 Link 类：`packages/reactivity/src/dep.ts` (398 lines)
 - EffectScope：`packages/reactivity/src/effectScope.ts` (203 lines)
@@ -85,18 +86,18 @@ Effect 系统通过以下机制实现：
 
 ## 关键概念速查表
 
-| 概念 | 作用 | 源代码 |
-|-----|-----|--------|
-| **Effect** | 自动追踪依赖的函数 | effect.ts:87-217 |
-| **Dep** | 存储依赖此属性的所有 effect | dep.ts:165-398 |
-| **Link** | 连接 effect 和 Dep 的双链表节点 | dep.ts:32-165 |
-| **activeSub** | 当前正在执行的 effect | effect.ts:全局 |
-| **EffectFlags** | 8 个状态位标志 | effect.ts:枚举 |
-| **track()** | 依赖追踪 API | dep.ts:262-299 |
-| **trigger()** | 依赖触发 API | dep.ts:300-389 |
-| **batch()** | 批处理入队 | effect.ts:236-299 |
-| **Scheduler** | 自定义执行时机 | effect.ts:选项 |
-| **EffectScope** | 管理一组 effect | effectScope.ts:6-162 |
+| 概念              | 作用                     | 源代码                  |
+|-----------------|------------------------|----------------------|
+| **Effect**      | 自动追踪依赖的函数              | effect.ts:87-217     |
+| **Dep**         | 存储依赖此属性的所有 effect      | dep.ts:165-398       |
+| **Link**        | 连接 effect 和 Dep 的双链表节点 | dep.ts:32-165        |
+| **activeSub**   | 当前正在执行的 effect         | effect.ts:全局         |
+| **EffectFlags** | 8 个状态位标志               | effect.ts:枚举         |
+| **track()**     | 依赖追踪 API               | dep.ts:262-299       |
+| **trigger()**   | 依赖触发 API               | dep.ts:300-389       |
+| **batch()**     | 批处理入队                  | effect.ts:236-299    |
+| **Scheduler**   | 自定义执行时机                | effect.ts:选项         |
+| **EffectScope** | 管理一组 effect            | effectScope.ts:6-162 |
 
 ## 8 个核心机制
 
@@ -154,6 +155,7 @@ obj.count = 1;
 ## 总结
 
 Vue 3 的 Effect 系统是响应式系统的核心。通过：
+
 - 精巧的 Link 双链表设计实现高效的依赖管理
 - EffectFlags 位标志简化状态表示
 - Batch 机制避免频繁重复执行

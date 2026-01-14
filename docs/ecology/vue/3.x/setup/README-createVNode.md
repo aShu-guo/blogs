@@ -5,6 +5,7 @@ Vue 3 中最核心的虚拟 DOM 创建函数 `createVNode` 的完整文档索引
 ## 文档导航
 
 ### [createVNode-flow.md](./createVNode-flow.md) - 完整流程分析
+
 深入理解 createVNode 执行过程的详尽指南。
 
 - 函数签名和参数说明
@@ -16,6 +17,7 @@ Vue 3 中最核心的虚拟 DOM 创建函数 `createVNode` 的完整文档索引
 阅读时间：20-30 分钟 | 长度：~500 行
 
 ### [createVNode-quickref.md](./createVNode-quickref.md) - 快速参考
+
 编码时快速查阅的参考卡片。
 
 - 核心流程图（5 步）
@@ -29,6 +31,7 @@ Vue 3 中最核心的虚拟 DOM 创建函数 `createVNode` 的完整文档索引
 阅读时间：5-10 分钟 | 长度：~300 行
 
 ### [createVNode-scenarios.md](./createVNode-scenarios.md) - 场景对比
+
 不同使用场景的差异和权衡分析。
 
 - 6 种场景对比表
@@ -44,17 +47,20 @@ Vue 3 中最核心的虚拟 DOM 创建函数 `createVNode` 的完整文档索引
 ## 学习路径
 
 ### 快速上手（15 分钟）
+
 1. [createVNode-quickref.md](./createVNode-quickref.md) - 核心流程部分
 2. 查看关键决策树
 3. 浏览常见调用模式
 
 ### 全面理解（1 小时）
+
 1. [createVNode-quickref.md](./createVNode-quickref.md) - 完整阅读（10 分钟）
 2. [createVNode-flow.md](./createVNode-flow.md) - 步骤 1-3（20 分钟）
 3. [createVNode-scenarios.md](./createVNode-scenarios.md) - 场景 1-3（20 分钟）
 4. 实践编写简单的 h() 函数（10 分钟）
 
 ### 精通深入（2-3 小时）
+
 1. [createVNode-quickref.md](./createVNode-quickref.md) - 全部（10 分钟）
 2. [createVNode-flow.md](./createVNode-flow.md) - 全部（30 分钟）
 3. [createVNode-scenarios.md](./createVNode-scenarios.md) - 全部（20 分钟）
@@ -66,48 +72,54 @@ Vue 3 中最核心的虚拟 DOM 创建函数 `createVNode` 的完整文档索引
 
 ### 5 个关键概念
 
-| 概念 | 作用 | 文档位置 |
-|------|------|---------|
-| **guardReactiveProps** | 克隆响应式对象避免副作用 | [flow.md](./createVNode-flow.md) 步骤 2 |
-| **normalizeClass** | 统一 class 格式为字符串 | [flow.md](./createVNode-flow.md) 步骤 2.2 / [quickref.md](./createVNode-quickref.md) |
-| **normalizeStyle** | 统一 style 格式为对象/字符串 | [flow.md](./createVNode-flow.md) 步骤 2.3 / [quickref.md](./createVNode-quickref.md) |
-| **ShapeFlag** | 用位运算标记 VNode 类型 | [flow.md](./createVNode-flow.md) 步骤 3 / [quickref.md](./createVNode-quickref.md) |
-| **PatchFlags** | 标记哪些属性需要更新 | [flow.md](./createVNode-flow.md) 步骤 3 / [quickref.md](./createVNode-quickref.md) |
+| 概念                     | 作用                 | 文档位置                                                                               |
+|------------------------|--------------------|------------------------------------------------------------------------------------|
+| **guardReactiveProps** | 克隆响应式对象避免副作用       | [flow.md](./createVNode-flow.md) 步骤 2                                              |
+| **normalizeClass**     | 统一 class 格式为字符串    | [flow.md](./createVNode-flow.md) 步骤 2.2 / [quickref.md](./createVNode-quickref.md) |
+| **normalizeStyle**     | 统一 style 格式为对象/字符串 | [flow.md](./createVNode-flow.md) 步骤 2.3 / [quickref.md](./createVNode-quickref.md) |
+| **ShapeFlag**          | 用位运算标记 VNode 类型    | [flow.md](./createVNode-flow.md) 步骤 3 / [quickref.md](./createVNode-quickref.md)   |
+| **PatchFlags**         | 标记哪些属性需要更新         | [flow.md](./createVNode-flow.md) 步骤 3 / [quickref.md](./createVNode-quickref.md)   |
 
 ### 4 个执行路径
 
-| 路径 | 场景 | 性能 | 文档位置 |
-|------|------|------|---------|
-| **编译模板** | `<template>` | 最优 | [scenarios.md](./createVNode-scenarios.md) 场景 1 |
-| **h() 函数** | 手写渲染 | 中等 | [scenarios.md](./createVNode-scenarios.md) 场景 2 |
-| **动态类型** | `:is` 指令 | 中等 | [scenarios.md](./createVNode-scenarios.md) 场景 3 |
-| **特殊类型** | Fragment/Teleport/Suspense | 可控 | [scenarios.md](./createVNode-scenarios.md) 场景 4-6 |
+| 路径         | 场景                         | 性能 | 文档位置                                              |
+|------------|----------------------------|----|---------------------------------------------------|
+| **编译模板**   | `<template>`               | 最优 | [scenarios.md](./createVNode-scenarios.md) 场景 1   |
+| **h() 函数** | 手写渲染                       | 中等 | [scenarios.md](./createVNode-scenarios.md) 场景 2   |
+| **动态类型**   | `:is` 指令                   | 中等 | [scenarios.md](./createVNode-scenarios.md) 场景 3   |
+| **特殊类型**   | Fragment/Teleport/Suspense | 可控 | [scenarios.md](./createVNode-scenarios.md) 场景 4-6 |
 
 ## 快速查询
 
 ### "我想知道 class 怎么被规范化的"
+
 - [createVNode-quickref.md](./createVNode-quickref.md) - Props 处理细节
 - [createVNode-flow.md](./createVNode-flow.md) - 步骤 2.2: class 处理
 
 ### "编译模板和 h() 的性能差异"
+
 - [createVNode-scenarios.md](./createVNode-scenarios.md) - Props 处理的差异
 - [createVNode-scenarios.md](./createVNode-scenarios.md) - 性能对比
 
 ### "我的组件为什么收到警告？"
+
 - [createVNode-quickref.md](./createVNode-quickref.md) - 避免做的事
 - [createVNode-flow.md](./createVNode-flow.md) - 步骤 3.1: 开发模式警告
 
 ### "如何优化渲染性能？"
+
 - [createVNode-quickref.md](./createVNode-quickref.md) - 性能技巧
 - [createVNode-flow.md](./createVNode-flow.md) - 优化机制
 
 ### "我需要用 h() 写复杂组件"
+
 - [createVNode-scenarios.md](./createVNode-scenarios.md) - 场景 2: 手写 h() 函数
 - [createVNode-quickref.md](./createVNode-quickref.md) - 常见调用模式
 
 ## 实践练习
 
 ### 练习 1: 编写简单的组件
+
 ```javascript
 // 用 h() 写出一个带 class 的 div
 import { h } from 'vue'
@@ -120,6 +132,7 @@ export default () => h('div', {
 ```
 
 ### 练习 2: 理解 Props 规范化
+
 ```javascript
 // 尝试这些 Props，理解发生了什么
 h('div', {
@@ -133,6 +146,7 @@ h('div', {
 ```
 
 ### 练习 3: 对比编译模板和 h()
+
 ```vue
 <!-- 写一个简单的模板 -->
 <template>
@@ -144,6 +158,7 @@ h('div', {
 ```
 
 ### 练习 4: 识别 ShapeFlag
+
 ```javascript
 // 判断以下 VNode 的 ShapeFlag
 const v1 = h('div')        // ELEMENT
@@ -193,6 +208,7 @@ createVNode 是 Vue 虚拟 DOM 系统的核心工厂函数：
 ```
 
 理解 createVNode 等于理解：
+
 - Vue 虚拟 DOM 的组织方式
 - 为什么模板比手写 h() 快
 - 编译器的重要性和优化
@@ -234,8 +250,6 @@ packages/shared/src/normalizeProp.ts
 - [Vue 3 源代码](https://github.com/vuejs/core)
 - [编译器文档](https://vue-macros.sxzz.moe/)
 - [性能优化](https://vuejs.org/guide/best-practices/performance.html)
-
----
 
 **最后更新：** 2024年11月
 **文档版本：** 1.0

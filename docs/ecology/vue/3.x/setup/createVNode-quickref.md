@@ -16,11 +16,10 @@ _createVNode(type, props, children, ...)
 5. 追踪到块树 → 如果有 patchFlag 或是组件，加入 currentBlock
 ```
 
----
-
 ## 类型决策树
 
 ### type 参数
+
 ```
 type 是什么？
 ├─ null/undefined → Comment VNode
@@ -32,6 +31,7 @@ type 是什么？
 ```
 
 ### props 参数
+
 ```
 props 是什么？
 ├─ null → 跳过处理
@@ -48,14 +48,13 @@ props 是什么？
 ```
 
 ### children 参数
+
 ```
 children 是什么？
 ├─ 字符串 → ShapeFlags.TEXT_CHILDREN
 ├─ 数组 → ShapeFlags.ARRAY_CHILDREN
 └─ 对象 → ShapeFlags.SLOTS_CHILDREN
 ```
-
----
 
 ## Props 处理
 
@@ -102,8 +101,6 @@ const cloned = extend({}, proxy)  // 克隆为普通对象
   → {color: 'red', fontSize: '14px'}（合并）
 ```
 
----
-
 ## VNode 对象结构
 
 ```javascript
@@ -140,8 +137,6 @@ const cloned = extend({}, proxy)  // 克隆为普通对象
 }
 ```
 
----
-
 ## ShapeFlags 位标志
 
 ```javascript
@@ -158,6 +153,7 @@ COMPONENT_KEPT_ALIVE           = 512
 ```
 
 **使用方式：**
+
 ```javascript
 // 判断是否为组件
 if (vnode.shapeFlag & ShapeFlags.COMPONENT) {
@@ -169,8 +165,6 @@ if (vnode.shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
   // 有数组子节点
 }
 ```
-
----
 
 ## PatchFlags 优化标记
 
@@ -189,8 +183,6 @@ DYNAMIC_SLOTS    = 1 << 10   = 1024
 ```
 
 **作用：** 编译器标记需要更新的内容，patch 算法据此优化比对，性能提升约 30-50%。
-
----
 
 ## 常见调用模式
 
@@ -235,8 +227,6 @@ h(Fragment, null, [
 ])
 ```
 
----
-
 ## 函数调用链
 
 ```
@@ -260,8 +250,6 @@ VNode 后续流程
   ├─→ mount()（挂载到 DOM）
   └─→ unmount()（卸载时清理）
 ```
-
----
 
 ## 性能优化
 
@@ -301,8 +289,6 @@ h('div', props)  // ✓ 会被 guardReactiveProps 克隆
 // 好：{class: ['a', 'b']}
 ```
 
----
-
 ## 调试技巧
 
 ```javascript
@@ -321,8 +307,6 @@ console.log(vnode.props)
 // 在开发模式查看警告
 // 控制台会显示关于响应式组件等的警告
 ```
-
----
 
 ## 常见问题
 

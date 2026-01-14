@@ -4,7 +4,8 @@
 
 ### 核心问题
 
-Vue 3 的 `.vue` 文件包含 template、script、style 三种不同语法，浏览器无法直接执行。Vite 如何在开发时实现"保存即刷新"，在生产时打包优化？
+Vue 3 的 `.vue` 文件包含 template、script、style 三种不同语法，浏览器无法直接执行。Vite 如何在开发时实现"保存即刷新"
+，在生产时打包优化？
 
 ### 生活化类比
 
@@ -15,7 +16,8 @@ Vue 3 的 `.vue` 文件包含 template、script、style 三种不同语法，浏
 - **Vue Compiler**：专业翻译团队，将 template 翻译成 render 函数，将 `<script setup>` 翻译成标准 JS
 - **浏览器**：客户，只接受标准的 JavaScript/CSS
 
-当你修改 `.vue` 文件时，协调员会判断：只改了 template？那就只重新翻译 template，script 和 style 复用之前的结果。这就是 **HMR（热模块替换）** 的核心思想。
+当你修改 `.vue` 文件时，协调员会判断：只改了 template？那就只重新翻译 template，script 和 style 复用之前的结果。这就是 *
+*HMR（热模块替换）** 的核心思想。
 
 ### 核心流程
 
@@ -33,8 +35,6 @@ plugin-vue 调用 compiler.parse() 解析文件
   ↓
 浏览器执行并渲染
 ```
-
----
 
 ## 2. 最小实现：手写"低配版"
 
@@ -90,19 +90,17 @@ export function vuePlugin() {
 
 **运行效果**：这段代码可以处理简单的 `.vue` 文件，但缺少 HMR、错误处理、缓存优化等生产特性。
 
----
-
 ## 3. 逐行解剖：关键路径分析
 
 ### 3.1 编译器加载机制
 
 plugin-vue 需要动态加载项目中的 `vue/compiler-sfc`：
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `const compiler = tryResolveCompiler(root)` | **动态解析**：从项目的 node_modules 中查找 Vue 编译器 |
-| `if (vueMeta.version.split('.')[0] >= 3)` | **版本校验**：确保 Vue 版本 >= 3.2.25，避免 API 不兼容 |
-| `return tryRequire('vue/compiler-sfc', root)` | **按需加载**：只在需要时加载编译器，减少启动时间 |
+| 源码片段                                          | 逻辑拆解                                    |
+|-----------------------------------------------|-----------------------------------------|
+| `const compiler = tryResolveCompiler(root)`   | **动态解析**：从项目的 node_modules 中查找 Vue 编译器  |
+| `if (vueMeta.version.split('.')[0] >= 3)`     | **版本校验**：确保 Vue 版本 >= 3.2.25，避免 API 不兼容 |
+| `return tryRequire('vue/compiler-sfc', root)` | **按需加载**：只在需要时加载编译器，减少启动时间              |
 
 ### 3.2 SFC 解析与缓存
 
@@ -143,12 +141,12 @@ function createDescriptor(filename, source, { compiler }) {
 
 plugin-vue 通过 URL query 参数区分不同的编译需求：
 
-| 请求 URL | 返回内容 | 编译器调用 |
-|---------|---------|-----------|
-| `/App.vue` | 完整组件（主请求） | 所有编译器 API |
-| `/App.vue?type=script` | 编译后的 script | `compileScript()` |
-| `/App.vue?type=template` | render 函数 | `compileTemplate()` |
-| `/App.vue?type=style&index=0` | 第一个 style 块 | `compileStyle()` |
+| 请求 URL                        | 返回内容        | 编译器调用               |
+|-------------------------------|-------------|---------------------|
+| `/App.vue`                    | 完整组件（主请求）   | 所有编译器 API           |
+| `/App.vue?type=script`        | 编译后的 script | `compileScript()`   |
+| `/App.vue?type=template`      | render 函数   | `compileTemplate()` |
+| `/App.vue?type=style&index=0` | 第一个 style 块 | `compileStyle()`    |
 
 ```typescript
 function parseVueRequest(id) {
@@ -185,11 +183,11 @@ const result = compiler.compileTemplate({
 // 返回：{ code: 'function render() { ... }', errors: [] }
 ```
 
-| 配置项 | 作用 |
-|-------|------|
-| `scoped: true` | 为模板中的元素添加 `data-v-abc123` 属性 |
-| `transformAssetUrls` | 将相对路径转换为 Vite 可处理的模块导入 |
-| `ssr: true` | 生成服务端渲染代码（返回字符串而非 VNode） |
+| 配置项                  | 作用                           |
+|----------------------|------------------------------|
+| `scoped: true`       | 为模板中的元素添加 `data-v-abc123` 属性 |
+| `transformAssetUrls` | 将相对路径转换为 Vite 可处理的模块导入       |
+| `ssr: true`          | 生成服务端渲染代码（返回字符串而非 VNode）     |
 
 ### 3.5 Script 编译
 
@@ -262,8 +260,6 @@ div { color: red; }
 div[data-v-abc123] { color: red; }
 ```
 
----
-
 ## 4. 细节补充：边界与性能优化
 
 ### 4.1 缓存策略
@@ -276,11 +272,11 @@ const hmrCache = new Map()   // HMR 缓存（开发时）
 const prevCache = new Map()  // 前一版本缓存（用于对比）
 ```
 
-| 缓存类型 | 使用场景 | 失效时机 |
-|---------|---------|---------|
-| `cache` | 生产构建时复用 descriptor | 构建完成后清空 |
-| `hmrCache` | 开发时快速获取当前版本 | 文件修改时更新 |
-| `prevCache` | HMR 时对比新旧版本 | 下次 HMR 时覆盖 |
+| 缓存类型        | 使用场景               | 失效时机       |
+|-------------|--------------------|------------|
+| `cache`     | 生产构建时复用 descriptor | 构建完成后清空    |
+| `hmrCache`  | 开发时快速获取当前版本        | 文件修改时更新    |
+| `prevCache` | HMR 时对比新旧版本        | 下次 HMR 时覆盖 |
 
 ### 4.2 HMR 精确更新
 
@@ -375,47 +371,46 @@ function createRollupError(filename, error) {
 
 ### 4.5 边界情况
 
-| 场景 | 处理方式 |
-|-----|---------|
-| 没有 template | 只编译 script 和 style |
-| 没有 script | 生成默认的空组件 `export default {}` |
-| 多个 style 块 | 按 index 顺序分别编译并注入 |
+| 场景               | 处理方式                         |
+|------------------|------------------------------|
+| 没有 template      | 只编译 script 和 style           |
+| 没有 script        | 生成默认的空组件 `export default {}` |
+| 多个 style 块       | 按 index 顺序分别编译并注入            |
 | 自定义块（如 `<docs>`） | 通过 `customBlocks` 暴露给用户自定义处理 |
-| 循环依赖 | 使用 WeakMap 避免内存泄漏 |
-
----
+| 循环依赖             | 使用 WeakMap 避免内存泄漏            |
 
 ## 5. 总结与延伸
 
 ### 一句话总结
 
-**plugin-vue 是 Vite 和 Vue Compiler 之间的"翻译协调员"，负责请求分发、缓存管理和 HMR 优化，而真正的编译工作由 Vue Compiler 完成。**
+**plugin-vue 是 Vite 和 Vue Compiler 之间的"翻译协调员"，负责请求分发、缓存管理和 HMR 优化，而真正的编译工作由 Vue Compiler
+完成。**
 
 ### 核心设计理念
 
-| 模块 | 职责 |
-|-----|------|
-| **Vite** | 开发服务器、模块热替换、生产构建 |
-| **plugin-vue** | 拦截 `.vue` 请求、管理缓存、实现 HMR |
+| 模块               | 职责                              |
+|------------------|---------------------------------|
+| **Vite**         | 开发服务器、模块热替换、生产构建                |
+| **plugin-vue**   | 拦截 `.vue` 请求、管理缓存、实现 HMR        |
 | **Vue Compiler** | 解析 SFC、编译 template/script/style |
 
 ### 面试考点
 
 1. **Vite 如何处理 `.vue` 文件？**
-   - 通过 `@vitejs/plugin-vue` 拦截请求，调用 `vue/compiler-sfc` 编译
+    - 通过 `@vitejs/plugin-vue` 拦截请求，调用 `vue/compiler-sfc` 编译
 
 2. **HMR 如何实现精确更新？**
-   - 对比新旧 descriptor 的各个块，只更新变化的部分
+    - 对比新旧 descriptor 的各个块，只更新变化的部分
 
 3. **为什么 Vite 比 Webpack 快？**
-   - 开发时按需编译（不打包），利用浏览器原生 ESM
-   - 生产时使用 Rollup 打包，tree-shaking 更彻底
+    - 开发时按需编译（不打包），利用浏览器原生 ESM
+    - 生产时使用 Rollup 打包，tree-shaking 更彻底
 
 4. **Scoped CSS 的原理？**
-   - 编译时为元素添加 `data-v-xxx` 属性，CSS 选择器添加对应的属性选择器
+    - 编译时为元素添加 `data-v-xxx` 属性，CSS 选择器添加对应的属性选择器
 
 5. **`<script setup>` 如何编译？**
-   - `compiler.compileScript()` 将其转换为标准的 `setup()` 函数，处理 `defineProps` 等宏
+    - `compiler.compileScript()` 将其转换为标准的 `setup()` 函数，处理 `defineProps` 等宏
 
 ### 延伸阅读
 

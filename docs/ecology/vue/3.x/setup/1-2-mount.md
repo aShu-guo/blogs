@@ -7,6 +7,7 @@
 想象你是一个建筑工程师：
 
 **设计图纸（VNode）**：
+
 ```
 - 平面图：房间布局、尺寸
 - 立面图：外观设计
@@ -14,6 +15,7 @@
 ```
 
 **实际施工（mount + render）**：
+
 ```
 1. mount()：选择施工地点，准备开工
 2. render()：按照图纸开始施工
@@ -178,24 +180,28 @@ app.mount(document.getElementById('app'));
 
 ### 3.1 mount - 挂载应用
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `if (!isMounted)` | **挂载检查**：防止重复挂载 |
-| `const vnode = createVNode(rootComponent, rootProps)` | **创建根 VNode**：将组件配置转换为 VNode |
-| `vnode.appContext = context` | **关联上下文**：传递 AppContext 给 VNode |
-| `if (namespace === true) namespace = 'svg'` | **命名空间处理**：SVG/MathML 需要特殊处理 |
-| `if (isHydrate && hydrate)` | **SSR 激活**：服务端渲染时激活已有 HTML |
-| `else render(vnode, rootContainer, namespace)` | **客户端渲染**：从零创建 DOM |
-| `isMounted = true` | **标记已挂载**：防止重复挂载 |
-| `app._container = rootContainer` | **保存容器**：用于 unmount |
-| `(rootContainer as any).__vue_app__ = app` | **标记容器**：在容器上保存应用引用 |
+| 源码片段                                                  | 逻辑拆解                            |
+|-------------------------------------------------------|---------------------------------|
+| `if (!isMounted)`                                     | **挂载检查**：防止重复挂载                 |
+| `const vnode = createVNode(rootComponent, rootProps)` | **创建根 VNode**：将组件配置转换为 VNode    |
+| `vnode.appContext = context`                          | **关联上下文**：传递 AppContext 给 VNode |
+| `if (namespace === true) namespace = 'svg'`           | **命名空间处理**：SVG/MathML 需要特殊处理    |
+| `if (isHydrate && hydrate)`                           | **SSR 激活**：服务端渲染时激活已有 HTML      |
+| `else render(vnode, rootContainer, namespace)`        | **客户端渲染**：从零创建 DOM              |
+| `isMounted = true`                                    | **标记已挂载**：防止重复挂载                |
+| `app._container = rootContainer`                      | **保存容器**：用于 unmount             |
+| `(rootContainer as any).__vue_app__ = app`            | **标记容器**：在容器上保存应用引用             |
 
 ```typescript
 mount(
-  rootContainer: HostElement | string,
-  isHydrate?: boolean,
-  namespace?: ElementNamespace | boolean
-): ComponentPublicInstance {
+  rootContainer
+:
+HostElement | string,
+  isHydrate ? : boolean,
+  namespace ? : ElementNamespace | boolean
+):
+ComponentPublicInstance
+{
   if (!isMounted) {
     const vnode = createVNode(rootComponent, rootProps);
     vnode.appContext = context;
@@ -230,14 +236,14 @@ mount(
 
 ### 3.2 render - 渲染函数
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `if (vnode == null)` | **卸载模式**：vnode 为 null 时卸载应用 |
-| `if (container._vnode)` | **检查旧 VNode**：容器中是否有旧的 VNode |
-| `unmount(container._vnode, ...)` | **卸载旧节点**：清理旧的 DOM 和组件 |
-| `else patch(container._vnode \\|\\| null, vnode, ...)` | **挂载或更新**：调用 patch 进行 diff |
-| `container._vnode = vnode` | **保存 VNode**：在容器上保存当前 VNode |
-| `flushPostFlushCbs()` | **执行回调**：执行 mounted/updated 等钩子 |
+| 源码片段                                                   | 逻辑拆解                            |
+|--------------------------------------------------------|---------------------------------|
+| `if (vnode == null)`                                   | **卸载模式**：vnode 为 null 时卸载应用     |
+| `if (container._vnode)`                                | **检查旧 VNode**：容器中是否有旧的 VNode    |
+| `unmount(container._vnode, ...)`                       | **卸载旧节点**：清理旧的 DOM 和组件          |
+| `else patch(container._vnode \\|\\| null, vnode, ...)` | **挂载或更新**：调用 patch 进行 diff      |
+| `container._vnode = vnode`                             | **保存 VNode**：在容器上保存当前 VNode     |
+| `flushPostFlushCbs()`                                  | **执行回调**：执行 mounted/updated 等钩子 |
 
 ```typescript
 const render: RootRenderFunction = (vnode, container, namespace) => {
@@ -269,17 +275,17 @@ const render: RootRenderFunction = (vnode, container, namespace) => {
 
 ### 3.3 patch - 核心 diff 算法
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `if (n1 === n2) return` | **相同引用**：完全相同的 VNode，跳过 |
-| `if (n1 && !isSameVNodeType(n1, n2))` | **类型不同**：卸载旧节点，重新挂载 |
-| `unmount(n1, ...)` | **卸载旧节点**：清理旧的 DOM 和组件 |
-| `n1 = null` | **重置旧节点**：标记为挂载模式 |
-| `const { type, shapeFlag } = n2` | **获取类型**：从新 VNode 获取类型信息 |
-| `if (type === Text)` | **文本节点**：调用 processText |
-| `else if (type === Fragment)` | **Fragment**：调用 processFragment |
-| `else if (shapeFlag & ShapeFlags.ELEMENT)` | **HTML 元素**：调用 processElement |
-| `else if (shapeFlag & ShapeFlags.COMPONENT)` | **组件**：调用 processComponent |
+| 源码片段                                         | 逻辑拆解                            |
+|----------------------------------------------|---------------------------------|
+| `if (n1 === n2) return`                      | **相同引用**：完全相同的 VNode，跳过         |
+| `if (n1 && !isSameVNodeType(n1, n2))`        | **类型不同**：卸载旧节点，重新挂载             |
+| `unmount(n1, ...)`                           | **卸载旧节点**：清理旧的 DOM 和组件          |
+| `n1 = null`                                  | **重置旧节点**：标记为挂载模式               |
+| `const { type, shapeFlag } = n2`             | **获取类型**：从新 VNode 获取类型信息        |
+| `if (type === Text)`                         | **文本节点**：调用 processText         |
+| `else if (type === Fragment)`                | **Fragment**：调用 processFragment |
+| `else if (shapeFlag & ShapeFlags.ELEMENT)`   | **HTML 元素**：调用 processElement   |
+| `else if (shapeFlag & ShapeFlags.COMPONENT)` | **组件**：调用 processComponent      |
 
 ```typescript
 const patch = (
@@ -322,14 +328,14 @@ const patch = (
 
 ### 3.4 processComponent - 处理组件
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `n2.slotScopeIds = slotScopeIds` | **插槽作用域**：传递插槽作用域 ID |
-| `if (n1 == null)` | **挂载模式**：旧 VNode 为 null |
-| `if (n2.shapeFlag & ShapeFlags.COMPONENT_KEPT_ALIVE)` | **KeepAlive 组件**：激活缓存的组件 |
+| 源码片段                                                       | 逻辑拆解                             |
+|------------------------------------------------------------|----------------------------------|
+| `n2.slotScopeIds = slotScopeIds`                           | **插槽作用域**：传递插槽作用域 ID             |
+| `if (n1 == null)`                                          | **挂载模式**：旧 VNode 为 null          |
+| `if (n2.shapeFlag & ShapeFlags.COMPONENT_KEPT_ALIVE)`      | **KeepAlive 组件**：激活缓存的组件         |
 | `(parentComponent!.ctx as KeepAliveContext).activate(...)` | **激活组件**：调用 KeepAlive 的 activate |
-| `else mountComponent(...)` | **挂载组件**：创建组件实例并挂载 |
-| `else updateComponent(n1, n2, optimized)` | **更新模式**：更新已有组件 |
+| `else mountComponent(...)`                                 | **挂载组件**：创建组件实例并挂载               |
+| `else updateComponent(n1, n2, optimized)`                  | **更新模式**：更新已有组件                  |
 
 ```typescript
 const processComponent = (
@@ -408,9 +414,10 @@ if (typeof rootContainer === 'string') {
 
 ```typescript
 // 服务端渲染的 HTML
-<div id="app" data-server-rendered="true">
-  <div>0</div>
-</div>
+<div id = "app"
+data - server - rendered = "true" >
+  <div>0 < /div>
+  < /div>
 
 // 客户端激活
 const app = createApp(App);
@@ -446,6 +453,7 @@ if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
 ```
 
 **优势**：
+
 - O(1) 判断：位运算比类型检查快
 - 组合类型：可以同时标记多个特征
 - 内存效率：一个数字存储多个布尔值
@@ -560,6 +568,7 @@ DOM 创建完成
 **Q1：mount 方法做了什么？**
 
 A：主要步骤：
+
 1. **检查挂载状态**：防止重复挂载
 2. **创建根 VNode**：调用 createVNode(rootComponent, rootProps)
 3. **关联上下文**：vnode.appContext = context
@@ -570,6 +579,7 @@ A：主要步骤：
 **Q2：render 和 patch 的区别是什么？**
 
 A：区别：
+
 1. **render**：入口函数，判断挂载或卸载，调用 patch 或 unmount
 2. **patch**：核心 diff 算法，对比新旧 VNode，决定如何更新 DOM
 3. **关系**：render 是 patch 的包装器，处理边界情况
@@ -577,6 +587,7 @@ A：区别：
 **Q3：为什么使用 ShapeFlags 而不是 typeof？**
 
 A：优势：
+
 1. **性能**：位运算比类型检查快
 2. **组合**：可以同时标记多个特征（如 ELEMENT | TEXT_CHILDREN）
 3. **统一**：所有类型判断使用相同的方式
@@ -585,6 +596,7 @@ A：优势：
 **Q4：SSR Hydration 和普通 render 的区别？**
 
 A：区别：
+
 1. **普通 render**：从零创建 DOM，调用 createElement、appendChild
 2. **Hydration**：复用服务端渲染的 HTML，只绑定事件和建立响应式
 3. **性能**：Hydration 更快，因为 DOM 已经存在

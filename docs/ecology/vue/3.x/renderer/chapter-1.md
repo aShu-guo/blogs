@@ -29,8 +29,6 @@ Patch（对比算法）
 DOM Operations（真实 DOM 操作）
 ```
 
----
-
 ## 2. 最小实现：手写"低配版"渲染器
 
 下面是一个 40 行的极简渲染器，展示核心逻辑：
@@ -96,28 +94,26 @@ renderer.render(vnode, document.body);
 
 虽然真实的 Vue 3 源码有数千行，但**骨架就是这段代码**。
 
----
-
 ## 3. 逐行解剖：Vue 3 渲染器核心路径
 
 ### 3.1 渲染器的创建：`createRenderer`
 
 Vue 3 的渲染器是**平台无关**的，通过传入不同的 DOM 操作函数，可以渲染到不同平台（浏览器、Canvas、小程序等）。
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `function createRenderer(options)` | **平台抽象**：接收 `createElement`、`insert`、`patchProp` 等操作函数 |
-| `const { insert, remove, patchProp } = options` | **解构操作**：提取平台相关的 DOM 操作方法 |
-| `return { render, hydrate }` | **返回渲染函数**：`render` 用于客户端渲染，`hydrate` 用于 SSR |
+| 源码片段                                            | 逻辑拆解                                                   |
+|-------------------------------------------------|--------------------------------------------------------|
+| `function createRenderer(options)`              | **平台抽象**：接收 `createElement`、`insert`、`patchProp` 等操作函数 |
+| `const { insert, remove, patchProp } = options` | **解构操作**：提取平台相关的 DOM 操作方法                              |
+| `return { render, hydrate }`                    | **返回渲染函数**：`render` 用于客户端渲染，`hydrate` 用于 SSR           |
 
 ### 3.2 挂载元素：`mountElement`
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
+| 源码片段                                                  | 逻辑拆解                                                  |
+|-------------------------------------------------------|-------------------------------------------------------|
 | `const el = vnode.el = hostCreateElement(vnode.type)` | **创建元素**：调用平台的 `createElement`，并将真实 DOM 存到 `vnode.el` |
-| `if (shapeFlag & ShapeFlags.TEXT_CHILDREN)` | **位运算优化**：用位运算快速判断子节点类型（文本/数组） |
-| `hostPatchProp(el, key, null, props[key])` | **设置属性**：调用平台的 `patchProp` 处理 class、style、事件等 |
-| `hostInsert(el, container, anchor)` | **插入 DOM**：将元素插入到容器中，`anchor` 用于指定插入位置 |
+| `if (shapeFlag & ShapeFlags.TEXT_CHILDREN)`           | **位运算优化**：用位运算快速判断子节点类型（文本/数组）                        |
+| `hostPatchProp(el, key, null, props[key])`            | **设置属性**：调用平台的 `patchProp` 处理 class、style、事件等         |
+| `hostInsert(el, container, anchor)`                   | **插入 DOM**：将元素插入到容器中，`anchor` 用于指定插入位置                |
 
 **为什么用位运算？**
 Vue 3 用 `ShapeFlags` 枚举来标记 VNode 类型（元素、组件、文本等），位运算比字符串比较快 10 倍以上。
@@ -139,31 +135,31 @@ if (vnode.shapeFlag & ShapeFlags.ELEMENT) { /* ... */ }
 
 Patch 是渲染器的核心，负责**最小化 DOM 操作**。
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `if (n1 == null)` | **首次挂载**：旧节点不存在，直接调用 `mountElement` |
-| `else if (n1.type !== n2.type)` | **类型不同**：直接卸载旧节点，挂载新节点（无法复用） |
-| `else { patchElement(n1, n2) }` | **类型相同**：进入元素更新逻辑，复用 DOM 节点 |
+| 源码片段                            | 逻辑拆解                                |
+|---------------------------------|-------------------------------------|
+| `if (n1 == null)`               | **首次挂载**：旧节点不存在，直接调用 `mountElement` |
+| `else if (n1.type !== n2.type)` | **类型不同**：直接卸载旧节点，挂载新节点（无法复用）        |
+| `else { patchElement(n1, n2) }` | **类型相同**：进入元素更新逻辑，复用 DOM 节点         |
 
 **关键优化**：Vue 3 会尽可能**复用旧的 DOM 节点**，只更新变化的属性和子节点。
 
 ### 3.4 更新元素：`patchElement`
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
-| `const el = (n2.el = n1.el)` | **复用 DOM**：新 VNode 直接引用旧 VNode 的真实 DOM |
-| `patchProps(el, n1.props, n2.props)` | **更新属性**：对比新旧 props，只更新变化的部分 |
-| `patchChildren(n1, n2, el)` | **更新子节点**：这是最复杂的部分，涉及 Diff 算法 |
+| 源码片段                                 | 逻辑拆解                                   |
+|--------------------------------------|----------------------------------------|
+| `const el = (n2.el = n1.el)`         | **复用 DOM**：新 VNode 直接引用旧 VNode 的真实 DOM |
+| `patchProps(el, n1.props, n2.props)` | **更新属性**：对比新旧 props，只更新变化的部分           |
+| `patchChildren(n1, n2, el)`          | **更新子节点**：这是最复杂的部分，涉及 Diff 算法          |
 
 ### 3.5 子节点更新：`patchChildren`
 
 子节点有三种情况：文本、数组、空。Vue 3 用一个 9 宫格矩阵处理所有组合：
 
-| 旧 \ 新 | 文本 | 数组 | 空 |
-|--------|------|------|-----|
-| **文本** | 更新文本 | 清空文本 + 挂载数组 | 清空文本 |
+| 旧 \ 新  | 文本          | 数组          | 空    |
+|--------|-------------|-------------|------|
+| **文本** | 更新文本        | 清空文本 + 挂载数组 | 清空文本 |
 | **数组** | 卸载数组 + 设置文本 | **Diff 算法** | 卸载数组 |
-| **空** | 设置文本 | 挂载数组 | 无操作 |
+| **空**  | 设置文本        | 挂载数组        | 无操作  |
 
 **最复杂的情况**：新旧都是数组，需要用 Diff 算法找出最小操作。
 
@@ -171,11 +167,11 @@ Patch 是渲染器的核心，负责**最小化 DOM 操作**。
 
 组件的渲染流程：
 
-| 源码片段 | 逻辑拆解 |
-|---------|---------|
+| 源码片段                                              | 逻辑拆解                                   |
+|---------------------------------------------------|----------------------------------------|
 | `const instance = createComponentInstance(vnode)` | **创建实例**：初始化组件实例，包含 props、slots、emit 等 |
-| `setupComponent(instance)` | **执行 setup**：调用组件的 `setup` 函数，处理响应式数据 |
-| `setupRenderEffect(instance)` | **建立渲染副作用**：用 `effect` 包裹渲染函数，实现响应式更新 |
+| `setupComponent(instance)`                        | **执行 setup**：调用组件的 `setup` 函数，处理响应式数据  |
+| `setupRenderEffect(instance)`                     | **建立渲染副作用**：用 `effect` 包裹渲染函数，实现响应式更新  |
 
 **关键点**：`setupRenderEffect` 会创建一个响应式副作用，当组件依赖的数据变化时，自动触发重新渲染。
 
@@ -222,25 +218,23 @@ Patch 算法对比
 最小化 DOM 更新
 ```
 
----
-
 ## 4. 细节补充：边界与性能优化
 
 ### 4.1 异常处理
 
-| 场景 | 处理方式 |
-|------|---------|
+| 场景             | 处理方式         |
+|----------------|--------------|
 | VNode 为 `null` | 卸载旧节点，不挂载新节点 |
-| 子节点为空数组 | 跳过子节点处理 |
-| Props 为 `null` | 跳过属性设置 |
+| 子节点为空数组        | 跳过子节点处理      |
+| Props 为 `null` | 跳过属性设置       |
 
 ### 4.2 性能优化
 
-| 优化点 | 实现方式 |
-|--------|---------|
-| **静态提升** | 编译时将静态节点提升到渲染函数外，避免重复创建 |
-| **事件缓存** | 缓存事件处理函数，避免每次渲染都创建新函数 |
-| **Block Tree** | 将动态节点收集到数组中，Diff 时只对比动态节点 |
+| 优化点            | 实现方式                             |
+|----------------|----------------------------------|
+| **静态提升**       | 编译时将静态节点提升到渲染函数外，避免重复创建          |
+| **事件缓存**       | 缓存事件处理函数，避免每次渲染都创建新函数            |
+| **Block Tree** | 将动态节点收集到数组中，Diff 时只对比动态节点        |
 | **PatchFlags** | 标记节点的动态部分（文本、class、style 等），精准更新 |
 
 **示例：PatchFlags**
@@ -273,8 +267,6 @@ if (vnode.dynamicChildren) {
 **Fragment**：多根节点组件返回 Fragment，渲染器会遍历其子节点逐个挂载。
 
 **Teleport**：将子节点渲染到指定的 DOM 节点，而不是父容器。
-
----
 
 ## 5. 总结与延伸
 

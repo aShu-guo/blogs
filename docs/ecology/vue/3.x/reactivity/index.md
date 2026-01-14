@@ -2,7 +2,8 @@
 
 ## 什么是响应式？
 
-响应式是 Vue 3 的核心特性，它使应用程序能够自动跟踪数据的变化，并在数据改变时自动更新 UI。Vue 3 通过 **Proxy** 和 **Effect 系统** 实现了一个强大且优雅的响应式系统。
+响应式是 Vue 3 的核心特性，它使应用程序能够自动跟踪数据的变化，并在数据改变时自动更新 UI。Vue 3 通过 **Proxy** 和 **Effect
+系统** 实现了一个强大且优雅的响应式系统。
 
 ## 模块架构
 
@@ -47,6 +48,7 @@ const count = ref(0)
 ```
 
 **特点**：
+
 - 自动依赖收集（访问属性时记录）
 - 自动触发更新（修改属性时通知）
 - 深层响应式（嵌套对象也是响应式）
@@ -69,6 +71,7 @@ state.count++  // 触发 effect，控制台输出：Count is 1
 ```
 
 **执行流程**：
+
 1. 首次执行 effect 回调
 2. 在执行过程中，访问 `state.count` 会被追踪
 3. `state.count` 将此 effect 注册为依赖
@@ -106,14 +109,14 @@ set(target, key, value) {
 
 Vue 3 使用 Proxy 代替原始对象的原因：
 
-| 操作 | 直接对象 | Proxy |
-|------|--------|-------|
-| 访问属性 | 无法追踪 | ✅ 可追踪 |
-| 修改属性 | 无法追踪 | ✅ 可追踪 |
-| 新增属性 | 无法追踪（Vue 2 需要 $set） | ✅ 可追踪 |
-| 删除属性 | 无法追踪 | ✅ 可追踪 |
-| 数组索引 | 无法追踪 | ✅ 可追踪 |
-| in 操作符 | 无法追踪 | ✅ 可追踪 |
+| 操作     | 直接对象                | Proxy |
+|--------|---------------------|-------|
+| 访问属性   | 无法追踪                | ✅ 可追踪 |
+| 修改属性   | 无法追踪                | ✅ 可追踪 |
+| 新增属性   | 无法追踪（Vue 2 需要 $set） | ✅ 可追踪 |
+| 删除属性   | 无法追踪                | ✅ 可追踪 |
+| 数组索引   | 无法追踪                | ✅ 可追踪 |
+| in 操作符 | 无法追踪                | ✅ 可追踪 |
 
 详见 [Proxy 详解](./1-1-proxy.md)。
 
@@ -133,6 +136,7 @@ state.user.name = 'Jane'  // ✅ 响应
 ```
 
 **特点**：
+
 - 只适用于对象和数组
 - 深层响应式（递归代理）
 - 返回 Proxy 对象
@@ -140,12 +144,12 @@ state.user.name = 'Jane'  // ✅ 响应
 
 **vs ref()**：
 
-| 方面 | reactive | ref |
-|------|----------|-----|
-| 值类型 | 仅对象 | 任意 |
-| 访问方式 | 直接 | `.value` |
-| 简单状态 | ❌ 不太合适 | ✅ 推荐 |
-| 复杂对象 | ✅ 推荐 | ❌ 需解包 |
+| 方面   | reactive | ref      |
+|------|----------|----------|
+| 值类型  | 仅对象      | 任意       |
+| 访问方式 | 直接       | `.value` |
+| 简单状态 | ❌ 不太合适   | ✅ 推荐     |
+| 复杂对象 | ✅ 推荐     | ❌ 需解包    |
 
 ### ref() - 值响应式
 
@@ -163,6 +167,7 @@ count.value++             // 1
 ```
 
 **特点**：
+
 - 可用于任意值（包括基本类型）
 - 访问时需要 `.value`
 - 嵌套对象自动转为 reactive
@@ -190,6 +195,7 @@ const fullName = computed(
 ```
 
 **特点**：
+
 - 缓存计算结果（依赖未改变时不重新计算）
 - 延迟计算（依赖改变时不立即计算，访问时才计算）
 - 自动追踪依赖
@@ -225,6 +231,7 @@ watch(() => state, (newVal) => {
 ```
 
 **特点**：
+
 - 需要传入 getter 函数（响应式源）
 - 支持多源侦听
 - 支持立即执行（`{ immediate: true }`）
@@ -249,6 +256,7 @@ name.value = 'updated'
 ```
 
 **特点**：
+
 - 无需指定依赖源（自动追踪）
 - 类似 effect()，但返回停止函数
 - 更简洁，适合简单侦听
@@ -271,6 +279,7 @@ state.count++  // 不输出任何内容
 ```
 
 **特点**：
+
 - watch 和 watchEffect 都基于 effect 实现
 - 可手动停止
 - 可配置调度器（scheduler）
@@ -458,76 +467,76 @@ state.dom.textContent = 'hello'  // 不触发响应式更新
 
 ## API 快速参考
 
-| API | 用途 | 返回值 |
-|-----|------|--------|
-| `reactive(obj)` | 创建深层响应式对象 | Proxy |
-| `ref(value)` | 创建响应式引用 | RefImpl |
-| `shallowReactive(obj)` | 创建浅层响应式对象 | Proxy |
-| `shallowRef(value)` | 创建浅层响应式引用 | RefImpl |
-| `readonly(obj)` | 创建只读代理 | Proxy |
-| `computed(fn)` | 创建计算属性 | ComputedRef |
-| `watch(source, cb)` | 侦听响应式源 | 停止函数 |
-| `watchEffect(fn)` | 自动依赖追踪侦听 | 停止函数 |
-| `effect(fn)` | 注册副作用 | 停止函数 |
-| `isReactive(obj)` | 检查是否为响应式 | boolean |
-| `isReadonly(obj)` | 检查是否为只读 | boolean |
-| `isRef(obj)` | 检查是否为 ref | boolean |
-| `toRaw(obj)` | 获取原始对象 | any |
-| `toRef(obj, key)` | 将属性转为 ref | Ref |
-| `unref(ref)` | 获取 ref 的值 | any |
+| API                    | 用途        | 返回值         |
+|------------------------|-----------|-------------|
+| `reactive(obj)`        | 创建深层响应式对象 | Proxy       |
+| `ref(value)`           | 创建响应式引用   | RefImpl     |
+| `shallowReactive(obj)` | 创建浅层响应式对象 | Proxy       |
+| `shallowRef(value)`    | 创建浅层响应式引用 | RefImpl     |
+| `readonly(obj)`        | 创建只读代理    | Proxy       |
+| `computed(fn)`         | 创建计算属性    | ComputedRef |
+| `watch(source, cb)`    | 侦听响应式源    | 停止函数        |
+| `watchEffect(fn)`      | 自动依赖追踪侦听  | 停止函数        |
+| `effect(fn)`           | 注册副作用     | 停止函数        |
+| `isReactive(obj)`      | 检查是否为响应式  | boolean     |
+| `isReadonly(obj)`      | 检查是否为只读   | boolean     |
+| `isRef(obj)`           | 检查是否为 ref | boolean     |
+| `toRaw(obj)`           | 获取原始对象    | any         |
+| `toRef(obj, key)`      | 将属性转为 ref | Ref         |
+| `unref(ref)`           | 获取 ref 的值 | any         |
 
 ## 学习路径
 
 ### 初级：理解基础概念
 
 1. **理解 Proxy 的作用** → [Proxy 详解](./1-1-proxy.md)
-   - Proxy 如何拦截属性访问和修改
-   - 为什么需要 Proxy（vs Object.defineProperty）
-   - WeakMap 缓存原理
+    - Proxy 如何拦截属性访问和修改
+    - 为什么需要 Proxy（vs Object.defineProperty）
+    - WeakMap 缓存原理
 
 2. **掌握 reactive() 和 ref()**
-   - 何时使用 reactive（复杂对象）
-   - 何时使用 ref（简单值或需要整体替换）
-   - 自动解包的工作原理
+    - 何时使用 reactive（复杂对象）
+    - 何时使用 ref（简单值或需要整体替换）
+    - 自动解包的工作原理
 
 3. **理解 effect 和依赖收集**
-   - 副作用如何注册和执行
-   - track() 和 trigger() 的机制
-   - 依赖映射结构
+    - 副作用如何注册和执行
+    - track() 和 trigger() 的机制
+    - 依赖映射结构
 
 ### 中级：掌握常用 API
 
 4. **深入 computed()**
-   - 缓存和延迟计算
-   - vs 普通函数的性能差异
-   - getter/setter 模式
+    - 缓存和延迟计算
+    - vs 普通函数的性能差异
+    - getter/setter 模式
 
 5. **精通 watch()**
-   - 单源和多源侦听
-   - 深层侦听的开销
-   - vs watchEffect 的选择
+    - 单源和多源侦听
+    - 深层侦听的开销
+    - vs watchEffect 的选择
 
 6. **理解 ref 自动解包**
-   - reactive 对象中的 ref 自动解包
-   - 数组中的 ref 不解包的原因
-   - 模板中的自动解包
+    - reactive 对象中的 ref 自动解包
+    - 数组中的 ref 不解包的原因
+    - 模板中的自动解包
 
 ### 高级：性能优化和调试
 
 7. **性能优化**
-   - 使用 shallowReactive 处理大对象
-   - 使用 markRaw 跳过代理化
-   - 批处理更新的时机
+    - 使用 shallowReactive 处理大对象
+    - 使用 markRaw 跳过代理化
+    - 批处理更新的时机
 
 8. **常见陷阱**
-   - 直接解构失去响应性
-   - 修改原始对象不触发更新
-   - Symbol 属性的特殊处理
+    - 直接解构失去响应性
+    - 修改原始对象不触发更新
+    - Symbol 属性的特殊处理
 
 9. **高级调试和监控**
-   - 使用 Vue DevTools
-   - 手动追踪依赖图
-   - 性能分析工具
+    - 使用 Vue DevTools
+    - 手动追踪依赖图
+    - 性能分析工具
 
 ## 与其他模块的关系
 
@@ -566,6 +575,7 @@ effect 注册：render 函数作为副作用
 **Q: reactive() 和 ref() 应该如何选择？**
 
 A:
+
 - 使用 `ref()`：简单值（count、message）或需要整体替换（user = new User()）
 - 使用 `reactive()`：复杂对象结构（state.user.profile.settings）
 - 混合使用：最常见的做法
@@ -573,6 +583,7 @@ A:
 **Q: computed() 和普通函数有什么区别？**
 
 A:
+
 - computed 会缓存结果，依赖不变时不重新计算
 - 普通函数每次调用都会重新计算
 - 复杂计算应使用 computed，简单表达式可用函数
@@ -580,6 +591,7 @@ A:
 **Q: watch() 和 watchEffect() 有什么区别？**
 
 A:
+
 - watch：需指定源，可访问新旧值
 - watchEffect：自动追踪依赖，无法访问旧值
 - 简单侦听用 watchEffect，需要旧值用 watch
@@ -587,6 +599,7 @@ A:
 **Q: 为什么数组中的 Ref 不自动解包？**
 
 A: 防止混淆。解构数组时应获得 Ref 本身，而非解包后的值：
+
 ```typescript
 const arr = reactive([ref(0)])
 const [ref0] = arr  // ref0 应该是 Ref，不应被解包
@@ -595,6 +608,7 @@ const [ref0] = arr  // ref0 应该是 Ref，不应被解包
 **Q: 如何在响应式系统之外修改数据？**
 
 A: 使用 `toRaw()` 获取原始对象，但这样修改不会触发更新：
+
 ```typescript
 const raw = toRaw(state)
 raw.count++  // 修改了，但不响应
@@ -610,9 +624,11 @@ raw.count++  // 修改了，但不响应
 
 ## 总结
 
-Vue 3 的响应式系统通过 **Proxy + Effect** 的组合，实现了一个强大而优雅的自动依赖追踪和更新通知机制。它是 Vue 3 的核心，驱动了整个框架的响应能力。
+Vue 3 的响应式系统通过 **Proxy + Effect** 的组合，实现了一个强大而优雅的自动依赖追踪和更新通知机制。它是 Vue 3
+的核心，驱动了整个框架的响应能力。
 
 关键要点：
+
 - ✅ Proxy 拦截所有操作（新增属性、删除属性等）
 - ✅ track() 自动收集依赖
 - ✅ trigger() 自动触发更新
