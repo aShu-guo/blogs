@@ -11,7 +11,13 @@ export default {
           text: '组件初始化',
           link: '/ecology/vue/3.x/setup/1-3-component-init',
           items: [
+            { text: 'emits标准化', link: '/ecology/vue/3.x/setup/1-3.2-emits' },
             { text: 'props标准化', link: '/ecology/vue/3.x/setup/1-3.1-props' },
+            { text: 'slots标准化', link: '/ecology/vue/3.x/setup/1-3.3-slots' },
+            {
+              text: 'directives标准化',
+              link: '/ecology/vue/3.x/setup/1-3.4-directives',
+            },
           ],
         },
         { text: 'setup', link: '/ecology/vue/3.x/setup/1-4-setup' },
