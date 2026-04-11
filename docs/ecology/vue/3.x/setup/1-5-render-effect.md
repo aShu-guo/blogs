@@ -652,6 +652,6 @@ graph TD
 
 - [组件初始化流程](./1-3-component-init.md) - 了解 setupRenderEffect 在组件生命周期中的位置
 - [setup 函数执行](./1-4-setup.md) - 了解 setup 如何创建响应式数据
-- [响应式系统原理](../reactivity/1-1-reactive.md) - 深入理解 track 和 trigger 机制
+- [响应式系统原理](../reactivity/1-4.2-reactive.md) - 深入理解 track 和 trigger 机制
 - [异步更新队列](./1-6-scheduler.md) - 详解 queueJob 和 nextTick 的实现
 - [patch 算法](./1-2-mount.md) - 了解 vnode 如何转换为真实 DOM

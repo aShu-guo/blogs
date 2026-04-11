@@ -732,7 +732,7 @@ usePreload(() => import('./Heavy.vue'), 3000)
 ## 相关章节
 
 - [6.1 Vite 配置优化](../6-build/6-1-vite-config.md) - 分包配置详解
-- [3.2 大页面拆分](../project/3-2-page-splitting.md) - home/index.vue 拆分案例
+- [3.2 大页面拆分](../../project/3-2-page-splitting.md) - home/index.vue 拆分案例
 - [8.1 低空政务平台优化](../8-cases/8-1-low-altitude.md) - 完整优化案例
 
 ## 总结

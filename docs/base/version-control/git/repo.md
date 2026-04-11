@@ -1,184 +1,90 @@
-# 仓库相关操作
+# 仓库结构与提交流程
 
-## 仓库结构
-
-git仓库分为4个部分：工作区 -> 暂存区 -> 本地仓库 -> 远程仓库
+先把 Git 仓库粗暴地理解成四层就够用了：`工作区 -> 暂存区 -> 本地仓库 -> 远程仓库`
 
 ![img.png](/imgs/base/respo-flow.png)
 
-## 基础操作
+## 这四层分别在干什么
 
-### 变动代码提交
+### 工作区
 
-工作区可以理解为IDE开发环境，在IDE中变更代码
+就是你现在在编辑器里真正改的那堆文件。
+
+### 暂存区
+
+它不是“临时备份区”，更像是本次提交的候选清单。你可以把工作区里的一部分改动挑出来，先放进暂存区，准备组成下一个 commit。
+
+### 本地仓库
+
+执行 `git commit` 之后，改动会变成一个正式的提交节点，先落在你本地。
+
+### 远程仓库
+
+执行 `git push` 之后，别人才能看到你的提交。
+
+:::tip
+`commit` 只是提交到本地仓库，不等于已经同步给团队。
+:::
+
+## 场景 1：正常做完一个需求，准备提交
+
+这是最常见的路径。
 
 ```shell
-# 将变动代码提交到暂存区
+git status
 git add .
-# 将变动代码提交到本地仓库
-git commit -m "feat:提交测试"
-# 拉取最新代码
-git pull
-# 如果有冲突，则解决冲突，解决完之后提交代码到远程仓库
-git push origin feature
-# 可选的简写：前提是远程分支对应的是origin
+git commit -m "feat: 新增登录页表单校验"
 git push
 ```
 
+如果是第一次推送本地新分支，一般会多一步：
+
+```shell
+git push -u origin feature/login-form
+```
+
+`-u` 的作用是建立本地分支和远程分支的跟踪关系。第一次设完，后面通常直接 `git push` 就够了。
+
+## 场景 2：我只想提交一部分改动
+
+这个场景在真实开发里非常常见，比如你一边改需求，一边顺手修了个小问题，但这两件事不应该落在同一个 commit 里。
+
+这时不要上来就 `git add .`，更适合用：
+
+```shell
+git add -p
+```
+
+`-p` 是按代码块选择要不要进入暂存区。它不花哨，但很实用，能明显改善提交质量。
+
+## 场景 3：开始工作前，先把仓库同步到最新
+
+如果你是从主干切新分支，我自己的习惯是先同步主干，再开始写代码。
+
+```shell
+git switch main
+git pull --ff-only
+git switch -c feature/login-form
+```
+
+`--ff-only` 的意思是只允许快进更新。它的好处是：如果本地主干已经有额外提交，不会悄悄帮你做一次 merge，让主干历史变得更乱。
+
+## 场景 4：本地已经提交了，但还没推送
+
+这时你要记住一个判断标准：只要还没推送到远程，很多动作都还有比较大的腾挪空间。
+
+比如：
+
+- 提交说明写错了，可以 `git commit --amend`
+- 想拆 commit，可以用 `git reset`
+- 想整理历史，可以用 `git rebase -i`
+
+这类操作后面会分章节展开写。
+
+## 常见坑
+
+- `git add .` 太顺手，容易把临时文件、调试代码、顺手改动一起带进去
+- 工作区不干净时就去 `pull`，后面一旦冲突，现场会更乱
+- 以为 `commit` 完就结束了，结果根本没 `push`，别人看不到你的代码
+
 ![img.png](/imgs/base/git-commit.gif)
-
-重复执行上述代码，将本地仓库中的变更提交到远程仓库，远程仓库中`feature`分支新增节点并前进。
-
-### 丢弃代码
-
-```shell
-# 改动了工作区的文件，但是希望丢弃掉
-
-# 丢弃工作区指定文件的代码
-git checkout file_path
-# 丢弃所有工作区的代码
-git checkout .
-
-# 已经提交到暂存区的文件希望回退变动文件到工作区中
-
-# 回退暂存区指定文件的代码到工作区
-git reset file_path
-# 回退所有暂存区的代码
-git reset .
-
-# 已经提交到本地仓库的改动希望丢弃代码
-
-# 回滚代码到上一个版本
-git reset --head HEAD^
-# 回滚代码到n个版本
-git reset --head HEAD~n
-
-# 已经提交到远程仓库的改动希望丢弃代码
-
-# 首先查看logId
-git log
-# 回退本地仓库到指定logId
-git reset --hard logId
-# 强推到远程仓库
-git push --force origin HEAD
-```
-
-![img.png](/imgs/base/git-reset.gif)
-
-### 代码暂存
-
-```shell
-# 在开发需求时，需要修改其他分支的bug时，可以先暂存工作区的改动
-
-# 暂存当前工作区代码
-git stash
-# 改完bug之后再恢复工作区改动代码
-git stash pop
-```
-
-> 删除分支
-
-```shell
-首先切到其他分支，并删除本地分支：git branch -d 分支名
-
-删除远程分支：git push origin --delete 分支名
-```
-
-### 回滚
-
-```shell
-查看日志，获取需要回滚的logid
-
-git rebase -i logid
-
-将commit中需要删除的“pick”修改为“drop”，然后保存
-```
-
-### 回滚到上一提交
-
-```shell
-git reset --hard HEAD^
-
-git push origin HEAD --force
-```
-
-### 暂存
-
-```shell
-git stash
-
-git stash list
-
-git stash pop = git stash apply + git stash drop
-```
-
-### 合并时出现偏离
-
-```shell
-git fetch
-
-git merge FETCH_HEAD
-```
-
-### 添加子模块
-
-```shell
-git submodule add <url> <path>
-```
-
-### 子模块
-
-```shell
-1.先更新子模块，更新之后切到主项目再次提交更新子模块
-git submodule foreach git checkout release-test/v1.0.0
-git submodule foreach git pull
-2.在每个主项目中，即使每个子模块的分支相同，在其他主项目更新完子模块也不会影响其他主项目中的子模块，仍然需要做操作'1'
-```
-
-### 更新.gitignore
-
-```shell
-git rm -r --cached .
-git add .
-git commit
-```
-
-### 新建git仓库 上传文件
-
-```shell
-cd existing_folder
-git init
-git remote add origin git@gitlab.com:zxpo/test.git
-git add .
-git commit
-git push -u origin master
-```
-
-### 找回git stash丢弃的改动
-
-```shell
-git fsck --lost-found（只关注commit的logid）
-git show commitLogId
-git merge commitLogId
-```
-
-### 设置alias
-
-```shell
-git config --global alias.ck checkout
-```
-
-### 设置remote
-
-```shell
-git remote add origin https://github.com/GuoChengLi-A/uview-input-bug.git
-```
-
-
-tag
-
-```shell
-git tag -a v1.2
-git tag v1.2 -d
-git push origin v1.2
-```

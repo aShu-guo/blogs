@@ -1,3 +1,4 @@
+import { resolve } from 'node:path';
 // 导出navs
 import MvvmNavs from './navs/ecology';
 import BaseNavs from './navs/base';
@@ -105,7 +106,15 @@ export default withMermaid({
   },
   vite: {
     optimizeDeps: {
-      // include: ['@braintree/sanitize-url']
+      include: ['@braintree/sanitize-url'],
+    },
+    resolve: {
+      alias: {
+        '@braintree/sanitize-url': resolve(
+          process.cwd(),
+          'node_modules/.pnpm/node_modules/@braintree/sanitize-url/src/index.ts',
+        ),
+      },
     },
     plugins: [
       groupIconVitePlugin(),

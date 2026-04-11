@@ -1,79 +1,89 @@
 # 分支基础操作
 
-切记：在进行分支操作之前都必须保持分支上的代码是最新的，意味着每次操作分支之前都必须pull一次
+日常开发里，分支操作其实就三件事：从对的基线切出来、在对的分支上开发、用完及时合并和清理。
 
-## 新增分支
+## 场景 1：从主干切一个新功能分支
+
+切分支之前，先确认主干是最新的。
 
 ```shell
-# 假设从master分支切出一个新分支：feature/add-branch
+git switch main
+git pull --ff-only
+git switch -c feature/login-form
+```
 
-# 首先切到mater分支
-git checkout master
-# 拉取master分支最新代码
+如果你还在用老命令，上面三步对应的就是：
+
+```shell
+git checkout main
 git pull
-# 切出新分支
-git checkout -b feature/branch
-# 将本地分支与远程分支关联
-git push --set-upstream origin feature/branch
+git checkout -b feature/login-form
+```
+
+第一次把这个分支推到远程：
+
+```shell
+git push -u origin feature/login-form
 ```
 
 ![img.png](/imgs/base/git-checkout-b.png)
 
-## 删除分支
+## 场景 2：查看本地分支和远程跟踪关系
 
 ```shell
-# 假设删除分支：feature/add-branch
-
-# 首先切到另外一个分支master
-git checkout master
-# 删除本地分支
-git branch -d feature/add-branch
-# 删除远程分支
-git push --delete origin feature/add-branch
-```
-
-## 更改分支名称
-
-```shell
-# 假设重命名分支：feature/add-branch -> feature/rename-branch
-
-# 首先重命名本地分支
-git branch -m feature/add-branch feature/rename-branch
-# 删除远程分支
-git push --delete origin feature/add-branch
-# 推送最新本地分支到远程
-git push origin feature/rename-branch
-# 将本地分支与远程分支关联
-git push --set-upstream origin feature/rename-branch
-```
-
-## 查看分支
-
-```shell
-# 查看所有远程分支
-git branch -v
-# 查看所有本地分支
 git branch
+git branch -v
 ```
 
-## 合并分支
+我更常用 `git branch -v`，因为它除了能看本地分支，还能看到每个分支当前跟踪的是哪个远程分支，以及和远程相比是领先还是落后。
+
+## 场景 3：需求做完了，把功能分支合回主干
+
+最朴素的做法是：
 
 ```shell
-# 在协同开发同一版本需求时，开发者A开发功能A，在开发完功能之后需要合并到同一分支
-# 开发者A 在分支：feature 上开发
-
-# 切换到需要合并的分支并保持代码最新
-git chekcout feature
-# 拉取最新代码
-git pull
-# 切换到最终分支
-git checkout master
-# 拉取最新代码
-git pull
-# 合并分支feature
-git merge feature
-# 解决冲突之后提交
+git switch main
+git pull --ff-only
+git merge feature/login-form
 git push
 ```
+
+如果团队通过 PR 合并，这一步通常是在平台上点按钮完成；本地更常见的动作是先把功能分支同步好，再发起合并。
+
+:::info
+如果你想在合并前整理提交历史，不要直接在这里硬合，先看 [rebase](/base/version-control/git/rebase)。
+:::
+
+## 场景 4：分支名起错了，直接改
+
+### 只改本地分支名
+
+```shell
+git branch -m feature/logn-form feature/login-form
+```
+
+### 本地和远程一起改
+
+```shell
+git branch -m feature/logn-form feature/login-form
+git push origin --delete feature/logn-form
+git push -u origin feature/login-form
+```
+
+## 场景 5：功能已经合完，删除旧分支
+
+```shell
+git switch main
+git branch -d feature/login-form
+git push origin --delete feature/login-form
+```
+
+如果 Git 提示本地分支还没被合并，说明它认为这条分支上的提交还有丢失风险。这个时候先别急着 `-D`，先看看到底是不是你还需要的历史。
+
+## 常见坑
+
+- 从过期的 `main` 上切分支，后面补同步会增加无意义冲突
+- 工作区有未提交改动时直接切分支，容易把现场带脏
+- 分支已经合并了，但本地和远程都不清理，时间久了会越来越难找
 
 ![img.png](/imgs/base/merge-animation.gif)

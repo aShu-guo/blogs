@@ -1,150 +1,78 @@
-# 分支进阶操作
+# 分支协作进阶
 
-## git rebase
+基础分支操作不难，真正麻烦的是协作过程里的“分支关系乱了”。这类问题通常不是命令不会写，而是没想清楚当前分支和远程、和主干、和其他分支分别是什么关系。
 
-rebase可译为变基，指在一个分支上所有提交应用指定分支的最新节点上
+## 场景 1：我要接手一个远程已经存在的分支
 
-![img.png](/imgs/base/git-rebase.gif)
-
-### 标准模式
-
-假设有分支feature以及分支master，并且当前分支为feature
-
-```markdown
-          A---B---C feature
-         /
-    D---E---F---G master
-```
-
-执行
+比如同事推了一个 `feature/order-refactor`，你要继续在他后面改。
 
 ```shell
-git rebase master
-# 或者
-git rebase master feature
+git fetch origin
+git switch --track origin/feature/order-refactor
 ```
 
-将A、B、C对应的提交变基到master分支上
+如果本地已经有同名分支，就不用再 `--track`，直接切过去即可。
 
-```markdown
-                  A'--B'--C' feature
-                 /
-    D---E---F---G master
-```
+## 场景 2：本地分支跟踪错了远程分支
 
-如果分支feature上存在与master分支上有相同的改动
-
-```markdown
-          A---B---C feature
-         /
-    D---E---A'---G master
-```
-
-那么变基之后的提交记录变为
-
-```markdown
-                  B---C feature
-                 /
-    D---E---A'---G master
-```
-
-### --onto 参数
-
-将一系列提交变基到指定分支上（只会保证在指定分支上，并不会放置在最新的节点上）
-
-> 用于处理基于其他分支开发的功能分支（feature/A分支需求较多还没有开发完成，而feature/B分支是基于feature/A开发的，但是已经开发完），希望合并到主分支
-
-```markdown
-    o---o---o---o---o  master
-         \
-          o---o---o---o---o---o  feature/A
-                           \
-                            o---o---o  feature/B
-```
-
-执行：
+这种事不常见，但一旦配错，`pull` 和 `push` 都会很别扭。
 
 ```shell
-git rebase --onto master feature/A feature/B
+git branch -u origin/feature/order-refactor
 ```
 
-因为feature/A分支是从master分支上切出的，所以它并不会改变。而feature/B是从feature/A分支上切出，执行变基之后，会将feature/B变为从master上切出。
+先用 `git branch -v` 看清楚当前分支到底在跟踪谁，再改。
 
-```markdown
-    o---o---o---o---o  master
-         \          \
-          \          o---o---o  feature/B
-           \
-            o---o---o---o---o---o  feature/A
+## 场景 3：想看自己的分支到底比主干多了什么
 
-```
-
-当然，rebase不仅可以变基多个分支，也可以操作一个分支来删除commit（删除不连续的commit）
-
-```markdown
-    E---F---G---H---I---J  feature/A
-```
-
-执行
+在合并前，我很少直接凭感觉看代码，而是会先看一眼分支差异。
 
 ```shell
-git rebase --onto feature/A~5 feature/A~3 feature/A
+git fetch origin
+git log --oneline --left-right origin/main...HEAD
+git diff origin/main...HEAD
 ```
 
-其中feature/A~5表示E，feature/A~3表示E、F、G，此时feature/A还剩H、I、J提交。变基之后H、I、J提交覆盖了F、G提交，最终分支变为：
+这两条命令足够回答两个问题：
 
-```markdown
-    E---H'---I'---J' feature/A
-```
+- 我这个分支独有的提交有哪些
+- 相比主干，实际代码差异是什么
 
-### 交互模式
-
-以上是标准模式的变基操作，即只会将一系列commit集成到指定分支的最新修改。开启交互模式只需要添加参数：-i | --interactive。
+## 场景 4：远程分支已经合并，本地想顺手清理
 
 ```shell
-# 假设有以下提交
-commit 936e658ab28704455fd10d5a480b5b0fa0e43625 (HEAD -> master, origin/v1.2-1110, origin/master, v1.2-1110)
-commit 12d5aae891d92b94cc601c9777dfca6d951ee8c4 feat:'生产环境修改ws配置'
-commit fba7386ff9a4d0524e26a817e2a06cd17caa7541 fix:'样式调整'
-commit ae3321e4c0833be2cec233f3eb2e3e3a1bb15662 feat:'新增部门概念、模块拆分'
-commit ebe56a451bdb560135042f8a0bc43d2a6ffb416e feat:'修改生产环境变量'
+git fetch --prune
+git branch --merged
 ```
 
-假设在上述commit中删除掉ae3321e4c0833be2cec233f3eb2e3e3a1bb15662
+`git fetch --prune` 很有用，它会顺手把那些远程已经删除的引用清理掉。不然时间久了，远程分支列表会越来越脏。
+
+确认没问题之后，再删本地旧分支：
 
 ```shell
-# rebase操作的logId必须在ae3321e4c0833be2cec233f3eb2e3e3a1bb15662之前
-git rebase -i ebe56a451bdb560135042f8a0bc43d2a6ffb416e
+git branch -d feature/order-refactor
 ```
+
+## 场景 5：`git pull` 提示本地和远程已经分叉
+
+这时先别急着重复 `pull`。它通常说明两边都各自前进了。
+
+你可以先看状态：
 
 ```shell
-pick ae3321e feat:'修改生产环境变量'
-pick fba7386 feat:'上云API新增部门概念、模块拆分'
-pick 12d5aae fix:'样式调整'
-pick 936e658 feat:'生产环境修改ws配置'
-
-# Rebase ebe56a4..936e658 onto ebe56a4 (4 commands)
-#
-# Commands:
-# p, pick <commit> = 保留
-# r, reword <commit> = 保留，但是修改提交信息
-# e, edit <commit> = 保留但停止修改
-# s, squash <commit> = 保留，但合并到前一个提交
-# f, fixup [-C | -c] <commit> = 类似"squash"，但只保留前一个提交的提交信息,。指定参数-c时，仅保留当前提交信息
-# x, exec <command> = 使用 shell 运行命令
-# b, break = 在此处停止（使用 'git rebase --continue' 继续变基）
-# d, drop <commit> = 移除
+git status
+git branch -v
 ```
 
-将ae3321e修改为drop后并保存退出，
+然后按团队习惯处理：
 
-## 缺点
+- 如果团队是 merge 流程，可以 `git pull --no-rebase`
+- 如果团队偏线性历史，可以 `git pull --rebase`
 
-1. commit log会变得与实际情况不一致，部分log会丢失,导致排查错误时更困难。
-2. 上手成本较高，新手不建议使用，容易造成commit丢失。
+如果你已经知道自己要手动整理提交历史，就直接看 [rebase](/base/version-control/git/rebase) 那一章，不要在这里硬拧。
 
-## 优点
+## 常见坑
 
-1. commit日志更加清晰明了，而且rebase后的分支比merge更直观
-2. 相对于merge更加灵活，可以胜任复杂的操作。
-
+- `git pull` 的默认行为团队里不统一，时间久了容易每个人历史都长得不一样
+- 很多人只会 `branch`，不会 `branch -vv`，结果跟踪关系出问题还没发现
+- 远程分支删了，本地引用不清理，过一阵子你自己都认不出来哪个还在用

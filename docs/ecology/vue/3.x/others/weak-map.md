@@ -398,10 +398,10 @@ reactiveMap.delete(obj)  // 但如何知道何时清理？
 
 ### 延伸阅读
 
-- **下一章节**：[Vue 3 响应式系统 - Proxy 与 Reflect](/ecology/vue/3.x/reactivity/proxy-reflect)
+- **下一章节**：[Vue 3 响应式系统 - Reflect 应用](/ecology/vue/3.x/reactivity/1-2.2-reflect-utilize)
 - **相关主题**：
-    - [依赖收集与触发](/ecology/vue/3.x/reactivity/effect)
-    - [响应式 API 设计](/ecology/vue/3.x/reactivity/api-design)
+    - [依赖收集与触发](/ecology/vue/3.x/reactivity/1-3-effect)
+    - [响应式 API 设计](/ecology/vue/3.x/reactivity-api)
     - [内存管理与性能优化](/ecology/vue/3.x/performance/memory)
 
 ### 实践建议

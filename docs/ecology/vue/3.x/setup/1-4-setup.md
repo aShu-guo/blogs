@@ -395,7 +395,7 @@ async setup() {
 
 - [组件初始化流程](./1-3-component-init.md) - 了解 setup 在整个初始化流程中的位置
 - [渲染副作用](./1-5-render-effect.md) - setup 返回值如何驱动组件更新
-- [响应式系统](../reactivity/1-1-reactive.md) - 深入理解 ref 和 reactive 的实现原理
+- [响应式系统](../reactivity/1-4.2-reactive.md) - 深入理解 ref 和 reactive 的实现原理
 - [Composition API 最佳实践](./composables.md) - 如何编写可复用的组合式函数
 
 ### 实战建议
