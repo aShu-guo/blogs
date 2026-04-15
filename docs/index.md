@@ -18,6 +18,9 @@ hero:
       text: JavaScript
       link: /base/js/
     - theme: brand
+      text: CSS
+      link: /base/css/
+    - theme: brand
       text: Vue-RFCs翻译
       link: /ecology/vue/rfcs/
     - theme: brand
